@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.marcinseweryn.visualizer.Controller"
+            stylesheets="Style.css" styleClass="main">
+    <padding>
+        <Insets top="10" right="25" bottom="25" left="25"/>
+    </padding>
+    <left>
+        <TabPane fx:id="algorithmTab" tabClosingPolicy="UNAVAILABLE" styleClass="tabPane">
+            <Tab text="Path Finding" styleClass="tab">
+                <TabPane fx:id="graphTab" tabClosingPolicy="UNAVAILABLE" styleClass="tabPane">
+                    <Tab text="Algorithm" styleClass="tab">
+                        <VBox>
+                            <padding>
+                                <Insets topRightBottomLeft="5"/>
+                            </padding>
+                            <spacing>10</spacing>
+                            <VBox>
+                                <Label text="Candidate Nodes" contentDisplay="RIGHT" styleClass="tabLabel">
+                                </Label>
+                                <ListView minHeight="105" maxHeight="145" styleClass="listView"/>
+                            </VBox>
+                            <VBox>
+                                <Label text="Visited" contentDisplay="RIGHT" styleClass="tabLabel">
+                                </Label>
+                                <ListView minHeight="105" maxHeight="145" styleClass="listView"></ListView>
+                            </VBox>
+                            <VBox>
+                                <Label text="Code" contentDisplay="RIGHT" styleClass="tabLabel">
+                                </Label>
+                                <ListView minHeight="360" maxHeight="420" styleClass="listView"></ListView>
+                            </VBox>
+                        </VBox>
+                    </Tab>
+                    <Tab text="Edges" styleClass="tab">
+                    </Tab>
+                    <Tab text="Help" styleClass="tab">
+                    </Tab>
+                </TabPane>
+            </Tab>
+            <Tab text="Sorting">
+            </Tab>
+        </TabPane>
+    </left>
+</BorderPane>

@@ -1,0 +1,31 @@
+.main {
+}
+
+.tabLabel {
+    -fx-font-family: "Lato";
+    -fx-font-size: 16;
+    -fx-text-fill: #000000ff;
+    -fx-fill: #000000ff;
+    -fx-padding: 5;
+}
+
+.tab {
+    -fx-padding: 5 7 5 7;
+    -fx-font-family: "Lato";
+    -fx-font-weight: Bold;
+    -fx-font-size: 14;
+    -fx-text-fill: #000000ff;
+    -fx-fill: #000000ff;
+}
+
+.listView {
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-background-color: #333333;
+    -fx-font-family: "Lato";
+    -fx-font-size: 16;
+    -fx-text-fill: white;
+    -fx-padding: 5;
+}
+
+.tabPane {}

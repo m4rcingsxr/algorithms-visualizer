@@ -1,4 +1,5 @@
 module com.marcinseweryn {
     requires javafx.controls;
-    exports com.marcinseweryn;
+    requires javafx.fxml;
+    exports com.marcinseweryn.visualizer;
 }
