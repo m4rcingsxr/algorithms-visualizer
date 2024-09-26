@@ -8,7 +8,7 @@
         <Insets top="10" right="25" bottom="25" left="25"/>
     </padding>
     <left>
-        <TabPane fx:id="algorithmTab" tabClosingPolicy="UNAVAILABLE" styleClass="tabPane">
+        <TabPane fx:id="algorithmTab" tabClosingPolicy="UNAVAILABLE" styleClass="tabPane" VBox.vgrow="ALWAYS">
             <Tab text="Path Finding" styleClass="tab">
                 <TabPane fx:id="graphTab" tabClosingPolicy="UNAVAILABLE" styleClass="tabPane">
                     <Tab text="Algorithm" styleClass="tab">
@@ -44,4 +44,28 @@
             </Tab>
         </TabPane>
     </left>
+    <center>
+        <VBox spacing="20">
+            <padding><Insets right="40" left="20"/></padding>
+
+
+            <HBox alignment="BOTTOM_LEFT" spacing="10">
+                <ChoiceBox fx:id="algorithmList"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <AnchorPane fx:id="algorithmSpace"
+                        onMousePressed="#onAlgorithmSpaceMousePressed"
+                        onDragDetected="#onAlgorithmSpaceDragDetected"
+                        onMouseDragged="#onAlgorithmSpaceMouseDragged"
+                        onMouseReleased="#onAlgorithmSpaceMouseReleased"
+                        onDragOver="#onAlgorithmSpaceDragOver"
+                        onDragDropped="#onAlgorithmSpaceDragDropped"
+                        prefHeight="720"
+                        styleClass="algorithmSpace"
+                        minWidth="700"
+                        VBox.vgrow="ALWAYS"
+                        HBox.hgrow="ALWAYS"/>
+        </VBox>
+    </center>
 </BorderPane>
