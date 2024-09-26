@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class GraphNode extends Button {
@@ -41,11 +42,23 @@ public class GraphNode extends Button {
         logger.debug("GraphNode ID {} positioned at coordinates: [X: {}, Y: {}]", this.getId(), x, y);
     }
 
+    public static void decrementCount() {
+        count--;
+    }
+
     public void addEdge(Edge temp) {
         this.edges.add(temp);
     }
 
     public List<Edge> getEdges() {
         return this.edges;
+    }
+
+    public List<GraphNode> getNeighbours() {
+        return this.edges.stream().map(e -> e.getNeighbour(this)).toList();
+    }
+
+    public void removeEdge(Edge edge) {
+        this.edges.remove(edge);
     }
 }

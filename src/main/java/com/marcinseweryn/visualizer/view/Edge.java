@@ -18,4 +18,8 @@ public class Edge extends Arrow {
         this.x2.bind(vertex2.layoutXProperty());
         this.y2.bind(vertex2.layoutYProperty());
     }
+
+    public GraphNode getNeighbour(GraphNode vertex) {
+        return vertex == vertex1 ? vertex2 : vertex1;
+    }
 }
