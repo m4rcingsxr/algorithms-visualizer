@@ -8,35 +8,35 @@
         <Insets top="10" right="25" bottom="25" left="25"/>
     </padding>
     <left>
-        <TabPane fx:id="algorithmTab" tabClosingPolicy="UNAVAILABLE" styleClass="tabPane" VBox.vgrow="ALWAYS">
-            <Tab text="Path Finding" styleClass="tab">
-                <TabPane fx:id="graphTab" tabClosingPolicy="UNAVAILABLE" styleClass="tabPane">
-                    <Tab text="Algorithm" styleClass="tab">
-                        <VBox>
+        <TabPane fx:id="algorithmTab" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <Tab text="Path Finding">
+                <TabPane fx:id="graphTab" tabClosingPolicy="UNAVAILABLE">
+                    <Tab text="Algorithm">
+                        <VBox styleClass="tab-content-box">
                             <padding>
-                                <Insets topRightBottomLeft="5"/>
+                                <Insets topRightBottomLeft="10"/>
                             </padding>
                             <spacing>10</spacing>
                             <VBox>
-                                <Label text="Candidate Nodes" contentDisplay="RIGHT" styleClass="tabLabel">
+                                <Label text="Candidate Nodes" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView minHeight="105" maxHeight="145" styleClass="listView"/>
+                                <ListView minHeight="105" maxHeight="145"/>
                             </VBox>
                             <VBox>
-                                <Label text="Visited" contentDisplay="RIGHT" styleClass="tabLabel">
+                                <Label text="Visited" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView minHeight="105" maxHeight="145" styleClass="listView"></ListView>
+                                <ListView minHeight="105" maxHeight="145"></ListView>
                             </VBox>
                             <VBox>
-                                <Label text="Code" contentDisplay="RIGHT" styleClass="tabLabel">
+                                <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView minHeight="360" maxHeight="420" styleClass="listView"></ListView>
+                                <ListView minHeight="360" maxHeight="420"></ListView>
                             </VBox>
                         </VBox>
                     </Tab>
-                    <Tab text="Edges" styleClass="tab">
+                    <Tab text="Edges">
                     </Tab>
-                    <Tab text="Help" styleClass="tab">
+                    <Tab text="Help">
                     </Tab>
                 </TabPane>
             </Tab>
@@ -46,7 +46,7 @@
     </left>
     <center>
             <VBox fx:id="centerVBox" spacing="20">
-                <padding><Insets right="40" left="20"/></padding>
+                <padding><Insets right="40" left="40"/></padding>
 
                 <HBox alignment="BOTTOM_LEFT" spacing="10">
                     <ChoiceBox fx:id="algorithmList"/>

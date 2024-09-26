@@ -28,6 +28,8 @@ public class Arrow extends Group {
         initializeChangeListenerOnCoordinates();
 
         this.getChildren().addAll(mainLine, headA, headB);
+
+        mainLine.getStyleClass().add("arrow-line");
     }
 
     private void initializeChangeListenerOnCoordinates() {

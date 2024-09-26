@@ -56,6 +56,8 @@ public class PathFindingController {
         }
 
         if (this.vertex2 != null) {
+            this.vertex2.getStyleClass().remove("drag");
+            this.edge.getStyleClass().remove("drag");
             this.vertex2 = null;
         }
     }
@@ -66,17 +68,20 @@ public class PathFindingController {
         );
         if (mouseEvent.isPrimaryButtonDown()) {
 
-            // allow as i would drag it from the existing node (mouseDragExited, mouseDragEntered)
-            graphPane.startFullDrag();
-
             // here's position is translated to the cursor (initialization step)
             this.vertex2 = createAndAddVertex(mouseEvent.getX(), mouseEvent.getY());
+
+            this.vertex2.startFullDrag();
+
             this.vertex2.toBack();
 
             // required to hold it - mouse release must remove this edge if vertex entered other one
             // that's different from vertex1 and vertex2 -  create network from vertex1
             // to already existing vertex`
             this.edge = createAndAddEdge(this.vertex1, this.vertex2);
+
+            this.vertex2.getStyleClass().add("drag");
+            this.edge.getStyleClass().add("drag");
         }
     }
 
@@ -155,12 +160,22 @@ public class PathFindingController {
             }
         }
 
+        if(vertex2 != null) {
+            vertex2.getStyleClass().remove("drag");
+        }
+
+        for (Edge e : node.getEdges()) {
+            e.getStyleClass().remove("drag");
+        }
+
         if (this.deleteNode) {
             deleteNode(node);
             deleteNode = false;
         }
         this.vertex1 = null;
         this.vertex2 = null;
+        this.edge = null;
+        this.tempVertex = null;
     }
 
     private void deleteNode(GraphNode node) {
@@ -192,13 +207,18 @@ public class PathFindingController {
             // whenever move this vertex on other put it on back
             // might stay on top of other elements even when it is supposed to be hidden
             this.vertex2.toBack();
+
+            vertex2.getStyleClass().add("drag");
+            edge.getStyleClass().add("drag");
         }
 
         if (mouseEvent.isSecondaryButtonDown()) {
             this.deleteNode = false; // do not delete on release
 
+            graphNode.getStyleClass().add("drag");
             for (Edge edge : graphNode.getEdges()) {
                 edge.toFront();
+                edge.getStyleClass().add("drag");
             }
 
             graphNode.toFront();
@@ -210,6 +230,7 @@ public class PathFindingController {
 
     private void nodeMouseDragEntered(MouseDragEvent e, GraphNode graphNode) {
         if (graphNode != vertex1 && graphNode != vertex2) {
+            graphNode.getStyleClass().add("drag");
             this.tempVertex = graphNode;
             this.vertex2.setVisible(false);
         }
@@ -221,6 +242,7 @@ public class PathFindingController {
         }
 
         if (tempVertex != null) {
+            graphNode.getStyleClass().remove("drag");
             tempVertex = null;
         }
     }

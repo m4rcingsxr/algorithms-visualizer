@@ -1,12 +1,50 @@
-.main {
+* {
+    -primary: #FF6600;
+    -warning: #FF0033;
+    -info: #FF9900;
+    -dark: #333333;
+    -subtle-dark: #3a3a3a;
+    -light: #666666;
 }
 
-.tabLabel {
+.main {
+    -fx-background-color: -dark;
+}
+
+.tab-pane {
+    -fx-background-color: transparent;
+    -fx-tab-min-width: 100px;
+}
+
+.tab-label {
+    -fx-text-fill: white;
     -fx-font-family: "Lato";
     -fx-font-size: 16;
-    -fx-text-fill: #000000ff;
-    -fx-fill: #000000ff;
+}
+
+.list-view-label {
+    -fx-text-fill: white;
+    -fx-font-family: "Lato";
+    -fx-font-size: 16;
     -fx-padding: 5;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
+}
+
+.tab:hover {
+    -fx-background-color: -subtle-dark;
+}
+
+.tab:pressed {
+    -fx-background-color: -subtle-dark;
+    -fx-border-width: 0px;
+}
+
+.tab:selected {
+    -fx-background-color: -subtle-dark;
+    -fx-border-width: 0px;
 }
 
 .tab {
@@ -14,11 +52,12 @@
     -fx-font-family: "Lato";
     -fx-font-weight: Bold;
     -fx-font-size: 14;
-    -fx-text-fill: #000000ff;
-    -fx-fill: #000000ff;
+    -fx-background-color: -light;
 }
 
-.listView {
+
+.list-view {
+    -fx-background-color: -light;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
     -fx-font-family: "Lato";
@@ -27,9 +66,46 @@
     -fx-padding: 5;
 }
 
-.tabPane {
-}
 
 .algorithmPane {
-    -fx-background-color: #555555;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-background-color: -light;
+}
+
+.vertex {
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-background-color: black;
+    -fx-font-family: "Lato";
+    -fx-font-weight: Bold;
+    -fx-font-size: 15;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.vertex:hover {
+    -fx-background-color: -primary;
+    -fx-opacity: .4;
+    -fx-cursor: HAND;
+}
+
+
+.arrow-line {
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+    -fx-cursor: HAND;
+}
+
+.arrow-line:hover {
+    -fx-stroke: -primary;
+    -fx-stroke-width: 4;
+    -fx-opacity: .4;
+}
+
+.drag {
+    -fx-stroke: -primary !important;
+    -fx-background-color: -primary !important;
+    -fx-opacity: .3;
+    -fx-border-color: null !important;
 }

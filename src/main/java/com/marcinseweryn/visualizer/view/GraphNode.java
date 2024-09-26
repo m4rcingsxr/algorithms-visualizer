@@ -40,6 +40,8 @@ public class GraphNode extends Button {
         this.setLayoutX(x);
         this.setLayoutY(y);
         logger.debug("GraphNode ID {} positioned at coordinates: [X: {}, Y: {}]", this.getId(), x, y);
+
+        getStyleClass().add("vertex");
     }
 
     public static void decrementCount() {
