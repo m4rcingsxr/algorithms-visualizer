@@ -18,6 +18,8 @@ public class PathFindingController {
     private GraphNode vertex1;
     private GraphNode vertex2;
 
+    private boolean deleteNode;
+
     public PathFindingController(AnchorPane graphPane) {
         this.graphPane = graphPane;
         logger.info("PathFindingController initialized with graphPane.");
@@ -68,10 +70,31 @@ public class PathFindingController {
 
         GraphNode graphNode = new GraphNode(x, y);
 
+        graphNode.setOnMousePressed(this::handleVertexMousePressed);
+        graphNode.setOnMouseReleased(e -> handleVertexMouseReleased(e, graphNode));
+
         logger.debug("Adding new GraphNode with ID {} to the graphPane.", graphNode.getId());
 
         graphPane.getChildren().add(graphNode);
 
         return graphNode;
+    }
+
+    private void handleVertexMousePressed(MouseEvent mouseEvent) {
+        if (mouseEvent.isSecondaryButtonDown()) {
+            deleteNode = true;
+        }
+    }
+
+
+    private void handleVertexMouseReleased(MouseEvent mouseEvent, GraphNode node) {
+        if(this.deleteNode) {
+            deleteNode(node);
+            deleteNode = false;
+        }
+    }
+
+    private void deleteNode(GraphNode node) {
+        graphPane.getChildren().remove(node);
     }
 }
