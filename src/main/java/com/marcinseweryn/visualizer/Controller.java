@@ -17,21 +17,21 @@ public class Controller {
     // ===========================================
     // ================== GRAPH ==================
     // ===========================================
-    @FXML public TabPane algorithmTab;
-    @FXML public TabPane graphTab;
+    @FXML TabPane algorithmTab;
+    @FXML TabPane graphTab;
 
     // ===========================================
     // ================== COMMON =================
     // ===========================================
-    @FXML public ChoiceBox<String> algorithmList;
+    @FXML ChoiceBox<String> algorithmList;
 
     // ===========================================
     // ============= ALGORITHM SPACE =============
     // ===========================================
-    @FXML public AnchorPane graphPane;
-    @FXML public AnchorPane arrayPane;
+    @FXML AnchorPane graphPane;
+    @FXML AnchorPane arrayPane;
 
-    @FXML public VBox centerVBox;
+    @FXML VBox centerVBox;
 
     private PathFindingController findController;
     private SortingController sortController;
@@ -77,28 +77,33 @@ public class Controller {
     }
 
 
-
-    public void onGraphPaneMousePressed(MouseEvent mouseEvent) {
+    @FXML
+    private void onGraphPaneMousePressed(MouseEvent mouseEvent) {
         this.findController.onGraphMousePressed(mouseEvent);
     }
 
-    public void onGraphPaneDragDetected(MouseEvent mouseEvent) {
+    @FXML
+    private void onGraphPaneDragDetected(MouseEvent mouseEvent) {
         this.findController.onGraphPaneDragDetected(mouseEvent);
     }
 
-    public void onGraphPaneMouseDragged(MouseEvent mouseEvent) {
+    @FXML
+    private void onGraphPaneMouseDragged(MouseEvent mouseEvent) {
         this.findController.onGraphPaneMouseDragged(mouseEvent);
     }
 
-    public void onGraphPaneMouseReleased(MouseEvent mouseEvent) {
+    @FXML
+    private void onGraphPaneMouseReleased(MouseEvent mouseEvent) {
         this.findController.onGraphPaneMouseReleased(mouseEvent);
     }
 
-    public void onGraphPaneDragOver(DragEvent dragEvent) {
+    @FXML
+    private void onGraphPaneDragOver(DragEvent dragEvent) {
         this.findController.onGraphPaneDragOver(dragEvent);
     }
 
-    public void onGraphPaneDragDropped(DragEvent dragEvent) {
+    @FXML
+    private void onGraphPaneDragDropped(DragEvent dragEvent) {
         this.findController.onGraphPaneDragDropped(dragEvent);
     }
 }
