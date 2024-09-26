@@ -1,5 +1,7 @@
 package com.marcinseweryn.visualizer;
 
+import com.marcinseweryn.visualizer.view.Arrow;
+import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
@@ -44,7 +46,17 @@ public class PathFindingController {
 
             // here's position is translated to the cursor (initialization step)
             this.vertex2 = createAndAddVertex(mouseEvent.getX(), mouseEvent.getY());
+            createAndAddEdge(this.vertex1, this.vertex2);
         }
+    }
+
+    private void createAndAddEdge(GraphNode vertex1, GraphNode vertex2) {
+        Edge temp = new Edge(this.vertex1, this.vertex2);
+
+        vertex1.addEdge(temp);
+        vertex2.addEdge(temp);
+
+        this.graphPane.getChildren().add(temp);
     }
 
     void onGraphPaneMouseDragged(MouseEvent mouseEvent) {
@@ -101,6 +113,9 @@ public class PathFindingController {
     }
 
     private void deleteNode(GraphNode node) {
+        for (Edge edge : node.getEdges()) {
+            this.graphPane.getChildren().remove(edge);
+        }
         this.graphPane.getChildren().remove(node);
     }
 
@@ -118,6 +133,7 @@ public class PathFindingController {
             this.vertex1 = graphNode;
             this.vertex2 = createAndAddVertex(graphNode.getLayoutX() + mouseEvent.getX() + graphNode.getTranslateX() ,
                                               graphNode.getLayoutY() +  mouseEvent.getY() + graphNode.getTranslateX());
+            createAndAddEdge(vertex1, vertex2);
         }
     }
 

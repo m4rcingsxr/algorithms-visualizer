@@ -1,14 +1,21 @@
 package com.marcinseweryn.visualizer.view;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GraphNode extends Button {
 
-    Logger logger = LogManager.getLogger(GraphNode.class);
+    private static final Logger logger = LogManager.getLogger(GraphNode.class);
 
     private static int count = 0;
+
+    private final List<Edge> edges = new ArrayList<>();
 
     // Constructor to create a new GraphNode at specified (x, y) coordinates
     public GraphNode(double x, double y) {
@@ -34,4 +41,11 @@ public class GraphNode extends Button {
         logger.debug("GraphNode ID {} positioned at coordinates: [X: {}, Y: {}]", this.getId(), x, y);
     }
 
+    public void addEdge(Edge temp) {
+        this.edges.add(temp);
+    }
+
+    public List<Edge> getEdges() {
+        return this.edges;
+    }
 }
