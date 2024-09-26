@@ -16,6 +16,7 @@ public class PathFindingController {
 
     // internal
     private GraphNode vertex1;
+    private GraphNode vertex2;
 
     public PathFindingController(AnchorPane graphPane) {
         this.graphPane = graphPane;
@@ -26,26 +27,29 @@ public class PathFindingController {
         logger.debug("Mouse pressed at coordinates: [X: {}, Y: {}]", mouseEvent.getX(), mouseEvent.getY());
 
         if (mouseEvent.isPrimaryButtonDown()) {
-            logger.debug("Creating a new GraphNode at coordinates: [X: {}, Y: {}]", mouseEvent.getX(), mouseEvent.getY());
-
-            this.vertex1 = new GraphNode(mouseEvent.getX(), mouseEvent.getY());
-
-            logger.debug("Adding new GraphNode with ID {} to the graphPane.", this.vertex1.getId());
-
-            graphPane.getChildren().add(this.vertex1);
+            this.vertex1 = createAndAddVertex(mouseEvent.getX(), mouseEvent.getY());
         }
     }
 
     void onGraphPaneMouseReleased(MouseEvent mouseEvent) {
         logger.debug("Mouse released at coordinates: [X: {}, Y: {}]", mouseEvent.getX(), mouseEvent.getY());
+        this.vertex2 = null;
     }
 
     void onGraphPaneDragDetected(MouseEvent mouseEvent) {
         logger.debug("Drag detected at coordinates: [X: {}, Y: {}]", mouseEvent.getX(), mouseEvent.getY());
+        if (mouseEvent.isPrimaryButtonDown()) {
+            this.vertex2 = createAndAddVertex(mouseEvent.getX(), mouseEvent.getY());
+        }
     }
 
     void onGraphPaneMouseDragged(MouseEvent mouseEvent) {
         logger.debug("Mouse dragged to coordinates: [X: {}, Y: {}]", mouseEvent.getX(), mouseEvent.getY());
+
+        if(this.vertex2 != null) {
+            this.vertex2.setLayoutX(mouseEvent.getX());
+            this.vertex2.setLayoutY(mouseEvent.getY());
+        }
     }
 
     // After a drag is detected, the system starts handling drag-and-drop events such as onDragOver and onDragDropped
@@ -57,5 +61,17 @@ public class PathFindingController {
     // dragged object is dropped onto a target
     void onGraphPaneDragDropped(DragEvent dragEvent) {
         logger.debug("Drag dropped at coordinates: [X: {}, Y: {}]", dragEvent.getX(), dragEvent.getY());
+    }
+
+    private GraphNode createAndAddVertex(double x, double y) {
+        logger.debug("Creating a new GraphNode at coordinates: [X: {}, Y: {}]", x, y);
+
+        GraphNode graphNode = new GraphNode(x, y);
+
+        logger.debug("Adding new GraphNode with ID {} to the graphPane.", graphNode.getId());
+
+        graphPane.getChildren().add(graphNode);
+
+        return graphNode;
     }
 }
