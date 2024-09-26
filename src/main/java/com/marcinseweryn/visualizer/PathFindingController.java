@@ -41,6 +41,8 @@ public class PathFindingController {
     void onGraphPaneDragDetected(MouseEvent mouseEvent) {
         logger.debug("Drag detected at coordinates: [X: {}, Y: {}]", mouseEvent.getX(), mouseEvent.getY());
         if (mouseEvent.isPrimaryButtonDown()) {
+
+            // here's position is translated to the cursor (initialization step)
             this.vertex2 = createAndAddVertex(mouseEvent.getX(), mouseEvent.getY());
         }
     }
@@ -70,8 +72,10 @@ public class PathFindingController {
 
         GraphNode graphNode = new GraphNode(x, y);
 
-        graphNode.setOnMousePressed(this::handleVertexMousePressed);
-        graphNode.setOnMouseReleased(e -> handleVertexMouseReleased(e, graphNode));
+        graphNode.setOnMousePressed(this::handleVertexPressed);
+        graphNode.setOnMouseReleased(e -> handleVertexReleased(e, graphNode));
+        graphNode.setOnDragDetected(e -> handleVertexDragDetected(e, graphNode));
+        graphNode.setOnMouseDragged(e -> handleVertexDragged(e, graphNode));
 
         logger.debug("Adding new GraphNode with ID {} to the graphPane.", graphNode.getId());
 
@@ -80,21 +84,41 @@ public class PathFindingController {
         return graphNode;
     }
 
-    private void handleVertexMousePressed(MouseEvent mouseEvent) {
+    private void handleVertexPressed(MouseEvent mouseEvent) {
         if (mouseEvent.isSecondaryButtonDown()) {
             deleteNode = true;
         }
     }
 
 
-    private void handleVertexMouseReleased(MouseEvent mouseEvent, GraphNode node) {
+    private void handleVertexReleased(MouseEvent mouseEvent, GraphNode node) {
         if(this.deleteNode) {
             deleteNode(node);
             deleteNode = false;
         }
+        this.vertex1 = null;
+        this.vertex2 = null;
     }
 
     private void deleteNode(GraphNode node) {
-        graphPane.getChildren().remove(node);
+        this.graphPane.getChildren().remove(node);
     }
+
+    private void handleVertexDragged(MouseEvent e, GraphNode graphNode) {
+        if(this.vertex2 != null) {
+
+            // relative from graphNode
+            this.vertex2.setLayoutX(graphNode.getLayoutX() + e.getX() + graphNode.getTranslateX());
+            this.vertex2.setLayoutY(graphNode.getLayoutY() + e.getY() + graphNode.getTranslateY());
+        }
+    }
+
+    private void handleVertexDragDetected(MouseEvent mouseEvent, GraphNode graphNode) {
+        if(mouseEvent.isPrimaryButtonDown()) {
+            this.vertex1 = graphNode;
+            this.vertex2 = createAndAddVertex(graphNode.getLayoutX() + mouseEvent.getX() + graphNode.getTranslateX() ,
+                                              graphNode.getLayoutY() +  mouseEvent.getY() + graphNode.getTranslateX());
+        }
+    }
+
 }

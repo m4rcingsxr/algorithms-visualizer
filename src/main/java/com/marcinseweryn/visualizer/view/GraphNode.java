@@ -34,6 +34,4 @@ public class GraphNode extends Button {
         logger.debug("GraphNode ID {} positioned at coordinates: [X: {}, Y: {}]", this.getId(), x, y);
     }
 
-
-
 }
