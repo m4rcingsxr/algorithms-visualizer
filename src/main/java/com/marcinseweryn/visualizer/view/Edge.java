@@ -22,4 +22,18 @@ public class Edge extends Arrow {
     public GraphNode getNeighbour(GraphNode vertex) {
         return vertex == vertex1 ? vertex2 : vertex1;
     }
+
+
+    public void setHeadAVisible(GraphNode vertex, boolean b) {
+        if(vertex == vertex1) {
+            setHeadAVisible(b);
+        } else {
+            setHeadBVisible(b);
+        }
+    }
+
+    public boolean isHeadVisible(GraphNode vertex) {
+        return vertex == this.vertex1 ? isHeadAVisible() : isHeadBVisible();
+    }
+
 }

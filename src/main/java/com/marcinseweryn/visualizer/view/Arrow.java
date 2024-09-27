@@ -1,5 +1,6 @@
 package com.marcinseweryn.visualizer.view;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Group;
 import javafx.scene.shape.Polyline;
@@ -89,6 +90,30 @@ public class Arrow extends Group {
         double arrowY2 = y1 + Math.sin(theta - Arrow.ARROW_HEAD_ANGLE) * Arrow.ARROW_HEAD_LENGTH;
 
         return new double[]{arrowX1, arrowY1, arrowX2, arrowY2};
+    }
+
+    public boolean isHeadAVisible() {
+        return this.headA.isVisible();
+    }
+
+    public boolean isHeadBVisible() {
+        return this.headB.isVisible();
+    }
+
+    public void setHeadAVisible(boolean headAVisible) {
+        this.headA.setVisible(headAVisible);
+    }
+
+    public void setHeadBVisible(boolean headBVisible) {
+        this.headB.setVisible(headBVisible);
+    }
+
+    public BooleanProperty headAVisibleProperty() {
+        return this.headA.visibleProperty();
+    }
+
+    public BooleanProperty headBVisibleProperty() {
+        return this.headB.visibleProperty();
     }
 
 }

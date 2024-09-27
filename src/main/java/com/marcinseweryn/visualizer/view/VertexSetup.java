@@ -2,7 +2,6 @@ package com.marcinseweryn.visualizer.view;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -50,8 +49,8 @@ public class VertexSetup extends VBox {
             HBox edge = new HBox();
             edge.getChildren().addAll(
                     new GraphNode(left),
-                    createArrow("<", e, left),
-                    createArrow(">", e, right),
+                    createArrowDirectionChanger("<", e, left),
+                    createArrowDirectionChanger(">", e, right),
                     new GraphNode(right)
             );
 
@@ -65,10 +64,16 @@ public class VertexSetup extends VBox {
         vertexContainer.getChildren().add(new GraphNode(vertex));
     }
 
-    private Button createArrow(String text, Edge e, GraphNode left) {
+    private Button createArrowDirectionChanger(String text, Edge edge, GraphNode node) {
         Button btn = new Button();
         btn.setPrefWidth(50);
-        btn.setText(text);
+        btn.setText(edge.isHeadVisible(node) ? text : "");
+
+        btn.setOnAction(e -> {
+            edge.setHeadAVisible(node, !edge.isHeadVisible(node));
+            btn.setText(edge.isHeadVisible(node) ? text : "");
+        });
+
         return btn;
     }
 
