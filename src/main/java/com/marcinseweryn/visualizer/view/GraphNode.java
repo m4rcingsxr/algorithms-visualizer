@@ -16,7 +16,7 @@ public class GraphNode extends Button {
 
     private static int count = 0;
 
-    private final List<Edge> edges = new ArrayList<>();
+    private final ObservableList<Edge> edges = FXCollections.observableArrayList();
 
     // Constructor to create a new GraphNode at specified (x, y) coordinates
     public GraphNode(double x, double y) {

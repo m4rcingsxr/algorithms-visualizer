@@ -200,6 +200,7 @@ public class PathFindingController {
 
     private void deleteNode(GraphNode node) {
         for (Edge edge : node.getEdges()) {
+            edge.getNeighbour(node).getEdges().remove(edge);
             this.graphPane.getChildren().remove(edge);
         }
         this.graphPane.getChildren().remove(node);
@@ -280,6 +281,7 @@ public class PathFindingController {
                     }
                 }
         );
+
 
     }
 
