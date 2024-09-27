@@ -109,4 +109,9 @@
     -fx-border-color: null !important;
 }
 
+.weighted {
+    -fx-stroke: green !important;
+    -fx-stroke-width: 4;
+}
+
 

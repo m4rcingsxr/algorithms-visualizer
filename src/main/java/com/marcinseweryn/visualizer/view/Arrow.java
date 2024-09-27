@@ -11,7 +11,7 @@ public class Arrow extends Group {
     private static final double ARROW_HEAD_LENGTH = 10;
     private static final double ARROW_HEAD_ANGLE = Math.toRadians(20);
 
-    private final Polyline mainLine = new Polyline();
+    protected final Polyline mainLine = new Polyline();
     private final Polyline headA = new Polyline();
     private final Polyline headB = new Polyline();
 

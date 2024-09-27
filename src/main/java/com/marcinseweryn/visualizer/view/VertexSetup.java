@@ -3,6 +3,8 @@ package com.marcinseweryn.visualizer.view;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -50,6 +52,7 @@ public class VertexSetup extends VBox {
             edge.getChildren().addAll(
                     new GraphNode(left),
                     createArrowDirectionChanger("<", e, left),
+                    createWeightChanger(e),
                     createArrowDirectionChanger(">", e, right),
                     new GraphNode(right)
             );
@@ -75,6 +78,19 @@ public class VertexSetup extends VBox {
         });
 
         return btn;
+    }
+
+    private Spinner<Double> createWeightChanger(Edge edge) {
+        // Create a spinner for double values with a range (min, max, step)
+        Spinner<Double> spinner = new Spinner<>(0.0, 1000.0, edge.getWeight(), 0.1); // Adjust min, max, step as needed
+
+        // Enable typing and number control through Spinner's text field
+        spinner.setEditable(true);
+
+        // Bind the Spinner's value to the edge's weightProperty
+        spinner.getValueFactory().valueProperty().bindBidirectional(edge.weightProperty().asObject());
+
+        return spinner;
     }
 
 }
