@@ -1,14 +1,19 @@
 package com.marcinseweryn.visualizer.view;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 
-public class Edge extends Arrow {
+public class Edge extends PaneArrow {
 
     private final GraphNode vertex1;
     private final GraphNode vertex2;
 
     private final DoubleProperty weight = new SimpleDoubleProperty();
+
+    private final Label weightLabel = new Label();
 
     public Edge(GraphNode vertex1, GraphNode vertex2) {
         super(vertex1.getLayoutX(), vertex1.getLayoutY(), vertex2.getLayoutX(), vertex2.getLayoutY());
@@ -28,6 +33,11 @@ public class Edge extends Arrow {
                mainLine.getStyleClass().remove("weighted");
            }
         });
+
+        this.weightLabel.visibleProperty().bind(this.weight.isNotEqualTo(0));
+        this.weightLabel.textProperty().bind(Bindings.concat("w:[", this.weight.asString(), "]"));
+
+        addContent(new HBox(5, weightLabel));
     }
 
     public GraphNode getNeighbour(GraphNode vertex) {
