@@ -44,6 +44,14 @@ public class GraphNode extends Button {
         getStyleClass().add("vertex");
     }
 
+    // used in accordion to show the styled vertex
+    public GraphNode(GraphNode vertex) {
+
+        // on change of original vertex - update this one
+        textProperty().bind(vertex.textProperty());
+        getStyleClass().setAll(vertex.getStyleClass());
+    }
+
     public static void decrementCount() {
         count--;
     }

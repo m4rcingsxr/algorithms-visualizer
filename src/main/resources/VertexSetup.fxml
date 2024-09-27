@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
+    <Label text="Setup Vertex">
+        <padding>
+            <Insets topRightBottomLeft="5"/>
+        </padding>
+    </Label>
+    <HBox alignment="CENTER" spacing="5">
+        <padding>
+            <Insets topRightBottomLeft="5"/>
+        </padding>
+        <Label text="ID:"/>
+
+        <HBox fx:id="vertexContainer"/>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
+</fx:root>

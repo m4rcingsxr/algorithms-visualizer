@@ -2,12 +2,20 @@ package com.marcinseweryn.visualizer;
 
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
+import com.marcinseweryn.visualizer.view.VertexSetup;
+import javafx.beans.value.ChangeListener;
+import javafx.scene.control.Accordion;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.util.Optional;
 
 public class PathFindingController {
 
@@ -15,6 +23,7 @@ public class PathFindingController {
 
     // main view
     private final AnchorPane graphPane;
+    private final Accordion vertexList;
 
     // internal
     private GraphNode vertex1;
@@ -24,8 +33,9 @@ public class PathFindingController {
     private GraphNode tempVertex;
     private Edge edge;
 
-    public PathFindingController(AnchorPane graphPane) {
+    public PathFindingController(AnchorPane graphPane, Accordion vertexList) {
         this.graphPane = graphPane;
+        this.vertexList = vertexList;
         logger.info("PathFindingController initialized with graphPane.");
     }
 
@@ -47,6 +57,10 @@ public class PathFindingController {
         if (this.tempVertex != null) {
             this.vertex1.removeEdge(this.edge);
             this.graphPane.getChildren().removeAll(this.vertex2, this.edge);
+
+            // remove additional candidate as new vertex from accordion
+            this.removeVertexFromAccordion(this.vertex2);
+
             GraphNode.decrementCount();
             this.vertex2 = tempVertex;
 
@@ -136,6 +150,7 @@ public class PathFindingController {
 
         logger.debug("Adding new GraphNode with ID {} to the graphPane.", graphNode.getId());
 
+        this.addVertexToAccordion(graphNode);
         graphPane.getChildren().add(graphNode);
 
         return graphNode;
@@ -151,6 +166,9 @@ public class PathFindingController {
         if (this.tempVertex != null) {
             this.vertex1.removeEdge(edge);
             this.graphPane.getChildren().removeAll(vertex2, edge);
+
+            removeVertexFromAccordion(this.vertex2);
+
             GraphNode.decrementCount();
             this.vertex2 = this.tempVertex;
 
@@ -171,7 +189,9 @@ public class PathFindingController {
         if (this.deleteNode) {
             deleteNode(node);
             deleteNode = false;
+            removeVertexFromAccordion(node);
         }
+
         this.vertex1 = null;
         this.vertex2 = null;
         this.edge = null;
@@ -245,6 +265,29 @@ public class PathFindingController {
             graphNode.getStyleClass().remove("drag");
             tempVertex = null;
         }
+    }
+
+    private void addVertexToAccordion(GraphNode graphNode) {
+        VertexSetup vertexSetup = new VertexSetup(graphNode);
+        TitledPane titledPane = new TitledPane(graphNode.getId(), vertexSetup);
+        titledPane.setMaxWidth(Double.MAX_VALUE);
+        this.vertexList.getPanes().add(titledPane);
+
+        titledPane.expandedProperty().addListener(
+                (ChangeListener<? super Boolean>) (obs, wasExpanded, expandedNow) -> {
+                    if(expandedNow) {
+                        vertexSetup.update();
+                    }
+                }
+        );
+
+    }
+
+    private void removeVertexFromAccordion(GraphNode graphNode) {
+        vertexList.getPanes().stream()
+                .filter(tp -> tp.getText().equals(graphNode.getId()))
+                .findFirst()
+                .ifPresent(vertexList.getPanes()::remove);
     }
 
 }

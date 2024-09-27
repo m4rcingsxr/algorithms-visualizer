@@ -12,7 +12,7 @@
             <Tab text="Path Finding">
                 <TabPane fx:id="graphTab" tabClosingPolicy="UNAVAILABLE">
                     <Tab text="Algorithm">
-                        <VBox styleClass="tab-content-box">
+                        <VBox>
                             <padding>
                                 <Insets topRightBottomLeft="10"/>
                             </padding>
@@ -34,7 +34,12 @@
                             </VBox>
                         </VBox>
                     </Tab>
-                    <Tab text="Edges">
+                    <Tab text="Vertex">
+                        <VBox>
+                            <ScrollPane>
+                                <Accordion fx:id="vertexList"/>
+                            </ScrollPane>
+                        </VBox>
                     </Tab>
                     <Tab text="Help">
                     </Tab>

@@ -8,4 +8,5 @@ module com.marcinseweryn {
 
     // Opens the package to javafx.fxml for reflection
     opens com.marcinseweryn.visualizer to javafx.fxml;
+    opens com.marcinseweryn.visualizer.view to javafx.fxml;
 }

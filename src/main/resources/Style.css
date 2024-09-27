@@ -44,7 +44,6 @@
 
 .tab:selected {
     -fx-background-color: -subtle-dark;
-    -fx-border-width: 0px;
 }
 
 .tab {
@@ -109,3 +108,5 @@
     -fx-opacity: .3;
     -fx-border-color: null !important;
 }
+
+
