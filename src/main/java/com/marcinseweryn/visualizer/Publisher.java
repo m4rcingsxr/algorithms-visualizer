@@ -1,6 +1,8 @@
 package com.marcinseweryn.visualizer;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
+import javafx.scene.Node;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +26,7 @@ public class Publisher {
     }
 
     // Notify all subscribers about a specific event
-    public void notify(String eventType, GraphNode vertex) {
+    public void notify(String eventType, Node vertex) {
         List<Subscriber> subscribersOfType = this.subscribers.get(eventType);
         if (subscribersOfType != null) {
             for (Subscriber subscriber : subscribersOfType) {

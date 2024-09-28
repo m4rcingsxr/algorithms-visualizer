@@ -3,10 +3,12 @@ package com.marcinseweryn.visualizer.view;
 import com.marcinseweryn.visualizer.Publisher;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -58,19 +60,37 @@ public class VertexSetup extends VBox {
             GraphNode left = lewak ? vertex : e.getNeighbour(vertex);
             GraphNode right = !lewak ? vertex : e.getNeighbour(vertex);
 
+            Region space = new Region();
+            HBox.setHgrow(space, Priority.ALWAYS);
+
             HBox edge = new HBox();
             edge.getChildren().addAll(
                     new GraphNode(left),
                     createArrowDirectionChanger("<", e, left),
                     createWeightChanger(e),
                     createArrowDirectionChanger(">", e, right),
-                    new GraphNode(right)
+                    new GraphNode(right),
+                    space,
+                    createArrowRemoveBtn(e, this.vertex)
             );
 
             this.edgeContainer.getChildren().add(edge);
         }
 
         System.out.println("Updating selected vertex setup");
+    }
+
+    private Node createArrowRemoveBtn(Edge edge, GraphNode vertex) {
+        Button btn = new Button("Remove");
+        btn.setMaxWidth(10);
+        btn.setOnAction(e -> {
+            vertex.getEdges().remove(edge);
+            edge.getNeighbour(vertex).getEdges().remove(edge);
+            publisher.notify("removeEdge", edge);
+            update();
+        });
+
+        return btn;
     }
 
     private void notifyStartButtonClicked() {

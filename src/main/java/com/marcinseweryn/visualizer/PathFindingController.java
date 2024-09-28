@@ -5,6 +5,7 @@ import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
@@ -49,6 +50,7 @@ public class PathFindingController implements Subscriber {
 
         this.publisher.subscribe("startClicked", this);
         this.publisher.subscribe("destinationClicked", this);
+        this.publisher.subscribe("removeEdge", this);
 
         logger.info("PathFindingController initialized with graphPane.");
     }
@@ -309,14 +311,17 @@ public class PathFindingController implements Subscriber {
     }
 
     @Override
-    public void update(String eventType, GraphNode vertex) {
+    public void update(String eventType, Node node) {
         if (eventType.equals("startClicked")) {
-            logger.info("Start button clicked for vertex: {}", vertex.getId());
-            startVertex.set(vertex);
+            logger.info("Start button clicked for node: {}", node.getId());
+            startVertex.set((GraphNode) node);
         } else if (eventType.equals("destinationClicked")) {
-            logger.info("Destination button clicked for vertex: {}", vertex.getId());
-            destinationVertex.set(vertex);
-            logger.info("Destination vertex set: {}", destinationVertex.get().getId());
+            logger.info("Destination button clicked for node: {}", node.getId());
+            destinationVertex.set((GraphNode) node);
+            logger.info("Destination node set: {}", destinationVertex.get().getId());
+        } else if(eventType.equals("removeEdge")) {
+            logger.info("removing edge");
+            this.graphPane.getChildren().remove(node);
         }
     }
 }
