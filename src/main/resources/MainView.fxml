@@ -36,6 +36,11 @@
                     </Tab>
                     <Tab text="Vertex">
                         <VBox>
+                            <HBox>
+                                <ToggleButton fx:id="toggleWeight" text="Show weight"/>
+                                <ToggleButton fx:id="toggleDistance" text="Show distance"/>
+                            </HBox>
+
                             <ScrollPane>
                                 <Accordion fx:id="vertexList"/>
                             </ScrollPane>
@@ -50,40 +55,42 @@
         </TabPane>
     </left>
     <center>
-            <VBox fx:id="centerVBox" spacing="20">
-                <padding><Insets right="40" left="40"/></padding>
+        <VBox fx:id="centerVBox" spacing="20">
+            <padding>
+                <Insets right="40" left="40"/>
+            </padding>
 
-                <HBox alignment="BOTTOM_LEFT" spacing="10">
-                    <ChoiceBox fx:id="algorithmList"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                </HBox>
+            <HBox alignment="BOTTOM_LEFT" spacing="10">
+                <ChoiceBox fx:id="algorithmList"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
 
-                <!-- Path Finding Pane initially added -->
-                <AnchorPane fx:id="graphPane"
-                            onMousePressed="#onGraphPaneMousePressed"
-                            onDragDetected="#onGraphPaneDragDetected"
-                            onMouseDragged="#onGraphPaneMouseDragged"
-                            onMouseReleased="#onGraphPaneMouseReleased"
-                            onDragOver="#onGraphPaneDragOver"
-                            onDragDropped="#onGraphPaneDragDropped"
-                            prefHeight="720"
-                            styleClass="algorithmPane"
-                            VBox.vgrow="ALWAYS"
-                            HBox.hgrow="ALWAYS"
-                            minWidth="700"
-                            maxWidth="Infinity"
-                            visible="false"/>
+            <!-- Path Finding Pane initially added -->
+            <AnchorPane fx:id="graphPane"
+                        onMousePressed="#onGraphPaneMousePressed"
+                        onDragDetected="#onGraphPaneDragDetected"
+                        onMouseDragged="#onGraphPaneMouseDragged"
+                        onMouseReleased="#onGraphPaneMouseReleased"
+                        onDragOver="#onGraphPaneDragOver"
+                        onDragDropped="#onGraphPaneDragDropped"
+                        prefHeight="720"
+                        styleClass="algorithmPane"
+                        VBox.vgrow="ALWAYS"
+                        HBox.hgrow="ALWAYS"
+                        minWidth="700"
+                        maxWidth="Infinity"
+                        visible="false"/>
 
-                <!-- Sorting Pane is hidden initially -->
-                <AnchorPane fx:id="arrayPane"
-                            prefHeight="720"
-                            styleClass="algorithmPane"
-                            VBox.vgrow="ALWAYS"
-                            HBox.hgrow="ALWAYS"
-                            minWidth="700"
-                            maxWidth="Infinity"
-                            visible="false"/>
-            </VBox>
-        </center>
+            <!-- Sorting Pane is hidden initially -->
+            <AnchorPane fx:id="arrayPane"
+                        prefHeight="720"
+                        styleClass="algorithmPane"
+                        VBox.vgrow="ALWAYS"
+                        HBox.hgrow="ALWAYS"
+                        minWidth="700"
+                        maxWidth="Infinity"
+                        visible="false"/>
+        </VBox>
+    </center>
 </BorderPane>
 

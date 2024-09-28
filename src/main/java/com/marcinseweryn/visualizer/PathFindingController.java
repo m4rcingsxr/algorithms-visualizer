@@ -6,6 +6,7 @@ import com.marcinseweryn.visualizer.view.VertexSetup;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -24,6 +25,8 @@ public class PathFindingController {
     // main view
     private final AnchorPane graphPane;
     private final Accordion vertexList;
+    private final ToggleButton toggleWeight;
+    private final ToggleButton toggleDistance;
 
     // internal
     private GraphNode vertex1;
@@ -33,9 +36,11 @@ public class PathFindingController {
     private GraphNode tempVertex;
     private Edge edge;
 
-    public PathFindingController(AnchorPane graphPane, Accordion vertexList) {
+    public PathFindingController(AnchorPane graphPane, Accordion vertexList, ToggleButton toggleWeight, ToggleButton toggleDistance) {
         this.graphPane = graphPane;
         this.vertexList = vertexList;
+        this.toggleWeight = toggleWeight;
+        this.toggleDistance = toggleDistance;
         logger.info("PathFindingController initialized with graphPane.");
     }
 
@@ -101,6 +106,8 @@ public class PathFindingController {
 
     private Edge createAndAddEdge(GraphNode vertex1, GraphNode vertex2) {
         Edge temp = new Edge(this.vertex1, this.vertex2);
+        temp.weightVisibleProperty().bind(toggleWeight.selectedProperty());
+        temp.distanceVisibleProperty().bind(toggleDistance.selectedProperty());
 
         vertex1.addEdge(temp);
         vertex2.addEdge(temp);

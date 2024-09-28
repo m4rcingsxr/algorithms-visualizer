@@ -1,10 +1,7 @@
 package com.marcinseweryn.visualizer.view;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
@@ -17,6 +14,9 @@ public class Edge extends PaneArrow {
 
     private final Label weightLabel = new Label();
     private final Label distanceLabel = new Label();
+
+    private final BooleanProperty weightVisible = new SimpleBooleanProperty(true);
+    private final BooleanProperty distanceVisible = new SimpleBooleanProperty(false);
 
     public Edge(GraphNode vertex1, GraphNode vertex2) {
         super(vertex1.getLayoutX(), vertex1.getLayoutY(), vertex2.getLayoutX(),
@@ -39,7 +39,8 @@ public class Edge extends PaneArrow {
             }
         });
 
-        this.weightLabel.visibleProperty().bind(this.weight.isNotEqualTo(0));
+        this.distanceLabel.visibleProperty().bind(this.distanceVisible);
+        this.weightLabel.visibleProperty().bind(this.weightVisible);
         this.weightLabel.textProperty().bind(Bindings.concat("w:[", this.weight.asString(), "]"));
 
         IntegerProperty distance = new SimpleIntegerProperty();
@@ -87,4 +88,17 @@ public class Edge extends PaneArrow {
     public double getWeight() {
         return this.weight.getValue();
     }
+
+    public boolean isWeightVisible() {
+        return weightVisible.get();
+    }
+
+    public BooleanProperty weightVisibleProperty() {
+        return weightVisible;
+    }
+
+    public BooleanProperty distanceVisibleProperty() {
+        return distanceVisible;
+    }
+
 }

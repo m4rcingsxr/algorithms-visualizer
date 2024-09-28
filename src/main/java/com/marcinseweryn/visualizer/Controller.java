@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -29,6 +30,8 @@ public class Controller {
     @FXML TabPane algorithmTab;
     @FXML TabPane graphTab;
     @FXML Accordion vertexList;
+    @FXML ToggleButton toggleWeight;
+    @FXML ToggleButton toggleDistance;
 
     // ===========================================
     // ================== SORT ===================
@@ -55,7 +58,7 @@ public class Controller {
         logger.info("Initializing Controller...");
 
         // Initialize controllers for path finding and sorting
-        this.findController = new PathFindingController(this.graphPane, this.vertexList);
+        this.findController = new PathFindingController(this.graphPane, this.vertexList, this.toggleWeight, this.toggleDistance);
         this.sortController = new SortingController(this.arrayPane);
 
         // Log once for both controllers initialization (if needed)
