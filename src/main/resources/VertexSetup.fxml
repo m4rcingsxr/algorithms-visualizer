@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
 <fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
     <Label text="Setup Vertex">
         <padding>
@@ -23,4 +24,8 @@
     <VBox fx:id="edgeContainer">
 
     </VBox>
+    <HBox spacing="20">
+        <Button fx:id="startBtn" text="start"></Button>
+        <Button fx:id="destinationBtn" text="destination"></Button>
+    </HBox>
 </fx:root>

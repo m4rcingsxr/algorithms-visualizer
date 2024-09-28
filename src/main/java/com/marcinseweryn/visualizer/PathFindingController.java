@@ -3,6 +3,7 @@ package com.marcinseweryn.visualizer;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
@@ -11,14 +12,10 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.util.Optional;
-
-public class PathFindingController {
+public class PathFindingController implements Subscriber {
 
     private static final Logger logger = LogManager.getLogger(PathFindingController.class);
 
@@ -29,6 +26,8 @@ public class PathFindingController {
     private final ToggleButton toggleDistance;
 
     // internal
+    private final Publisher publisher;
+
     private GraphNode vertex1;
     private GraphNode vertex2;
 
@@ -36,11 +35,21 @@ public class PathFindingController {
     private GraphNode tempVertex;
     private Edge edge;
 
-    public PathFindingController(AnchorPane graphPane, Accordion vertexList, ToggleButton toggleWeight, ToggleButton toggleDistance) {
+    private final SimpleObjectProperty<GraphNode> startVertex = new SimpleObjectProperty<>(null);
+    private final SimpleObjectProperty<GraphNode> destinationVertex = new SimpleObjectProperty<>(null);
+
+    public PathFindingController(AnchorPane graphPane, Accordion vertexList,
+                                 ToggleButton toggleWeight, ToggleButton toggleDistance) {
         this.graphPane = graphPane;
         this.vertexList = vertexList;
         this.toggleWeight = toggleWeight;
         this.toggleDistance = toggleDistance;
+
+        this.publisher = new Publisher();
+
+        this.publisher.subscribe("startClicked", this);
+        this.publisher.subscribe("destinationClicked", this);
+
         logger.info("PathFindingController initialized with graphPane.");
     }
 
@@ -185,7 +194,7 @@ public class PathFindingController {
             }
         }
 
-        if(vertex2 != null) {
+        if (vertex2 != null) {
             vertex2.getStyleClass().remove("drag");
         }
 
@@ -276,14 +285,14 @@ public class PathFindingController {
     }
 
     private void addVertexToAccordion(GraphNode graphNode) {
-        VertexSetup vertexSetup = new VertexSetup(graphNode);
+        VertexSetup vertexSetup = new VertexSetup(graphNode, this.publisher);
         TitledPane titledPane = new TitledPane(graphNode.getId(), vertexSetup);
         titledPane.setMaxWidth(Double.MAX_VALUE);
         this.vertexList.getPanes().add(titledPane);
 
         titledPane.expandedProperty().addListener(
                 (ChangeListener<? super Boolean>) (obs, wasExpanded, expandedNow) -> {
-                    if(expandedNow) {
+                    if (expandedNow) {
                         vertexSetup.update();
                     }
                 }
@@ -299,4 +308,15 @@ public class PathFindingController {
                 .ifPresent(vertexList.getPanes()::remove);
     }
 
+    @Override
+    public void update(String eventType, GraphNode vertex) {
+        if (eventType.equals("startClicked")) {
+            logger.info("Start button clicked for vertex: {}", vertex.getId());
+            startVertex.set(vertex);
+        } else if (eventType.equals("destinationClicked")) {
+            logger.info("Destination button clicked for vertex: {}", vertex.getId());
+            destinationVertex.set(vertex);
+            logger.info("Destination vertex set: {}", destinationVertex.get().getId());
+        }
+    }
 }

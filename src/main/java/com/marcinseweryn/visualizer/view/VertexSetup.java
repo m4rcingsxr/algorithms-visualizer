@@ -1,5 +1,6 @@
 package com.marcinseweryn.visualizer.view;
 
+import com.marcinseweryn.visualizer.Publisher;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -12,15 +13,21 @@ import java.io.IOException;
 
 public class VertexSetup extends VBox {
 
+    @FXML Button destinationBtn;
+    @FXML Button startBtn;
+
     @FXML HBox vertexContainer;
     @FXML VBox edgeContainer;
 
     private final GraphNode vertex;
+    private final Publisher publisher;
 
     private boolean initialized = false;
 
-    public VertexSetup(GraphNode vertex) {
+    public VertexSetup(GraphNode vertex, Publisher publisher) {
         this.vertex = vertex;
+        this.publisher = publisher;
+
         // Load the FXML file in the constructor
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/VertexSetup.fxml"));
         fxmlLoader.setRoot(this);
@@ -30,6 +37,9 @@ public class VertexSetup extends VBox {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        startBtn.setOnAction(e -> notifyStartButtonClicked());
+        destinationBtn.setOnAction(e -> notifyDestinationButtonClicked());
     }
 
     public void update() {
@@ -61,6 +71,14 @@ public class VertexSetup extends VBox {
         }
 
         System.out.println("Updating selected vertex setup");
+    }
+
+    private void notifyStartButtonClicked() {
+        publisher.notify("startClicked", vertex);
+    }
+
+    private void notifyDestinationButtonClicked() {
+        publisher.notify("destinationClicked", vertex);
     }
 
     public void init() {
