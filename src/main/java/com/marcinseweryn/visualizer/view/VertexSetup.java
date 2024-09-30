@@ -1,11 +1,14 @@
 package com.marcinseweryn.visualizer.view;
 
 import com.marcinseweryn.visualizer.Publisher;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -20,6 +23,9 @@ public class VertexSetup extends VBox {
 
     @FXML HBox vertexContainer;
     @FXML VBox edgeContainer;
+
+    @FXML Spinner<Double> x;
+    @FXML Spinner<Double> y;
 
     private final GraphNode vertex;
     private final Publisher publisher;
@@ -42,7 +48,19 @@ public class VertexSetup extends VBox {
 
         startBtn.setOnAction(e -> notifyStartButtonClicked());
         destinationBtn.setOnAction(e -> notifyDestinationButtonClicked());
+
+        SpinnerValueFactory<Double> xValueFactory =
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1); // min, max, initial value, step
+        SpinnerValueFactory<Double> yValueFactory =
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, Double.MAX_VALUE, 0.0, 1); // min, max, initial value, step
+        x.setValueFactory(xValueFactory);
+        y.setValueFactory(yValueFactory);
+        x.setEditable(true);
+        y.setEditable(true);
+        Bindings.bindBidirectional(x.getValueFactory().valueProperty(), vertex.layoutXProperty().asObject());
+        Bindings.bindBidirectional(y.getValueFactory().valueProperty(), vertex.layoutYProperty().asObject());
     }
+
 
     public void update() {
 

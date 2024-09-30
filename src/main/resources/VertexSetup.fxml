@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Spinner?>
 <fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
     <Label text="Setup Vertex">
         <padding>
@@ -20,6 +21,11 @@
 
         <HBox fx:id="vertexContainer"/>
         <Region HBox.hgrow="ALWAYS"/>
+
+        <Label text="x"></Label>
+        <Spinner fx:id="x"></Spinner>
+        <Label text="y"></Label>
+        <Spinner fx:id="y"></Spinner>
     </HBox>
     <VBox fx:id="edgeContainer">
 
