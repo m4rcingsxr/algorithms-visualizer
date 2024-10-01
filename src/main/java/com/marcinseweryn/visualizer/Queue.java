@@ -1,11 +1,12 @@
 package com.marcinseweryn.visualizer;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
+import javafx.scene.control.ListView;
 
 public class Queue extends Deque {
 
-    Queue(int listType) {
-        super(listType);
+    Queue(int listType, ListView candidateNodes) {
+        super(listType, candidateNodes);
     }
 
     @Override

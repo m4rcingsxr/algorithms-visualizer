@@ -21,7 +21,7 @@
                             <VBox>
                                 <Label text="Candidate Nodes" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView minHeight="105" maxHeight="145"/>
+                                <ListView fx:id="candidateNodes" minHeight="105" maxHeight="145"/>
                             </VBox>
                             <VBox>
                                 <Label text="Visited" contentDisplay="RIGHT" styleClass="list-view-label">

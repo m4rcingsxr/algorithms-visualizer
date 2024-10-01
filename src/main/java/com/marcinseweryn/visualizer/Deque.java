@@ -1,6 +1,7 @@
 package com.marcinseweryn.visualizer;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
+import javafx.scene.control.ListView;
 
 import java.util.ArrayDeque;
 
@@ -8,8 +9,8 @@ public abstract class Deque extends NodeVisualizer {
 
     private final ArrayDeque<GraphNode> pendingNodes = new ArrayDeque<>();
 
-    Deque( int listType) {
-        super(listType);
+    Deque(int listType, ListView candidateNodes) {
+        super(listType, candidateNodes);
     }
 
     void push(GraphNode node) {

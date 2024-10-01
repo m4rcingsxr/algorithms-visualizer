@@ -5,35 +5,34 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ListView;
 
 public abstract class NodeVisualizer {
 
     // A list of nodes to be visualized
     ObservableList<SimpleStringProperty> visualizedNodes = FXCollections.observableArrayList();
 
-    public static final int TYPE_PENDING_NODES = 0, TYPE_VISITED = 1;
+    public static final int TYPE_CANDIDATE_NODES = 0, TYPE_VISITED = 1;
 
     private int listType;
 
-    protected NodeVisualizer( int listType) {
+    protected NodeVisualizer(int listType, ListView candidateNodes) {
         // Run UI updates on the JavaFX application thread
         Platform.runLater(() -> {
             this.listType = listType;
 
-//            if (listType == TYPE_PENDING_NODES) {
-//                controller.frontierListView.setItems(visualizedNodes);
-//            } else if (listType == TYPE_VISITED) {
-//                controller.visitedListView.setItems(visualizedNodes);
-//            }
+            if (listType == TYPE_CANDIDATE_NODES) {
+                candidateNodes.setItems(visualizedNodes);
+            }
         });
     }
 
     // Visualize adding a node
     void visualizeAdd(GraphNode node) {
         Platform.runLater(() -> {
-//            visualizedNodes.add(node.getSimpleString());
+            visualizedNodes.add(node.getSimpleString());
             node.getStyleClass().removeAll("start", "destination", "visited", "pending-nodes", "path");
-            if (listType == TYPE_PENDING_NODES) {
+            if (listType == TYPE_CANDIDATE_NODES) {
                 node.getStyleClass().add("pending-nodes");
             } else if (listType == TYPE_VISITED) {
                 node.getStyleClass().add("visited");
@@ -44,8 +43,8 @@ public abstract class NodeVisualizer {
     // Visualize removing a node
     void visualizeRemove(GraphNode node) {
         Platform.runLater(() -> {
-//            visualizedNodes.remove(node.getSimpleString());
-//            controller.applyNodeStyle((VisNode) node, Controller.STYLE_DEFAULT);
+            node.getStyleClass().removeAll("start", "destination", "visited", "pending-nodes", "path");
+            visualizedNodes.remove(node.getSimpleString());
         });
     }
 

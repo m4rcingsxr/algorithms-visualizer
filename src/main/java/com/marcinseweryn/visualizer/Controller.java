@@ -1,5 +1,6 @@
 package com.marcinseweryn.visualizer;
 
+import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,6 +23,9 @@ import java.util.Objects;
 public class Controller {
 
     private static final Logger logger = LogManager.getLogger(Controller.class);
+
+    public ListView candidateNodes;
+
 
     // ===========================================
     // ================== GRAPH ==================
@@ -80,7 +84,7 @@ public class Controller {
 
         // Initialize controllers for path finding and sorting
         this.findController = new PathFindingController(this.graphPane, this.vertexList,
-                                                        this.toggleWeight, this.toggleDistance
+                                                        this.toggleWeight, this.toggleDistance, this.candidateNodes
         );
         this.sortController = new SortingController(this.arrayPane);
 

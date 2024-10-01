@@ -1,6 +1,7 @@
 package com.marcinseweryn.visualizer.view;
 
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -20,6 +21,19 @@ public class GraphNode extends Button {
     private final ObservableList<Edge> edges = FXCollections.observableArrayList();
 
     private SimpleObjectProperty<GraphNode> parent = new SimpleObjectProperty<>(null);
+
+    SimpleStringProperty info = new SimpleStringProperty() {
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(
+                    "ID: " + getId() +
+                            " | Parent: " + parent.getValue()
+            );
+
+            return sb.toString();
+        }
+    };
 
     // Constructor to create a new GraphNode at specified (x, y) coordinates
     public GraphNode(double x, double y) {
@@ -45,6 +59,8 @@ public class GraphNode extends Button {
         logger.debug("GraphNode ID {} positioned at coordinates: [X: {}, Y: {}]", this.getId(), x, y);
 
         getStyleClass().add("vertex");
+
+        info.bind(Bindings.concat(parent));
     }
 
     // used in accordion to show the styled vertex
@@ -91,4 +107,14 @@ public class GraphNode extends Button {
         }
         return null;
     }
+
+    public SimpleStringProperty getSimpleString() {
+        /*
+         *The simple string property will be used in listViews. This way the listview will be
+         * updated
+         * when the node's properties change.
+         */
+        return info;
+    }
+
 }

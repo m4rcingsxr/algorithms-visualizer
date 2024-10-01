@@ -2,6 +2,7 @@ package com.marcinseweryn.visualizer;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.application.Platform;
+import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,9 +42,9 @@ public abstract class GraphAlgorithm {
         this.publisher = publisher;
     }
 
-    void start(GraphNode startVertex, GraphNode destinationVertex, boolean isStepDisabled) {
-        this.pendingNodes = new Queue(NodeVisualizer.TYPE_PENDING_NODES);
-        this.visited = new Stack(NodeVisualizer.TYPE_VISITED);
+    void start(GraphNode startVertex, GraphNode destinationVertex, boolean isStepDisabled, ListView candidateNodes) {
+        this.pendingNodes = new Queue(NodeVisualizer.TYPE_CANDIDATE_NODES, candidateNodes);
+        this.visited = new Stack(NodeVisualizer.TYPE_VISITED, candidateNodes);
 
         this.startVertex = startVertex;
         this.destinationVertex = destinationVertex;

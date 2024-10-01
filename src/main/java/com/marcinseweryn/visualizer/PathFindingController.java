@@ -8,6 +8,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.DragEvent;
@@ -29,6 +30,7 @@ public class PathFindingController implements Subscriber {
 
     // internal
     private final Publisher publisher;
+    private final ListView candidateNodes;
 
     private GraphNode vertex1;
     private GraphNode vertex2;
@@ -45,11 +47,12 @@ public class PathFindingController implements Subscriber {
     static final PseudoClass ps_neighbourNode = PseudoClass.getPseudoClass("neighbour");
 
     public PathFindingController(AnchorPane graphPane, Accordion vertexList,
-                                 ToggleButton toggleWeight, ToggleButton toggleDistance) {
+                                 ToggleButton toggleWeight, ToggleButton toggleDistance, ListView candidateNodes) {
         this.graphPane = graphPane;
         this.vertexList = vertexList;
         this.toggleWeight = toggleWeight;
         this.toggleDistance = toggleDistance;
+        this.candidateNodes = candidateNodes;
 
         this.publisher = new Publisher();
 
@@ -305,7 +308,6 @@ public class PathFindingController implements Subscriber {
                 }
         );
 
-
     }
 
     private void removeVertexFromAccordion(GraphNode graphNode) {
@@ -334,7 +336,7 @@ public class PathFindingController implements Subscriber {
                                    SimpleObjectProperty<GraphAlgorithmThread> resolveThread,
                                    boolean isStepDisabled) {
        return new GraphAlgorithmThread(() -> {
-           algorithm.start(startVertex.get(), destinationVertex.get(), isStepDisabled);
+           algorithm.start(startVertex.get(), destinationVertex.get(), isStepDisabled, candidateNodes);
            resolveThread.set(null);
        }, algorithm, isStepDisabled);
     }
