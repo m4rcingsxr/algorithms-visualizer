@@ -1,6 +1,5 @@
 package com.marcinseweryn.visualizer;
 
-import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,6 +24,7 @@ public class Controller {
     private static final Logger logger = LogManager.getLogger(Controller.class);
 
     public ListView candidateNodes;
+    public ListView visitedNodes;
 
 
     // ===========================================
@@ -84,7 +84,8 @@ public class Controller {
 
         // Initialize controllers for path finding and sorting
         this.findController = new PathFindingController(this.graphPane, this.vertexList,
-                                                        this.toggleWeight, this.toggleDistance, this.candidateNodes
+                                                        this.toggleWeight, this.toggleDistance,
+                                                        this.candidateNodes, this.visitedNodes
         );
         this.sortController = new SortingController(this.arrayPane);
 
@@ -170,7 +171,8 @@ public class Controller {
 
         GraphAlgorithm algorithm = null;
         try {
-            algorithm = this.algorithmList.getValue().getClass().getDeclaredConstructor().newInstance();
+            algorithm =
+                    this.algorithmList.getValue().getClass().getDeclaredConstructor().newInstance();
         } catch (InvocationTargetException | IllegalAccessException |
                  NoSuchMethodException | InstantiationException e) {
             throw new RuntimeException(e);
@@ -179,9 +181,13 @@ public class Controller {
         // Check if a thread is running or if we need to start/resume it
         if (this.resolveThread.get() == null || isStepDisabled) {
 
-            if (this.algorithmTab.getSelectionModel().getSelectedItem().getText().equals("Path Finding")) {
+            if (this.algorithmTab.getSelectionModel().getSelectedItem().getText().equals(
+                    "Path Finding")) {
                 this.graphTab.getSelectionModel().selectFirst();
-                this.resolveThread.set(this.findController.getResolveThread(algorithm, this.resolveThread, isStepDisabled));
+                this.resolveThread.set(
+                        this.findController.getResolveThread(algorithm, this.resolveThread,
+                                                             isStepDisabled
+                        ));
             } else {
                 // Sorting logic
             }

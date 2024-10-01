@@ -1,11 +1,8 @@
 package com.marcinseweryn.visualizer.model.path;
 
 import com.marcinseweryn.visualizer.GraphAlgorithm;
-import com.marcinseweryn.visualizer.NodeVisualizer;
 import com.marcinseweryn.visualizer.Publisher;
 import com.marcinseweryn.visualizer.view.GraphNode;
-
-import java.util.ArrayDeque;
 
 public class BreadthFirstSearch extends GraphAlgorithm {
 
@@ -17,17 +14,17 @@ public class BreadthFirstSearch extends GraphAlgorithm {
 
     @Override
     public void resolve() {
-        this.pendingNodes.addVertex(this.startVertex);
+        this.candidateNodes.addVertex(this.startVertex);
 
         step(1);
-        while(!pendingNodes.isEmpty()) {
+        while(!candidateNodes.isEmpty()) {
             step(2);
-            setCurrent(this.pendingNodes.removeVertex());
+            setCurrent(this.candidateNodes.removeVertex());
             step(3);
             step(4);
 
             if(getCurrent() == this.destinationVertex) {
-                visited.addVertex(getCurrent());
+                visitedNodes.addVertex(getCurrent());
 
                 reconstructPath(getCurrent());
                 drawPath();
@@ -35,15 +32,15 @@ public class BreadthFirstSearch extends GraphAlgorithm {
                 break;
             }
 
-            visited.addVertex(getCurrent());
+            visitedNodes.addVertex(getCurrent());
             step(6);
             step(7);
             for (GraphNode neighbour : getCurrent().getNeighbours()) {
                 setNeighbour(neighbour);
                 step(8);
-                if(!visited.containsNode(getNeighbour())) {
-                    visited.addVertex(getNeighbour());
-                    pendingNodes.addVertex(getNeighbour());
+                if(!visitedNodes.containsNode(getNeighbour())) {
+                    visitedNodes.addVertex(getNeighbour());
+                    candidateNodes.addVertex(getNeighbour());
                     step(9);
                     getNeighbour().setParentNode(getCurrent());
                     step(10);

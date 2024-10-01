@@ -5,8 +5,8 @@ import javafx.scene.control.ListView;
 
 public class Queue extends Deque {
 
-    Queue(int listType, ListView candidateNodes) {
-        super(listType, candidateNodes);
+    Queue(int listType, ListView candidateNodes, ListView visitedNodes) {
+        super(listType, candidateNodes, visitedNodes);
     }
 
     @Override

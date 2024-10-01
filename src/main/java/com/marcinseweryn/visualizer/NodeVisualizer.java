@@ -16,13 +16,15 @@ public abstract class NodeVisualizer {
 
     private int listType;
 
-    protected NodeVisualizer(int listType, ListView candidateNodes) {
+    protected NodeVisualizer(int listType, ListView candidateNodes, ListView visitedNodes) {
         // Run UI updates on the JavaFX application thread
         Platform.runLater(() -> {
             this.listType = listType;
 
             if (listType == TYPE_CANDIDATE_NODES) {
                 candidateNodes.setItems(visualizedNodes);
+            } else if (listType == TYPE_VISITED) {
+                visitedNodes.setItems(visualizedNodes);
             }
         });
     }

@@ -18,7 +18,6 @@ public abstract class GraphAlgorithm {
     protected GraphNode startVertex;
     protected GraphNode destinationVertex;
 
-
     private List<GraphNode> path = new ArrayList<>();
 
     private boolean isStepDisabled = false;
@@ -27,8 +26,8 @@ public abstract class GraphAlgorithm {
     private final Condition stepCondition = lock.newCondition();
     private volatile boolean isStopped;
 
-    protected NodeVisualizer pendingNodes;
-    protected NodeVisualizer visited;
+    protected NodeVisualizer candidateNodes;
+    protected NodeVisualizer visitedNodes;
 
     private Publisher publisher;
     private GraphNode currentVertex;
@@ -42,9 +41,9 @@ public abstract class GraphAlgorithm {
         this.publisher = publisher;
     }
 
-    void start(GraphNode startVertex, GraphNode destinationVertex, boolean isStepDisabled, ListView candidateNodes) {
-        this.pendingNodes = new Queue(NodeVisualizer.TYPE_CANDIDATE_NODES, candidateNodes);
-        this.visited = new Stack(NodeVisualizer.TYPE_VISITED, candidateNodes);
+    void start(GraphNode startVertex, GraphNode destinationVertex, boolean isStepDisabled, ListView candidateNodes, ListView visitedNodes) {
+        this.candidateNodes = new Queue(NodeVisualizer.TYPE_CANDIDATE_NODES, candidateNodes, visitedNodes);
+        this.visitedNodes = new Stack(NodeVisualizer.TYPE_VISITED, candidateNodes, visitedNodes);
 
         this.startVertex = startVertex;
         this.destinationVertex = destinationVertex;

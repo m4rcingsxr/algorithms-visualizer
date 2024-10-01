@@ -26,7 +26,7 @@
                             <VBox>
                                 <Label text="Visited" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView minHeight="105" maxHeight="145"></ListView>
+                                <ListView fx:id="visitedNodes" minHeight="105" maxHeight="145"></ListView>
                             </VBox>
                             <VBox>
                                 <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">

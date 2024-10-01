@@ -31,6 +31,7 @@ public class PathFindingController implements Subscriber {
     // internal
     private final Publisher publisher;
     private final ListView candidateNodes;
+    private final ListView visitedNodes;
 
     private GraphNode vertex1;
     private GraphNode vertex2;
@@ -47,12 +48,14 @@ public class PathFindingController implements Subscriber {
     static final PseudoClass ps_neighbourNode = PseudoClass.getPseudoClass("neighbour");
 
     public PathFindingController(AnchorPane graphPane, Accordion vertexList,
-                                 ToggleButton toggleWeight, ToggleButton toggleDistance, ListView candidateNodes) {
+                                 ToggleButton toggleWeight, ToggleButton toggleDistance,
+                                 ListView candidateNodes, ListView visitedNodes) {
         this.graphPane = graphPane;
         this.vertexList = vertexList;
         this.toggleWeight = toggleWeight;
         this.toggleDistance = toggleDistance;
         this.candidateNodes = candidateNodes;
+        this.visitedNodes = visitedNodes;
 
         this.publisher = new Publisher();
 
@@ -333,11 +336,13 @@ public class PathFindingController implements Subscriber {
     }
 
     public GraphAlgorithmThread getResolveThread(final GraphAlgorithm algorithm,
-                                   SimpleObjectProperty<GraphAlgorithmThread> resolveThread,
-                                   boolean isStepDisabled) {
-       return new GraphAlgorithmThread(() -> {
-           algorithm.start(startVertex.get(), destinationVertex.get(), isStepDisabled, candidateNodes);
-           resolveThread.set(null);
-       }, algorithm, isStepDisabled);
+                                                 SimpleObjectProperty<GraphAlgorithmThread> resolveThread,
+                                                 boolean isStepDisabled) {
+        return new GraphAlgorithmThread(() -> {
+            algorithm.start(startVertex.get(), destinationVertex.get(), isStepDisabled,
+                            candidateNodes, visitedNodes
+            );
+            resolveThread.set(null);
+        }, algorithm, isStepDisabled);
     }
 }
