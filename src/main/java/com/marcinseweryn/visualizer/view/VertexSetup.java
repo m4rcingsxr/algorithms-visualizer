@@ -2,7 +2,6 @@ package com.marcinseweryn.visualizer.view;
 
 import com.marcinseweryn.visualizer.Publisher;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -74,9 +73,9 @@ public class VertexSetup extends VBox {
         for (Edge e : vertex.getEdges()) {
 
             // check if current vertex layout is less than the neighbor (of same edge)
-            boolean lewak = vertex.getLayoutX() <= e.getNeighbour(vertex).getLayoutX();
-            GraphNode left = lewak ? vertex : e.getNeighbour(vertex);
-            GraphNode right = !lewak ? vertex : e.getNeighbour(vertex);
+            boolean isCurrentVertexMoreToTheLeft = vertex.getLayoutX() <= e.getNeighbour(vertex).getLayoutX();
+            GraphNode left = isCurrentVertexMoreToTheLeft ? vertex : e.getNeighbour(vertex);
+            GraphNode right = !isCurrentVertexMoreToTheLeft ? vertex : e.getNeighbour(vertex);
 
             Region space = new Region();
             HBox.setHgrow(space, Priority.ALWAYS);

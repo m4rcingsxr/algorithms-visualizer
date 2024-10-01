@@ -1,5 +1,6 @@
 package com.marcinseweryn.visualizer.view;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -17,6 +18,8 @@ public class GraphNode extends Button {
     private static int count = 0;
 
     private final ObservableList<Edge> edges = FXCollections.observableArrayList();
+
+    private SimpleObjectProperty<GraphNode> parent = new SimpleObjectProperty<>(null);
 
     // Constructor to create a new GraphNode at specified (x, y) coordinates
     public GraphNode(double x, double y) {
@@ -70,5 +73,22 @@ public class GraphNode extends Button {
 
     public void removeEdge(Edge edge) {
         this.edges.remove(edge);
+    }
+
+    public GraphNode getParentVertex() {
+        return parent.getValue();
+    }
+
+    public void setParentNode(GraphNode parentVertex) {
+        this.parent.setValue(parentVertex);
+    }
+
+    public Edge getConnection(GraphNode neighbour) {
+        for (Edge a : edges) {
+            if (a.getNeighbour(this) == neighbour) {
+                return a;
+            }
+        }
+        return null;
     }
 }

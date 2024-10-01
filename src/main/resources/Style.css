@@ -115,3 +115,9 @@
 }
 
 
+.path {
+    -fx-background-color: -primary;
+    -fx-stroke: -primary !important;
+    -fx-stroke-width: 2 !important;
+    -fx-border-color: null;
+}

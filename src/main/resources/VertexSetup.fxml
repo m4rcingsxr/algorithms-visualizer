@@ -30,8 +30,10 @@
     <VBox fx:id="edgeContainer">
 
     </VBox>
+
     <HBox spacing="20">
         <Button fx:id="startBtn" text="start"></Button>
         <Button fx:id="destinationBtn" text="destination"></Button>
     </HBox>
+
 </fx:root>

@@ -1,10 +1,9 @@
 package com.marcinseweryn.visualizer;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -27,11 +26,16 @@ public class Controller {
     // ===========================================
     // ================== GRAPH ==================
     // ===========================================
-    @FXML TabPane algorithmTab;
-    @FXML TabPane graphTab;
-    @FXML Accordion vertexList;
-    @FXML ToggleButton toggleWeight;
-    @FXML ToggleButton toggleDistance;
+    @FXML
+    TabPane algorithmTab;
+    @FXML
+    TabPane graphTab;
+    @FXML
+    Accordion vertexList;
+    @FXML
+    ToggleButton toggleWeight;
+    @FXML
+    ToggleButton toggleDistance;
 
     // ===========================================
     // ================== SORT ===================
@@ -40,25 +44,44 @@ public class Controller {
     // ===========================================
     // ================== COMMON =================
     // ===========================================
-    @FXML ChoiceBox<Algorithm> algorithmList;
-    @FXML VBox centerVBox;
+    @FXML
+    ChoiceBox<GraphAlgorithm> algorithmList;
+    @FXML
+    VBox centerVBox;
 
 
     // ===========================================
     // ============= ALGORITHM SPACE =============
     // ===========================================
-    @FXML AnchorPane graphPane;
-    @FXML AnchorPane arrayPane;
+    @FXML
+    AnchorPane graphPane;
+    @FXML
+    AnchorPane arrayPane;
+
+    // ===========================================
+    // =========== ALGORITHM CONTROLS ============
+    // ===========================================
+    @FXML
+    public Button startBtn;
+
+    @FXML
+    public Button stepBtn;
 
     private PathFindingController findController;
     private SortingController sortController;
+
+    private SimpleObjectProperty<GraphAlgorithmThread> resolveThread = new SimpleObjectProperty<>();
+
+    private Publisher publisher = new Publisher();
 
     @FXML
     public void initialize() {
         logger.info("Initializing Controller...");
 
         // Initialize controllers for path finding and sorting
-        this.findController = new PathFindingController(this.graphPane, this.vertexList, this.toggleWeight, this.toggleDistance);
+        this.findController = new PathFindingController(this.graphPane, this.vertexList,
+                                                        this.toggleWeight, this.toggleDistance
+        );
         this.sortController = new SortingController(this.arrayPane);
 
         // Log once for both controllers initialization (if needed)
@@ -72,29 +95,30 @@ public class Controller {
         loadUserAlgorithms("com/marcinseweryn/visualizer/model/path");
 
         // Show correct algorithm space based on selected tab
-        algorithmTab.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-            String tabName = newTab.getText();
-            logger.info("{} tab selected.", tabName);
+        algorithmTab.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldTab, newTab) -> {
+                    String tabName = newTab.getText();
+                    logger.info("{} tab selected.", tabName);
 
-            // Manage panes visibility based on the tab selected
-            if (tabName.equals("Path Finding")) {
-                centerVBox.getChildren().remove(arrayPane);
-                if (!centerVBox.getChildren().contains(graphPane)) {
-                    centerVBox.getChildren().add(graphPane);
-                }
+                    // Manage panes visibility based on the tab selected
+                    if (tabName.equals("Path Finding")) {
+                        centerVBox.getChildren().remove(arrayPane);
+                        if (!centerVBox.getChildren().contains(graphPane)) {
+                            centerVBox.getChildren().add(graphPane);
+                        }
 
-                loadUserAlgorithms("com/marcinseweryn/visualizer/model/path");
-            } else if (tabName.equals("Sorting")) {
-                centerVBox.getChildren().remove(graphPane);
-                if (!centerVBox.getChildren().contains(arrayPane)) {
-                    centerVBox.getChildren().add(arrayPane);
-                }
+                        loadUserAlgorithms("com/marcinseweryn/visualizer/model/path");
+                    } else if (tabName.equals("Sorting")) {
+                        centerVBox.getChildren().remove(graphPane);
+                        if (!centerVBox.getChildren().contains(arrayPane)) {
+                            centerVBox.getChildren().add(arrayPane);
+                        }
 
-                loadUserAlgorithms("com/marcinseweryn/visualizer/model/sort");
-            } else {
-                logger.warn("Unknown tab selected: {}", tabName);
-            }
-        });
+                        loadUserAlgorithms("com/marcinseweryn/visualizer/model/sort");
+                    } else {
+                        logger.warn("Unknown tab selected: {}", tabName);
+                    }
+                });
 
         logger.info("Controller initialization completed.");
     }
@@ -123,7 +147,7 @@ public class Controller {
                 }
                 for (Class<?> c : classes) {
                     Object a = c.getDeclaredConstructor().newInstance();
-                    if (a instanceof Algorithm algorithm) {
+                    if (a instanceof GraphAlgorithm algorithm) {
                         algorithmList.getItems().add(algorithm);
                     }
                 }
@@ -134,6 +158,42 @@ public class Controller {
                  InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             logger.error(e);
         }
+    }
+
+    @FXML
+    private void clickStartAlgorithm(ActionEvent actionEvent) {
+        boolean isStepDisabled = actionEvent.getSource() == startBtn;
+
+        GraphAlgorithm algorithm = null;
+        try {
+            algorithm = this.algorithmList.getValue().getClass().getDeclaredConstructor().newInstance();
+        } catch (InvocationTargetException | IllegalAccessException |
+                 NoSuchMethodException | InstantiationException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Check if a thread is running or if we need to start/resume it
+        if (this.resolveThread.get() == null || !this.resolveThread.get().isAlive() || isStepDisabled) {
+
+            if (this.algorithmTab.getSelectionModel().getSelectedItem().getText().equals("Path Finding")) {
+                this.graphTab.getSelectionModel().selectFirst();
+                this.resolveThread.set(this.findController.getResolveThread(algorithm, this.resolveThread, isStepDisabled));
+            } else {
+                // Sorting logic
+            }
+
+            resolveThread.get().setDaemon(false);
+            resolveThread.get().start();
+        } else {
+            // Algorithm is paused, so resume it
+            logger.debug("Resuming algorithm...");
+            resolveThread.get().getAlgorithm().resumeAlgorithm();
+        }
+    }
+
+
+    @FXML
+    public void clickStopAlgorithm(ActionEvent actionEvent) {
     }
 
     @FXML
@@ -165,4 +225,5 @@ public class Controller {
     private void onGraphPaneDragDropped(DragEvent dragEvent) {
         this.findController.onGraphPaneDragDropped(dragEvent);
     }
+
 }

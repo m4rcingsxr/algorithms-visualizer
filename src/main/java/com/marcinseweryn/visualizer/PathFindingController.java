@@ -37,7 +37,8 @@ public class PathFindingController implements Subscriber {
     private Edge edge;
 
     private final SimpleObjectProperty<GraphNode> startVertex = new SimpleObjectProperty<>(null);
-    private final SimpleObjectProperty<GraphNode> destinationVertex = new SimpleObjectProperty<>(null);
+    private final SimpleObjectProperty<GraphNode> destinationVertex = new SimpleObjectProperty<>(
+            null);
 
     public PathFindingController(AnchorPane graphPane, Accordion vertexList,
                                  ToggleButton toggleWeight, ToggleButton toggleDistance) {
@@ -319,9 +320,18 @@ public class PathFindingController implements Subscriber {
             logger.info("Destination button clicked for node: {}", node.getId());
             destinationVertex.set((GraphNode) node);
             logger.info("Destination node set: {}", destinationVertex.get().getId());
-        } else if(eventType.equals("removeEdge")) {
+        } else if (eventType.equals("removeEdge")) {
             logger.info("removing edge");
             this.graphPane.getChildren().remove(node);
         }
+    }
+
+    public GraphAlgorithmThread getResolveThread(final GraphAlgorithm algorithm,
+                                   SimpleObjectProperty<GraphAlgorithmThread> resolveThread,
+                                   boolean isStepDisabled) {
+       return new GraphAlgorithmThread(() -> {
+           algorithm.start(startVertex.get(), destinationVertex.get(), isStepDisabled);
+           resolveThread.set(null);
+       }, algorithm, isStepDisabled);
     }
 }
