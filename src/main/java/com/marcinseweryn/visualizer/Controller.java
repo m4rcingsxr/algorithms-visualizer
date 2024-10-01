@@ -173,7 +173,7 @@ public class Controller {
         }
 
         // Check if a thread is running or if we need to start/resume it
-        if (this.resolveThread.get() == null || !this.resolveThread.get().isAlive() || isStepDisabled) {
+        if (this.resolveThread.get() == null || isStepDisabled) {
 
             if (this.algorithmTab.getSelectionModel().getSelectedItem().getText().equals("Path Finding")) {
                 this.graphTab.getSelectionModel().selectFirst();

@@ -1,6 +1,7 @@
 package com.marcinseweryn.visualizer.model.path;
 
 import com.marcinseweryn.visualizer.GraphAlgorithm;
+import com.marcinseweryn.visualizer.NodeVisualizer;
 import com.marcinseweryn.visualizer.Publisher;
 import com.marcinseweryn.visualizer.view.GraphNode;
 
@@ -16,39 +17,39 @@ public class BreadthFirstSearch extends GraphAlgorithm {
 
     @Override
     public void resolve() {
-        ArrayDeque<GraphNode> queue = new ArrayDeque<>();
-        boolean[] visited = new boolean[100]; // temp
-        queue.add(this.startVertex);
+        this.pendingNodes.addVertex(this.startVertex);
 
         step(1);
-        while(!queue.isEmpty()) {
+        while(!pendingNodes.isEmpty()) {
             step(2);
-            GraphNode current = queue.remove();
+            setCurrent(this.pendingNodes.removeVertex());
             step(3);
             step(4);
 
-            if(current == this.destinationVertex) {
-                visited[Integer.parseInt(current.getText())] = true;
+            if(getCurrent() == this.destinationVertex) {
+                visited.addVertex(getCurrent());
 
-                reconstructPath(current);
+                reconstructPath(getCurrent());
                 drawPath();
                 step(5);
                 break;
             }
 
-            visited[Integer.parseInt(current.getText())] = true;
+            visited.addVertex(getCurrent());
             step(6);
             step(7);
-            for (GraphNode neighbour : current.getNeighbours()) {
+            for (GraphNode neighbour : getCurrent().getNeighbours()) {
+                setNeighbour(neighbour);
                 step(8);
-                if(!visited[Integer.parseInt(neighbour.getText())]) {
-                    visited[Integer.parseInt(neighbour.getText())] = true;
-                    queue.add(neighbour);
+                if(!visited.containsNode(neighbour)) {
+                    visited.addVertex(neighbour);
+                    pendingNodes.addVertex(neighbour);
                     step(9);
-                    neighbour.setParentNode(current);
+                    getNeighbour().setParentNode(getCurrent());
                     step(10);
                 }
             }
+            setNeighbour(null);
         }
     }
 

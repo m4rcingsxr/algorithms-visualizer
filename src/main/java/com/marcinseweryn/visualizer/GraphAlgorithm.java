@@ -14,12 +14,8 @@ public abstract class GraphAlgorithm {
 
     public static Logger logger = LogManager.getLogger(GraphAlgorithm.class);
 
-    private Publisher publisher;
-
     protected GraphNode startVertex;
     protected GraphNode destinationVertex;
-    protected GraphNode currentVertex;
-    private GraphNode neighbourVertex;
 
 
     private List<GraphNode> path = new ArrayList<>();
@@ -30,6 +26,14 @@ public abstract class GraphAlgorithm {
     private final Condition stepCondition = lock.newCondition();
     private volatile boolean isStopped;
 
+    protected NodeVisualizer pendingNodes;
+    protected NodeVisualizer visited;
+
+    private Publisher publisher;
+    private GraphNode currentVertex;
+    private GraphNode neighbourVertex;
+
+
     protected GraphAlgorithm() {
     }
 
@@ -38,6 +42,9 @@ public abstract class GraphAlgorithm {
     }
 
     void start(GraphNode startVertex, GraphNode destinationVertex, boolean isStepDisabled) {
+        this.pendingNodes = new Queue(NodeVisualizer.TYPE_PENDING_NODES);
+        this.visited = new Stack(NodeVisualizer.TYPE_VISITED);
+
         this.startVertex = startVertex;
         this.destinationVertex = destinationVertex;
 
@@ -58,50 +65,88 @@ public abstract class GraphAlgorithm {
         for (int i = 0; i < path.size(); i++) {
             GraphNode n = path.get(i);
             Platform.runLater(() -> {
+                n.getStyleClass().removeAll("start", "destination", "visited", "pending-nodes", "path");
                 n.getStyleClass().add("path");
             });
         }
     }
 
     public void resumeAlgorithm() {
-        lock.lock();
-        try {
-            logger.debug("Lock acquired, signaling condition to resume algorithm...");
-            stepCondition.signalAll();  // Signal the waiting thread
-            isStopped = false;
-            logger.debug("Condition signaled");
-        } finally {
-            logger.debug("Lock released after signaling");
-            lock.unlock();
-        }
+        if(!this.isStepDisabled) {
+            lock.lock();
+            try {
+                logger.debug("Lock acquired, signaling condition to resume algorithm...");
+                stepCondition.signalAll();  // Signal the waiting thread
+                isStopped = false;
+                logger.debug("Condition signaled");
+            } finally {
+                logger.debug("Lock released after signaling");
+                lock.unlock();
+            }
 
-        try {
-            Thread.sleep(100);  // Add a short delay
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            try {
+                Thread.sleep(100);  // Add a short delay
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
     protected void step(int stepNum) {
-        lock.lock();
-        try {
-            logger.debug("Lock acquired, about to wait at step: " + stepNum);
+        if(!this.isStepDisabled) {
+            lock.lock();
+            try {
+                logger.debug("Lock acquired, about to wait at step: " + stepNum);
 
-            isStopped = true;
-            while (isStopped) {
-                stepCondition.await();  // Wait for the signal
+                isStopped = true;
+                while (isStopped) {
+                    stepCondition.await();  // Wait for the signal
+                }
+
+                logger.debug("Resumed from waiting at step: " + stepNum);
+            } catch (InterruptedException e) {
+                logger.error("Thread interrupted while waiting", e);
+                Thread.currentThread().interrupt();
+            } finally {
+                logger.debug("Lock released after step: " + stepNum);
+                lock.unlock();
             }
-
-            logger.debug("Resumed from waiting at step: " + stepNum);
-            Thread.sleep(5);  // Simulate step delay
-
-        } catch (InterruptedException e) {
-            logger.error("Thread interrupted while waiting", e);
-            Thread.currentThread().interrupt();
-        } finally {
-            logger.debug("Lock released after step: " + stepNum);
-            lock.unlock();
+        } else {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                logger.error("Thread interrupted while waiting", e);
+                Thread.currentThread().interrupt();
+            }
         }
     }
+
+    protected void setCurrent(GraphNode currentVertex) {
+        if (this.currentVertex != null) //set previous value to false first
+            this.currentVertex.pseudoClassStateChanged(PathFindingController.ps_currentNode, false);
+        if(currentVertex != null) {
+            currentVertex.pseudoClassStateChanged(PathFindingController.ps_currentNode, true);
+        }
+        this.currentVertex = currentVertex;
+    }
+
+    protected GraphNode getCurrent() {
+        return currentVertex;
+    }
+
+    protected void setNeighbour(GraphNode neighbourVertex) {
+        if (this.neighbourVertex != null) //set previous value to false first
+            this.neighbourVertex.pseudoClassStateChanged(PathFindingController.ps_neighbourNode, false);
+        if(neighbourVertex != null) {
+            neighbourVertex.pseudoClassStateChanged(PathFindingController.ps_neighbourNode, true);
+        }
+        this.neighbourVertex = neighbourVertex;
+    }
+
+    protected GraphNode getNeighbour() {
+        return neighbourVertex;
+    }
+
+
 
 }

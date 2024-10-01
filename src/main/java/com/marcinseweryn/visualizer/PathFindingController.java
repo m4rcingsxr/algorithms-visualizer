@@ -5,6 +5,7 @@ import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
@@ -39,6 +40,9 @@ public class PathFindingController implements Subscriber {
     private final SimpleObjectProperty<GraphNode> startVertex = new SimpleObjectProperty<>(null);
     private final SimpleObjectProperty<GraphNode> destinationVertex = new SimpleObjectProperty<>(
             null);
+
+    static final PseudoClass ps_currentNode = PseudoClass.getPseudoClass("current");
+    static final PseudoClass ps_neighbourNode = PseudoClass.getPseudoClass("neighbour");
 
     public PathFindingController(AnchorPane graphPane, Accordion vertexList,
                                  ToggleButton toggleWeight, ToggleButton toggleDistance) {

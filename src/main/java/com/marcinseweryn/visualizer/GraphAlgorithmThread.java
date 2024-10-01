@@ -1,8 +1,5 @@
 package com.marcinseweryn.visualizer;
 
-import com.marcinseweryn.visualizer.view.GraphNode;
-import javafx.beans.property.SimpleObjectProperty;
-
 public class GraphAlgorithmThread extends Thread {
 
     private final GraphAlgorithm algorithm;
@@ -17,4 +14,5 @@ public class GraphAlgorithmThread extends Thread {
     public GraphAlgorithm getAlgorithm() {
         return algorithm;
     }
+
 }

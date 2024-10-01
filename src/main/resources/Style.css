@@ -74,13 +74,15 @@
 
 .vertex {
     -fx-background-radius: 20;
-    -fx-border-radius: 20;
+    -fx-border-radius: 22;
+    -fx-border-width: 1;
     -fx-background-color: black;
     -fx-font-family: "Lato";
     -fx-font-weight: Bold;
     -fx-font-size: 15;
     -fx-text-fill: white;
     -fx-fill: white;
+    -fx-boder-color: black;
 }
 
 .vertex:hover {
@@ -103,21 +105,42 @@
 }
 
 .drag {
-    -fx-stroke: -primary !important;
-    -fx-background-color: -primary !important;
+    -fx-stroke: -primary;
+    -fx-background-color: -primary;
     -fx-opacity: .3;
-    -fx-border-color: null !important;
+    -fx-border-color: null;
 }
 
 .weighted {
-    -fx-stroke: green !important;
+    -fx-stroke: green;
     -fx-stroke-width: 4;
 }
 
 
 .path {
     -fx-background-color: -primary;
-    -fx-stroke: -primary !important;
-    -fx-stroke-width: 2 !important;
+    -fx-stroke: -primary;
+    -fx-stroke-width: 2;
     -fx-border-color: null;
+}
+
+.pending-nodes {
+    -fx-text-fill: white;
+    -fx-background-color: #5959ff;
+    -fx-border-color: null;
+}
+
+.visited {
+    -fx-text-fill: white;
+    -fx-background-color: #ffff83;
+}
+
+.vertex:current {
+    -fx-border-color: -primary;
+    -fx-border-width: 2px;
+}
+
+.vertex:neighbour {
+    -fx-border-color: green;
+    -fx-border-width: 3px;
 }
