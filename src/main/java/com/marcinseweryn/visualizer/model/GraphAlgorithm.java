@@ -1,5 +1,6 @@
-package com.marcinseweryn.visualizer;
+package com.marcinseweryn.visualizer.model;
 
+import com.marcinseweryn.visualizer.controller.PathFindingController;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;

@@ -1,4 +1,4 @@
-package com.marcinseweryn.visualizer;
+package com.marcinseweryn.visualizer.model;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.application.Platform;
@@ -7,8 +7,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
 
-import static com.marcinseweryn.visualizer.ListType.CANDIDATE_NODES;
-import static com.marcinseweryn.visualizer.ListType.VISITED;
+import static com.marcinseweryn.visualizer.model.ListType.CANDIDATE_NODES;
+import static com.marcinseweryn.visualizer.model.ListType.VISITED;
 
 public abstract class NodeVisualizer {
 

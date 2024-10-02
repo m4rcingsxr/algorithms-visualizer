@@ -1,5 +1,7 @@
-package com.marcinseweryn.visualizer;
+package com.marcinseweryn.visualizer.controller;
 
+import com.marcinseweryn.visualizer.model.Algorithm;
+import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;

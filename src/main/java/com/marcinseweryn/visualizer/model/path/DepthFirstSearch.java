@@ -1,7 +1,6 @@
 package com.marcinseweryn.visualizer.model.path;
 
-import com.marcinseweryn.visualizer.GraphAlgorithm;
-import com.marcinseweryn.visualizer.Publisher;
+import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;

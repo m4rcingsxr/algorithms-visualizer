@@ -1,4 +1,4 @@
-package com.marcinseweryn.visualizer;
+package com.marcinseweryn.visualizer.model;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.scene.control.ListView;

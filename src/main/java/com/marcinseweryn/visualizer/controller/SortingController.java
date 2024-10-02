@@ -1,6 +1,5 @@
-package com.marcinseweryn.visualizer;
+package com.marcinseweryn.visualizer.controller;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.layout.AnchorPane;
 
 public class SortingController {
@@ -9,8 +8,5 @@ public class SortingController {
 
     public SortingController(AnchorPane arrayPane) {
         this.arrayPane = arrayPane;
-    }
-
-    public void runAlgorithm(SimpleObjectProperty<Thread> resolveThread, GraphAlgorithm algorithm) {
     }
 }

@@ -1,6 +1,6 @@
-package com.marcinseweryn.visualizer;
+package com.marcinseweryn.visualizer.controller;
 
-import com.marcinseweryn.visualizer.view.GraphNode;
+import com.marcinseweryn.visualizer.model.Algorithm;
 
 public class AlgorithmThread extends Thread {
 
@@ -10,8 +10,6 @@ public class AlgorithmThread extends Thread {
         super(runnable);
         this.algorithm = algorithm;
     }
-
-
 
     public void resumeAlgorithm() {
         this.algorithm.resumeAlgorithm();

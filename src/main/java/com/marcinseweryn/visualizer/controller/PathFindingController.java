@@ -1,5 +1,9 @@
-package com.marcinseweryn.visualizer;
+package com.marcinseweryn.visualizer.controller;
 
+import com.marcinseweryn.visualizer.model.Algorithm;
+import com.marcinseweryn.visualizer.model.GraphAlgorithm;
+import com.marcinseweryn.visualizer.Publisher;
+import com.marcinseweryn.visualizer.Subscriber;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
@@ -54,8 +58,8 @@ public class PathFindingController implements Subscriber {
     private final SimpleObjectProperty<GraphNode> destinationNodeProperty = new SimpleObjectProperty<>(null);
 
     // pseudo classes to activate - used for state visualization of the executing algorithm
-    static final PseudoClass currentNodeStyle = PseudoClass.getPseudoClass("current");
-    static final PseudoClass neighborNodeStyle = PseudoClass.getPseudoClass("neighbour");
+    public static final PseudoClass currentNodeStyle = PseudoClass.getPseudoClass("current");
+    public static final PseudoClass neighborNodeStyle = PseudoClass.getPseudoClass("neighbour");
 
     /**
      * Initializes the PathFindingController, setting up the necessary event subscriptions
@@ -181,7 +185,7 @@ public class PathFindingController implements Subscriber {
         this.connectingEdge = createEdgeBetweenNodes(this.startingNode, this.draggedNode);
         this.draggedNode.startFullDrag();
         this.draggedNode.toBack();
-        applyDragStyleToDraggedNodeAndCurrentEdge("drag", true);
+        applyDragStyleToDraggedNodeAndCurrentEdge(true);
     }
 
     /**
@@ -274,7 +278,7 @@ public class PathFindingController implements Subscriber {
 
         // release occur on algorithm space
         if (this.draggedNode != null) {
-            applyDragStyleToDraggedNodeAndCurrentEdge("drag", false);
+            applyDragStyleToDraggedNodeAndCurrentEdge(false);
         }
     }
 
@@ -316,22 +320,22 @@ public class PathFindingController implements Subscriber {
     }
 
     // Applies or resets the specified style class on the current node and edge.
-    private void applyDragStyleToDraggedNodeAndCurrentEdge(String styleClass, boolean apply) {
+    private void applyDragStyleToDraggedNodeAndCurrentEdge(boolean apply) {
         if (apply) {
-            this.draggedNode.getStyleClass().add(styleClass);
-            this.connectingEdge.getStyleClass().add(styleClass);
+            this.draggedNode.getStyleClass().add("drag");
+            this.connectingEdge.getStyleClass().add("drag");
         } else {
-            resetNodeStyle(styleClass);
+            resetDragNodeStyle();
         }
     }
 
     // Resets the specified style class on the current node and edge.
-    private void resetNodeStyle(String styleClass) {
+    private void resetDragNodeStyle() {
         if (this.draggedNode != null) {
-            this.draggedNode.getStyleClass().remove(styleClass);
+            this.draggedNode.getStyleClass().remove("drag");
         }
         if (this.connectingEdge != null) {
-            this.connectingEdge.getStyleClass().remove(styleClass);
+            this.connectingEdge.getStyleClass().remove("drag");
         }
         this.draggedNode = null; // Reset the dragged node reference after the operation
     }
@@ -436,7 +440,7 @@ public class PathFindingController implements Subscriber {
         );
         this.connectingEdge = createEdgeBetweenNodes(startingNode, draggedNode);
         this.draggedNode.toBack();
-        applyDragStyleToDraggedNodeAndCurrentEdge("drag", true);
+        applyDragStyleToDraggedNodeAndCurrentEdge(true);
     }
 
     /**

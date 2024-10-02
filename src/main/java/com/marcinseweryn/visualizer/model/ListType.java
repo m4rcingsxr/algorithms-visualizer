@@ -1,4 +1,4 @@
-package com.marcinseweryn.visualizer;
+package com.marcinseweryn.visualizer.model;
 
 public enum ListType {
 

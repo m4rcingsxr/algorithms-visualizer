@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.SVGPath?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.marcinseweryn.visualizer.Controller"
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.marcinseweryn.visualizer.controller.Controller"
             stylesheets="Style.css" styleClass="main">
     <padding>
         <Insets top="10" right="25" bottom="25" left="25"/>
