@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.SVGPath?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.marcinseweryn.visualizer.controller.Controller"
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.marcinseweryn.visualizer.controller.MainController"
             stylesheets="Style.css" styleClass="main">
     <padding>
         <Insets top="10" right="25" bottom="25" left="25"/>
@@ -21,12 +21,12 @@
                             <VBox>
                                 <Label text="Candidate Nodes" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView fx:id="candidateNodes" minHeight="105" maxHeight="145"/>
+                                <ListView fx:id="candidateNodeList" minHeight="105" maxHeight="145"/>
                             </VBox>
                             <VBox>
                                 <Label text="Visited" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView fx:id="visitedNodes" minHeight="105" maxHeight="145"></ListView>
+                                <ListView fx:id="visitedNodeList" minHeight="105" maxHeight="145"></ListView>
                             </VBox>
                             <VBox>
                                 <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
@@ -38,12 +38,12 @@
                     <Tab text="Vertex">
                         <VBox>
                             <HBox>
-                                <ToggleButton fx:id="toggleWeight" text="Show weight"/>
-                                <ToggleButton fx:id="toggleDistance" text="Show distance"/>
+                                <ToggleButton fx:id="showEdgeWeightToggle" text="Show weight"/>
+                                <ToggleButton fx:id="showEdgeDistanceToggle" text="Show distance"/>
                             </HBox>
 
                             <ScrollPane>
-                                <Accordion fx:id="vertexList"/>
+                                <Accordion fx:id="renderedNodes"/>
                             </ScrollPane>
                         </VBox>
                     </Tab>
@@ -56,18 +56,18 @@
         </TabPane>
     </left>
     <center>
-        <VBox fx:id="centerVBox" spacing="20">
+        <VBox fx:id="algorithmContainer" spacing="20">
             <padding>
                 <Insets right="40" left="40"/>
             </padding>
 
             <HBox alignment="BOTTOM_LEFT" spacing="10">
-                <ChoiceBox fx:id="algorithmList"/>
+                <ChoiceBox fx:id="algorithmListBox"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <Button fx:id="startBtn"
-                        onAction="#clickStartAlgorithm"
+                <Button fx:id="startButton"
+                        onAction="#onStartButtonClick"
                         style="-fx-background-radius: 0%;">
                     <graphic>
                         <Region prefWidth="15" prefHeight="15" style="-fx-border-color:black;">
@@ -78,8 +78,8 @@
                     </graphic>
                 </Button>
 
-                <Button fx:id="stepBtn"
-                        onAction="#clickStartAlgorithm"
+                <Button fx:id="stepButton"
+                        onAction="#onStartButtonClick"
                         style="-fx-background-radius: 0%;">
                     <graphic>
                         <Region prefWidth="15" prefHeight="15" style="-fx-border-color:black;">
@@ -106,17 +106,17 @@
                         HBox.hgrow="ALWAYS"
                         minWidth="700"
                         maxWidth="Infinity"
-                        visible="false"/>
+                       />
 
             <!-- Sorting Pane is hidden initially -->
-            <AnchorPane fx:id="arrayPane"
+            <AnchorPane fx:id="sortingPane"
                         prefHeight="720"
                         styleClass="algorithmPane"
                         VBox.vgrow="ALWAYS"
                         HBox.hgrow="ALWAYS"
                         minWidth="700"
                         maxWidth="Infinity"
-                        visible="false"/>
+                        />
         </VBox>
     </center>
 </BorderPane>
