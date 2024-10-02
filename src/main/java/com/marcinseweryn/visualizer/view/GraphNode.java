@@ -109,11 +109,6 @@ public class GraphNode extends Button {
     }
 
     public SimpleStringProperty getSimpleString() {
-        /*
-         *The simple string property will be used in listViews. This way the listview will be
-         * updated
-         * when the node's properties change.
-         */
         return info;
     }
 

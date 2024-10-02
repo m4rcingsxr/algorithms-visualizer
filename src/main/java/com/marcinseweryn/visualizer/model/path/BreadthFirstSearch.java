@@ -20,46 +20,42 @@ public class BreadthFirstSearch extends GraphAlgorithm {
     }
 
     @Override
-    public void resolve() {
-        this.candidateNodes.addVertex(this.startNode.get());
+    public void executeAlgorithm() {
+        this.candidateNodeList.addGraphNode(this.startNode.get());
 
-        step(1);
-        while (!candidateNodes.isEmpty()) {
-            step(2);
-            setCurrent(this.candidateNodes.removeVertex());
-            step(3);
-            step(4);
+        pauseAtStep(0);
+        while (!candidateNodeList.isEmpty()) {
+            pauseAtStep(1);
+            setCurrentNode(this.candidateNodeList.removeGraphNode());
+            pauseAtStep(2);
+            pauseAtStep(3);
 
-            if (getCurrent() == this.destinationNode.get()) {
-                visitedNodes.addVertex(getCurrent());
+            if (getCurrentNode() == this.destinationNode.get()) {
+                visitedNodeList.addGraphNode(getCurrentNode());
 
-                reconstructPath(getCurrent());
-                drawPath();
-                step(5);
+                reconstructPath(getCurrentNode());
+                visualizePath();
+                pauseAtStep(4);
                 break;
             }
 
-            visitedNodes.addVertex(getCurrent());
-            step(6);
-            step(7);
-            for (GraphNode neighbour : getCurrent().getNeighbours()) {
-                setNeighbour(neighbour);
-                step(8);
-                if (!visitedNodes.containsNode(getNeighbour())) {
-                    visitedNodes.addVertex(getNeighbour());
-                    candidateNodes.addVertex(getNeighbour());
-                    step(9);
-                    getNeighbour().setParentNode(getCurrent());
-                    step(10);
+            visitedNodeList.addGraphNode(getCurrentNode());
+            pauseAtStep(5);
+            pauseAtStep(6);
+            for (GraphNode neighbour : getCurrentNode().getNeighbours()) {
+                setNeighborNode(neighbour);
+                pauseAtStep(7);
+                if (!visitedNodeList.containsGraphNode(getNeighborNode())) {
+                    visitedNodeList.addGraphNode(getNeighborNode());
+                    candidateNodeList.addGraphNode(getNeighborNode());
+                    pauseAtStep(8);
+                    getNeighborNode().setParentNode(getCurrentNode());
+                    pauseAtStep(9);
                 }
             }
-            setNeighbour(null);
-        }
-    }
 
-    @Override
-    public String toString() {
-        return "Breadth First Search";
+            setNeighborNode(null);
+        }
     }
 
     private void reconstructPath(GraphNode current) {
@@ -68,4 +64,10 @@ public class BreadthFirstSearch extends GraphAlgorithm {
         }
 
     }
+
+    @Override
+    public String toString() {
+        return "Breadth First Search";
+    }
+
 }

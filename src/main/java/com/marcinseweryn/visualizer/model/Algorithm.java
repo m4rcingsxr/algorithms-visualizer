@@ -6,71 +6,101 @@ import org.apache.logging.log4j.Logger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Abstract class representing a general algorithm with step-by-step and continuous execution modes.
+ * Provides functionality to pause and resume execution using a lock mechanism.
+ */
 public abstract class Algorithm {
 
     public static final Logger logger = LogManager.getLogger(Algorithm.class);
 
-    protected boolean isStepDisabled = false;
-    private final ReentrantLock lock = new ReentrantLock();
+    // Flag to determine if step mode is disabled (continuous execution)
+    protected boolean isContinuousMode = false;
 
-    private final Condition stepCondition = lock.newCondition();
-    private volatile boolean isStopped;
+    // Lock and condition variables for managing thread control
+    private final ReentrantLock executionLock = new ReentrantLock();
+    private final Condition canProceed = executionLock.newCondition();
 
+    // Flag to indicate if the algorithm is currently paused
+    private volatile boolean isPaused;
+
+    /**
+     * Resumes the algorithm if it is in step mode.
+     * Signals the waiting thread to continue execution.
+     */
     public void resumeAlgorithm() {
-        if(!this.isStepDisabled) {
-            lock.lock();
+        if(!this.isContinuousMode) {
+            executionLock.lock();
             try {
                 logger.debug("Lock acquired, signaling condition to resume algorithm...");
-                stepCondition.signalAll();  // Signal the waiting thread
-                isStopped = false;
+                canProceed.signalAll();
+                isPaused = false;
                 logger.debug("Condition signaled");
             } finally {
                 logger.debug("Lock released after signaling");
-                lock.unlock();
+                executionLock.unlock();
             }
 
             try {
-                Thread.sleep(100);  // Add a short delay
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
     }
 
-    protected void step(int stepNum) {
-        if(!this.isStepDisabled) {
-            lock.lock();
+    /**
+     * Pauses the execution at a specific step when in step-by-step mode.
+     * The method waits for a signal before resuming.
+     *
+     * @param stepNumber The current step number where the algorithm pauses.
+     */
+    protected void pauseAtStep(int stepNumber) {
+        if (!isContinuousMode) {
+            executionLock.lock();
             try {
-                logger.debug("Lock acquired, about to wait at step: " + stepNum);
+                logger.debug("Pausing at step: " + stepNumber);
+                isPaused = true;
 
-                isStopped = true;
-                while (isStopped) {
-                    stepCondition.await();  // Wait for the signal
+                // Wait until a signal is received to resume
+                while (isPaused) {
+                    canProceed.await();
                 }
 
-                logger.debug("Resumed from waiting at step: " + stepNum);
+                logger.debug("Resumed from pause at step: " + stepNumber);
             } catch (InterruptedException e) {
-                logger.error("Thread interrupted while waiting", e);
+                logger.error("Thread interrupted while pausing at step: " + stepNumber, e);
                 Thread.currentThread().interrupt();
             } finally {
-                logger.debug("Lock released after step: " + stepNum);
-                lock.unlock();
+                logger.debug("Lock released after step: " + stepNumber);
+                executionLock.unlock();
             }
         } else {
+            // If continuous mode is enabled, introduce a short delay between steps
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                logger.error("Thread interrupted while waiting", e);
+                logger.error("Thread interrupted during continuous mode delay", e);
                 Thread.currentThread().interrupt();
             }
         }
     }
 
-    public void start(boolean isStepDisabled) {
-        this.isStepDisabled = isStepDisabled;
-        resolve();
+    /**
+     * Starts the algorithm, setting the mode of execution based on the provided flag.
+     *
+     * @param continuousMode If true, the algorithm runs continuously without pausing at steps.
+     */
+    public void start(boolean continuousMode) {
+        this.isContinuousMode = continuousMode;
+        executeAlgorithm();  // Begin the algorithm's execution
     }
 
-    public abstract void resolve();
+    /**
+     * Abstract method to be implemented by subclasses to define the algorithm's logic.
+     * The implementation should call {@link #pauseAtStep(int)} at appropriate points
+     * in the algorithm to enable step-by-step execution.
+     */
+    public abstract void executeAlgorithm();
 
 }

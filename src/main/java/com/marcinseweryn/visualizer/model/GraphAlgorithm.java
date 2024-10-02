@@ -12,77 +12,132 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract class representing a graph traversal algorithm.
+ * It manages the traversal between nodes, tracks the current and neighboring vertices,
+ * and handles path visualization.
+ */
 public abstract class GraphAlgorithm extends Algorithm {
 
     public static final Logger logger = LogManager.getLogger(GraphAlgorithm.class);
 
-    protected SimpleObjectProperty<GraphNode> startNode = new SimpleObjectProperty<>();
-    protected SimpleObjectProperty<GraphNode> destinationNode = new SimpleObjectProperty<>();
+    // Starting and destination nodes for the graph traversal
+    protected final SimpleObjectProperty<GraphNode> startNode = new SimpleObjectProperty<>();
+    protected final SimpleObjectProperty<GraphNode> destinationNode = new SimpleObjectProperty<>();
 
-    private List<GraphNode> path = new ArrayList<>();
+    // List to store the nodes forming the path
+    private final List<GraphNode> path = new ArrayList<>();
 
-    protected NodeVisualizer candidateNodes;
-    protected NodeVisualizer visitedNodes;
+    // Visualizers for the candidate and visited nodes during traversal
+    protected GraphNodeVisualizer candidateNodeList;
+    protected GraphNodeVisualizer visitedNodeList;
 
-    private GraphNode currentVertex;
-    private GraphNode neighbourVertex;
+    // Currently active and neighboring graph nodes during traversal
+    private GraphNode currentNode;
+    private GraphNode neighborNode;
 
+    /**
+     * Used only for load algorithms to box list
+     */
     protected GraphAlgorithm() {
         super();
     }
 
+    /**
+     * Constructor for GraphAlgorithm that initializes the visualizers and binds the start and destination nodes.
+     *
+     * @param candidateNodeList  The ListView for visualizing candidate nodes.
+     * @param visitedNodeList    The ListView for visualizing visited nodes.
+     * @param startNode          The starting node for the traversal.
+     * @param destinationNode    The destination node for the traversal.
+     */
     protected GraphAlgorithm(
-            ListView<SimpleStringProperty> candidateNodes,
-            ListView<SimpleStringProperty> visitedNodes,
+            ListView<SimpleStringProperty> candidateNodeList,
+            ListView<SimpleStringProperty> visitedNodeList,
             SimpleObjectProperty<GraphNode> startNode,
             SimpleObjectProperty<GraphNode> destinationNode) {
-        this.candidateNodes = new Queue(ListType.CANDIDATE_NODES, candidateNodes, visitedNodes);
-        this.visitedNodes = new Stack(ListType.VISITED, candidateNodes, visitedNodes);
+        this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNodeList);
+        this.visitedNodeList = new GraphNodeStack(ListType.VISITED, visitedNodeList);
 
         this.startNode.bind(startNode);
         this.destinationNode.bind(destinationNode);
     }
 
-    // used by single thread - not modified by multiple threads
+    /**
+     * Adds a graph node to the path.
+     *
+     * @param node The GraphNode to be added to the path.
+     */
     protected void addToPath(GraphNode node) {
         path.add(node);
     }
 
-    protected void drawPath() {
-        for (int i = 0; i < path.size(); i++) {
-            GraphNode n = path.get(i);
+    /**
+     * Draws the path by applying a visual style to each node in the path.
+     */
+    protected void visualizePath() {
+        for (GraphNode node : path) {
             Platform.runLater(() -> {
-                n.getStyleClass().removeAll("start", "destination", "visited", "pending-nodes", "path");
-                n.getStyleClass().add("path");
+                node.clearStyle();  // Clear any existing styles
+                node.getStyleClass().add("path");  // Apply the "path" style to the node
             });
         }
     }
 
-    protected void setCurrent(GraphNode currentVertex) {
-        if (this.currentVertex != null) //set previous value to false first
-            this.currentVertex.pseudoClassStateChanged(PathFindingController.currentNodeStyle, false);
-        if(currentVertex != null) {
-            currentVertex.pseudoClassStateChanged(PathFindingController.currentNodeStyle, true);
+    /**
+     * Sets the current active node during traversal and updates its visual style.
+     *
+     * @param node The GraphNode to be set as the current node.
+     */
+    protected void setCurrentNode(GraphNode node) {
+        // Remove the "current" style from the previous current node
+        if (this.currentNode != null) {
+            this.currentNode.pseudoClassStateChanged(PathFindingController.currentNodeStyle, false);
         }
-        this.currentVertex = currentVertex;
-    }
 
-    protected GraphNode getCurrent() {
-        return currentVertex;
-    }
-
-    protected void setNeighbour(GraphNode neighbourVertex) {
-        if (this.neighbourVertex != null) //set previous value to false first
-            this.neighbourVertex.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, false);
-        if(neighbourVertex != null) {
-            neighbourVertex.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, true);
+        // Add the "current" style to the new current node
+        if (node != null) {
+            node.pseudoClassStateChanged(PathFindingController.currentNodeStyle, true);
         }
-        this.neighbourVertex = neighbourVertex;
+
+        this.currentNode = node;
     }
 
-    protected GraphNode getNeighbour() {
-        return neighbourVertex;
+    /**
+     * Gets the current active node during traversal.
+     *
+     * @return The current GraphNode.
+     */
+    protected GraphNode getCurrentNode() {
+        return currentNode;
     }
 
+    /**
+     * Sets the neighboring node during traversal and updates its visual style.
+     *
+     * @param node The GraphNode to be set as the neighboring node.
+     */
+    protected void setNeighborNode(GraphNode node) {
+        // Remove the "neighbor" style from the previous neighbor node
+        if (this.neighborNode != null) {
+            this.neighborNode.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, false);
+        }
+
+        // Add the "neighbor" style to the new neighbor node
+        if (node != null) {
+            node.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, true);
+        }
+
+        this.neighborNode = node;
+    }
+
+    /**
+     * Gets the neighboring node during traversal.
+     *
+     * @return The neighboring GraphNode.
+     */
+    protected GraphNode getNeighborNode() {
+        return neighborNode;
+    }
 
 }

@@ -195,7 +195,8 @@ public class MainController {
 
             // Select the first algorithm by default
             algorithmListBox.getSelectionModel().selectFirst();
-        } catch (IOException | ClassNotFoundException | InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+        } catch (IOException | ClassNotFoundException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException | NoSuchMethodException e) {
             logger.error(e);
         }
     }

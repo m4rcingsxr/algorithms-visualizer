@@ -14,7 +14,7 @@ public class BubbleSort extends Algorithm {
     }
 
     @Override
-    public void resolve() {
+    public void executeAlgorithm() {
 
     }
 }

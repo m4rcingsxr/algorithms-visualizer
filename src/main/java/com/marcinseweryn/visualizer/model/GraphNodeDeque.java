@@ -1,16 +1,17 @@
 package com.marcinseweryn.visualizer.model;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
 
 import java.util.ArrayDeque;
 
-public abstract class Deque extends NodeVisualizer {
+public abstract class GraphNodeDeque extends GraphNodeVisualizer {
 
     private final ArrayDeque<GraphNode> pendingNodes = new ArrayDeque<>();
 
-    Deque(ListType listType, ListView candidateNodes, ListView visitedNodes) {
-        super(listType, candidateNodes, visitedNodes);
+    GraphNodeDeque(ListType listType, ListView<SimpleStringProperty> list) {
+        super(listType, list);
     }
 
     void push(GraphNode node) {
@@ -35,7 +36,7 @@ public abstract class Deque extends NodeVisualizer {
         return node;
     }
 
-    public boolean containsNode(GraphNode node) {
+    public boolean containsGraphNode(GraphNode node) {
         return pendingNodes.contains(node);
     }
 

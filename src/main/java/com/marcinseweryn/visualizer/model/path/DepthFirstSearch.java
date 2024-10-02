@@ -25,7 +25,7 @@ public class DepthFirstSearch extends GraphAlgorithm {
     }
 
     @Override
-    public void resolve() {
+    public void executeAlgorithm() {
 
     }
 }
