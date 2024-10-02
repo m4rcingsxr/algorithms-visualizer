@@ -47,6 +47,9 @@ public class MainController {
     @FXML
     private ListView<SimpleStringProperty> visitedNodeList;
 
+    @FXML
+    private ListView<String> pseudoCodeList;
+
     // Sorting and common UI elements
     @FXML
     private TabPane algorithmTab;
@@ -103,7 +106,7 @@ public class MainController {
     private void initializeControllers() {
         this.pathFindingController = new PathFindingController(
                 graphPane, renderedNodes, showEdgeWeightToggle, showEdgeDistanceToggle, candidateNodeList,
-                visitedNodeList, algorithmListBox
+                visitedNodeList, pseudoCodeList, algorithmListBox
         );
         this.sortingController = new SortingController(sortingPane);
 

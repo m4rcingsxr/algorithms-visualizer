@@ -1,9 +1,9 @@
 package com.marcinseweryn.visualizer.controller;
 
-import com.marcinseweryn.visualizer.model.Algorithm;
-import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.Publisher;
 import com.marcinseweryn.visualizer.Subscriber;
+import com.marcinseweryn.visualizer.model.Algorithm;
+import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
@@ -41,10 +41,12 @@ public class PathFindingController implements Subscriber {
     private final ToggleButton showEdgeDistanceToggle;
     private final ListView<SimpleStringProperty> candidateNodeList;
     private final ListView<SimpleStringProperty> visitedNodeList;
+    private final ListView<String> pseudocodeList;
     private final ChoiceBox<Algorithm> algorithmListBox;
 
     // Internal state variables
     private final Publisher eventPublisher;
+    ;
     private GraphNode startingNode; // Graph node that starts the drag process
     private GraphNode draggedNode; // Node that is created by drag from the starting node
     private GraphNode hoveredNode; // Node currently hovered over during drag
@@ -69,6 +71,7 @@ public class PathFindingController implements Subscriber {
                                  ToggleButton showEdgeWeightToggle, ToggleButton showEdgeDistanceToggle,
                                  ListView<SimpleStringProperty> candidateNodeList,
                                  ListView<SimpleStringProperty> visitedNodeList,
+                                 ListView<String> pseudocodeList,
                                  ChoiceBox<Algorithm> algorithmListBox) {
         this.algorithmSpace = algorithmSpace;
         this.renderedNodes = renderedNodes;
@@ -76,6 +79,7 @@ public class PathFindingController implements Subscriber {
         this.showEdgeDistanceToggle = showEdgeDistanceToggle;
         this.candidateNodeList = candidateNodeList;
         this.visitedNodeList = visitedNodeList;
+        this.pseudocodeList = pseudocodeList;
         this.algorithmListBox = algorithmListBox;
 
         this.eventPublisher = new Publisher();
@@ -102,18 +106,18 @@ public class PathFindingController implements Subscriber {
         if (this.algorithmListBox.getValue() instanceof GraphAlgorithm selectedAlgorithm) {
             try {
                 return Optional.of(selectedAlgorithm.getClass()
-                                           .getDeclaredConstructor(ListView.class, ListView.class,
-                                                                   SimpleObjectProperty.class,
-                                                                   SimpleObjectProperty.class
+                                           .getDeclaredConstructor(ListView.class, ListView.class, ListView.class,
+                                                                   SimpleObjectProperty.class, SimpleObjectProperty.class
                                            )
-                                           .newInstance(candidateNodeList, visitedNodeList, startNodeProperty,
-                                                        destinationNodeProperty
+                                           .newInstance(candidateNodeList, visitedNodeList, pseudocodeList,
+                                                        startNodeProperty, destinationNodeProperty
                                            ));
             } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
                      InstantiationException e) {
                 throw new RuntimeException(e);
             }
         }
+
         return Optional.empty();
     }
 

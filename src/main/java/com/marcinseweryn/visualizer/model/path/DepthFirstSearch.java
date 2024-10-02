@@ -14,9 +14,10 @@ public class DepthFirstSearch extends GraphAlgorithm {
 
     public DepthFirstSearch(ListView<SimpleStringProperty> candidateNodes,
                             ListView<SimpleStringProperty> visitedNodes,
+                            ListView<String> pseudocodeList,
                             SimpleObjectProperty<GraphNode> startNode,
                             SimpleObjectProperty<GraphNode> destinationNode) {
-        super(candidateNodes, visitedNodes, startNode, destinationNode);
+        super(candidateNodes, visitedNodes, pseudocodeList, startNode, destinationNode);
     }
 
     @Override
@@ -26,6 +27,11 @@ public class DepthFirstSearch extends GraphAlgorithm {
 
     @Override
     public void executeAlgorithm() {
+
+    }
+
+    @Override
+    public void setPseudocode() {
 
     }
 }

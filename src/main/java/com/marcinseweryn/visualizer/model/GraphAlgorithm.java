@@ -40,7 +40,7 @@ public abstract class GraphAlgorithm extends Algorithm {
      * Used only for load algorithms to box list
      */
     protected GraphAlgorithm() {
-        super();
+        super(null);
     }
 
     /**
@@ -54,8 +54,10 @@ public abstract class GraphAlgorithm extends Algorithm {
     protected GraphAlgorithm(
             ListView<SimpleStringProperty> candidateNodeList,
             ListView<SimpleStringProperty> visitedNodeList,
+            ListView<String> pseudocodeList,
             SimpleObjectProperty<GraphNode> startNode,
             SimpleObjectProperty<GraphNode> destinationNode) {
+        super(pseudocodeList);
         this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNodeList);
         this.visitedNodeList = new GraphNodeStack(ListType.VISITED, visitedNodeList);
 

@@ -14,9 +14,10 @@ public class BreadthFirstSearch extends GraphAlgorithm {
 
     public BreadthFirstSearch(ListView<SimpleStringProperty> candidateNodes,
                               ListView<SimpleStringProperty> visitedNodes,
+                              ListView<String> pseudocodeList,
                               SimpleObjectProperty<GraphNode> startNode,
                               SimpleObjectProperty<GraphNode> destinationNode) {
-        super(candidateNodes, visitedNodes, startNode, destinationNode);
+        super(candidateNodes, visitedNodes, pseudocodeList, startNode, destinationNode);
     }
 
     @Override
@@ -39,24 +40,43 @@ public class BreadthFirstSearch extends GraphAlgorithm {
                 break;
             }
 
-            visitedNodeList.addGraphNode(getCurrentNode());
             pauseAtStep(5);
+            visitedNodeList.addGraphNode(getCurrentNode());
             pauseAtStep(6);
+            pauseAtStep(7);
             for (GraphNode neighbour : getCurrentNode().getNeighbours()) {
                 setNeighborNode(neighbour);
-                pauseAtStep(7);
+                pauseAtStep(8);
                 if (!visitedNodeList.containsGraphNode(getNeighborNode())) {
                     visitedNodeList.addGraphNode(getNeighborNode());
                     candidateNodeList.addGraphNode(getNeighborNode());
-                    pauseAtStep(8);
-                    getNeighborNode().setParentNode(getCurrentNode());
                     pauseAtStep(9);
+                    getNeighborNode().setParentNode(getCurrentNode());
+                    pauseAtStep(10);
                 }
             }
 
             setNeighborNode(null);
         }
     }
+
+    @Override
+    public void setPseudocode() {
+        this.pseudocode.addAll(
+                "Q.enqueue(Start)",                       // Initialize the queue with Start
+                "while (!Q.isEmpty())",                             // Loop until the queue is empty
+                "   Current = Q.dequeue()",                         // Dequeue the front element
+                "   if (Current == Destination)",                   // Check if Current is the destination
+                "      tracePath() and exit",                       // Trace the path if found
+                "   Visited.add(Current)",                          // Mark Current as visited
+                "   for (N : neighbors(Current))",                  // Loop through neighbors of Current
+                "      if (N not in Visited)",                      // Check if N is unvisited and not in queue
+                "         Visited.add(N)",
+                "         Q.enqueue(N)",                            // Enqueue N
+                "         parent[N] = Current"                      // Set Current as the parent of N
+        );
+    }
+
 
     private void reconstructPath(GraphNode current) {
         for (GraphNode node = current; node != null; node = node.getParentNode()) {

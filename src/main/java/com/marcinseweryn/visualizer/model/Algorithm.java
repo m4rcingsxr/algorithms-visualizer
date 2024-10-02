@@ -1,5 +1,9 @@
 package com.marcinseweryn.visualizer.model;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Algorithm {
 
     public static final Logger logger = LogManager.getLogger(Algorithm.class);
+    private final ListView<String> pseudocodeList;
 
     // Flag to determine if step mode is disabled (continuous execution)
     protected boolean isContinuousMode = false;
@@ -21,15 +26,24 @@ public abstract class Algorithm {
     private final ReentrantLock executionLock = new ReentrantLock();
     private final Condition canProceed = executionLock.newCondition();
 
+    protected final ObservableList<String> pseudocode = FXCollections.observableArrayList();
+
     // Flag to indicate if the algorithm is currently paused
     private volatile boolean isPaused;
+
+    protected Algorithm(ListView<String> pseudocodeList) {
+        this.pseudocodeList = pseudocodeList;
+        if(pseudocodeList != null) {
+            Platform.runLater(() -> pseudocodeList.setItems(pseudocode));
+        }
+    }
 
     /**
      * Resumes the algorithm if it is in step mode.
      * Signals the waiting thread to continue execution.
      */
     public void resumeAlgorithm() {
-        if(!this.isContinuousMode) {
+        if (!this.isContinuousMode) {
             executionLock.lock();
             try {
                 logger.debug("Lock acquired, signaling condition to resume algorithm...");
@@ -56,6 +70,10 @@ public abstract class Algorithm {
      * @param stepNumber The current step number where the algorithm pauses.
      */
     protected void pauseAtStep(int stepNumber) {
+        Platform.runLater(() -> {
+            pseudocodeList.scrollTo(stepNumber);
+            pseudocodeList.getSelectionModel().select(stepNumber);
+        });
         if (!isContinuousMode) {
             executionLock.lock();
             try {
@@ -93,6 +111,7 @@ public abstract class Algorithm {
      */
     public void start(boolean continuousMode) {
         this.isContinuousMode = continuousMode;
+        setPseudocode();
         executeAlgorithm();  // Begin the algorithm's execution
     }
 
@@ -102,5 +121,7 @@ public abstract class Algorithm {
      * in the algorithm to enable step-by-step execution.
      */
     public abstract void executeAlgorithm();
+
+    public abstract void setPseudocode();
 
 }

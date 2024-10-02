@@ -5,7 +5,7 @@ import com.marcinseweryn.visualizer.model.Algorithm;
 public class BubbleSort extends Algorithm {
 
     public BubbleSort() {
-
+        super(null);
     }
 
     @Override
@@ -15,6 +15,11 @@ public class BubbleSort extends Algorithm {
 
     @Override
     public void executeAlgorithm() {
+
+    }
+
+    @Override
+    public void setPseudocode() {
 
     }
 }
