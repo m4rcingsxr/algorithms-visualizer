@@ -1,6 +1,7 @@
 package com.marcinseweryn.visualizer;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -18,14 +19,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Controller {
 
     private static final Logger logger = LogManager.getLogger(Controller.class);
-
-    public ListView candidateNodes;
-    public ListView visitedNodes;
-
 
     // ===========================================
     // ================== GRAPH ==================
@@ -42,6 +40,15 @@ public class Controller {
     ToggleButton toggleDistance;
 
     // ===========================================
+    // ================== GRAPH TAB ==============
+    // ===========================================
+    @FXML
+    ListView<SimpleStringProperty> candidateNodes;
+
+    @FXML
+    ListView<SimpleStringProperty> visitedNodes;
+
+    // ===========================================
     // ================== SORT ===================
     // ===========================================
 
@@ -49,10 +56,9 @@ public class Controller {
     // ================== COMMON =================
     // ===========================================
     @FXML
-    ChoiceBox<GraphAlgorithm> algorithmList;
+    ChoiceBox<Algorithm> algorithmList;
     @FXML
     VBox centerVBox;
-
 
     // ===========================================
     // ============= ALGORITHM SPACE =============
@@ -67,16 +73,12 @@ public class Controller {
     // ===========================================
     @FXML
     public Button startBtn;
-
     @FXML
     public Button stepBtn;
 
     private PathFindingController findController;
     private SortingController sortController;
-
-    private SimpleObjectProperty<GraphAlgorithmThread> resolveThread = new SimpleObjectProperty<>();
-
-    private Publisher publisher = new Publisher();
+    private final SimpleObjectProperty<AlgorithmThread> resolveThread = new SimpleObjectProperty<>();
 
     @FXML
     public void initialize() {
@@ -85,7 +87,8 @@ public class Controller {
         // Initialize controllers for path finding and sorting
         this.findController = new PathFindingController(this.graphPane, this.vertexList,
                                                         this.toggleWeight, this.toggleDistance,
-                                                        this.candidateNodes, this.visitedNodes
+                                                        this.candidateNodes, this.visitedNodes,
+                                                        this.algorithmList
         );
         this.sortController = new SortingController(this.arrayPane);
 
@@ -152,7 +155,7 @@ public class Controller {
                 }
                 for (Class<?> c : classes) {
                     Object a = c.getDeclaredConstructor().newInstance();
-                    if (a instanceof GraphAlgorithm algorithm) {
+                    if (a instanceof Algorithm algorithm) {
                         algorithmList.getItems().add(algorithm);
                     }
                 }
@@ -169,71 +172,62 @@ public class Controller {
     private void clickStartAlgorithm(ActionEvent actionEvent) {
         boolean isStepDisabled = actionEvent.getSource() == startBtn;
 
-        GraphAlgorithm algorithm = null;
-        try {
-            algorithm =
-                    this.algorithmList.getValue().getClass().getDeclaredConstructor().newInstance();
-        } catch (InvocationTargetException | IllegalAccessException |
-                 NoSuchMethodException | InstantiationException e) {
-            throw new RuntimeException(e);
-        }
-
         // Check if a thread is running or if we need to start/resume it
         if (this.resolveThread.get() == null || isStepDisabled) {
 
             if (this.algorithmTab.getSelectionModel().getSelectedItem().getText().equals(
                     "Path Finding")) {
+                Optional<GraphAlgorithm> graphAlgorithm = findController.initializeSelectedAlgorithm();
+
+                if(graphAlgorithm.isEmpty()) {
+                    throw new RuntimeException("Initialization of algorithm goes wrong...");
+                }
+
                 this.graphTab.getSelectionModel().selectFirst();
-                this.resolveThread.set(
-                        this.findController.getResolveThread(algorithm, this.resolveThread,
-                                                             isStepDisabled
-                        ));
+                this.resolveThread.set(new AlgorithmThread(() -> {
+                    graphAlgorithm.get().start(isStepDisabled);
+                    this.resolveThread.set(null);
+                }, graphAlgorithm.get()));
             } else {
                 // Sorting logic
             }
 
-            resolveThread.get().setDaemon(false);
             resolveThread.get().start();
         } else {
             // Algorithm is paused, so resume it
             logger.debug("Resuming algorithm...");
-            resolveThread.get().getAlgorithm().resumeAlgorithm();
+            resolveThread.get().resumeAlgorithm();
         }
-    }
-
-
-    @FXML
-    public void clickStopAlgorithm(ActionEvent actionEvent) {
     }
 
     @FXML
     private void onGraphPaneMousePressed(MouseEvent mouseEvent) {
-        this.findController.onGraphMousePressed(mouseEvent);
+        this.findController.onAlgorithmSpaceMousePressed(mouseEvent);
     }
 
     @FXML
     private void onGraphPaneDragDetected(MouseEvent mouseEvent) {
-        this.findController.onGraphPaneDragDetected(mouseEvent);
+        this.findController.onAlgorithmSpaceDragDetected(mouseEvent);
     }
 
     @FXML
     private void onGraphPaneMouseDragged(MouseEvent mouseEvent) {
-        this.findController.onGraphPaneMouseDragged(mouseEvent);
+        this.findController.onAlgorithmSpaceMouseDragged(mouseEvent);
     }
 
     @FXML
     private void onGraphPaneMouseReleased(MouseEvent mouseEvent) {
-        this.findController.onGraphPaneMouseReleased(mouseEvent);
+        this.findController.onAlgorithmSpaceMouseReleased(mouseEvent);
     }
 
     @FXML
     private void onGraphPaneDragOver(DragEvent dragEvent) {
-        this.findController.onGraphPaneDragOver(dragEvent);
+        this.findController.onAlgorithmSpaceDragOver(dragEvent);
     }
 
     @FXML
     private void onGraphPaneDragDropped(DragEvent dragEvent) {
-        this.findController.onGraphPaneDragDropped(dragEvent);
+        this.findController.onAlgorithmSpaceDragDropped(dragEvent);
     }
 
 }

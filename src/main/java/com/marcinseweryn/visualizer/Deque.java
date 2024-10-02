@@ -9,7 +9,7 @@ public abstract class Deque extends NodeVisualizer {
 
     private final ArrayDeque<GraphNode> pendingNodes = new ArrayDeque<>();
 
-    Deque(int listType, ListView candidateNodes, ListView visitedNodes) {
+    Deque(ListType listType, ListView candidateNodes, ListView visitedNodes) {
         super(listType, candidateNodes, visitedNodes);
     }
 

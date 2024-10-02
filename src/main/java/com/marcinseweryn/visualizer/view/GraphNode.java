@@ -117,4 +117,7 @@ public class GraphNode extends Button {
         return info;
     }
 
+    public void clearStyle() {
+        this.getStyleClass().removeAll("start", "destination", "visited", "candidate-nodes", "path");
+    }
 }

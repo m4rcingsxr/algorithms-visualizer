@@ -5,7 +5,7 @@ import javafx.scene.control.ListView;
 
 public class Stack extends Deque {
 
-    public Stack(int listType, ListView candidateNodes, ListView visitedNodes) {
+    public Stack(ListType listType, ListView candidateNodes, ListView visitedNodes) {
         super(listType, candidateNodes, visitedNodes);
     }
 

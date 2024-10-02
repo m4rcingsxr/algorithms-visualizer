@@ -4,13 +4,11 @@ import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -18,331 +16,528 @@ import javafx.scene.layout.AnchorPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
+
+/**
+ * Controller for handling the Path Finding algorithm visualization.
+ * Manages the interaction between nodes (GraphNode) and edges (Edge)
+ * on the algorithm visualization space. Handles user inputs, drag events,
+ * and node creation, while also updating the UI components like
+ * the accordion and list views.
+ */
 public class PathFindingController implements Subscriber {
 
     private static final Logger logger = LogManager.getLogger(PathFindingController.class);
 
-    // main view
-    private final AnchorPane graphPane;
-    private final Accordion vertexList;
-    private final ToggleButton toggleWeight;
-    private final ToggleButton toggleDistance;
+    // UI Elements
+    private final AnchorPane algorithmSpace;
+    private final Accordion renderedNodes;
+    private final ToggleButton showEdgeWeightToggle;
+    private final ToggleButton showEdgeDistanceToggle;
+    private final ListView<SimpleStringProperty> candidateNodeList;
+    private final ListView<SimpleStringProperty> visitedNodeList;
+    private final ChoiceBox<Algorithm> algorithmListBox;
 
-    // internal
-    private final Publisher publisher;
-    private final ListView candidateNodes;
-    private final ListView visitedNodes;
+    // Internal state variables
+    private final Publisher eventPublisher;
+    private GraphNode startingNode; // Graph node that starts the drag process
+    private GraphNode draggedNode; // Node that is created by drag from the starting node
+    private GraphNode hoveredNode; // Node currently hovered over during drag
+    private Edge connectingEdge; // Edge created between the starting node and the dragged node
+    private boolean isNodeMarkedForDeletion = false; // // Flag to track node deletion requests
 
-    private GraphNode vertex1;
-    private GraphNode vertex2;
+    // Starting Node for path finding algorithms
+    private final SimpleObjectProperty<GraphNode> startNodeProperty = new SimpleObjectProperty<>(null);
 
-    private boolean deleteNode;
-    private GraphNode tempVertex;
-    private Edge edge;
+    // Destination Node for path finding algorithms
+    private final SimpleObjectProperty<GraphNode> destinationNodeProperty = new SimpleObjectProperty<>(null);
 
-    private final SimpleObjectProperty<GraphNode> startVertex = new SimpleObjectProperty<>(null);
-    private final SimpleObjectProperty<GraphNode> destinationVertex = new SimpleObjectProperty<>(
-            null);
+    // pseudo classes to activate - used for state visualization of the executing algorithm
+    static final PseudoClass currentNodeStyle = PseudoClass.getPseudoClass("current");
+    static final PseudoClass neighborNodeStyle = PseudoClass.getPseudoClass("neighbour");
 
-    static final PseudoClass ps_currentNode = PseudoClass.getPseudoClass("current");
-    static final PseudoClass ps_neighbourNode = PseudoClass.getPseudoClass("neighbour");
+    /**
+     * Initializes the PathFindingController, setting up the necessary event subscriptions
+     * and injecting UI elements for managing node and edge rendering.
+     */
+    public PathFindingController(AnchorPane algorithmSpace, Accordion renderedNodes,
+                                 ToggleButton showEdgeWeightToggle, ToggleButton showEdgeDistanceToggle,
+                                 ListView<SimpleStringProperty> candidateNodeList,
+                                 ListView<SimpleStringProperty> visitedNodeList,
+                                 ChoiceBox<Algorithm> algorithmListBox) {
+        this.algorithmSpace = algorithmSpace;
+        this.renderedNodes = renderedNodes;
+        this.showEdgeWeightToggle = showEdgeWeightToggle;
+        this.showEdgeDistanceToggle = showEdgeDistanceToggle;
+        this.candidateNodeList = candidateNodeList;
+        this.visitedNodeList = visitedNodeList;
+        this.algorithmListBox = algorithmListBox;
 
-    public PathFindingController(AnchorPane graphPane, Accordion vertexList,
-                                 ToggleButton toggleWeight, ToggleButton toggleDistance,
-                                 ListView candidateNodes, ListView visitedNodes) {
-        this.graphPane = graphPane;
-        this.vertexList = vertexList;
-        this.toggleWeight = toggleWeight;
-        this.toggleDistance = toggleDistance;
-        this.candidateNodes = candidateNodes;
-        this.visitedNodes = visitedNodes;
-
-        this.publisher = new Publisher();
-
-        this.publisher.subscribe("startClicked", this);
-        this.publisher.subscribe("destinationClicked", this);
-        this.publisher.subscribe("removeEdge", this);
-
-        logger.info("PathFindingController initialized with graphPane.");
+        this.eventPublisher = new Publisher();
+        initializeEventSubscriptions();
+        logger.info("PathFindingController initialized.");
     }
 
-    void onGraphMousePressed(MouseEvent mouseEvent) {
-        logger.debug("Mouse pressed at coordinates: [X: {}, Y: {}]", mouseEvent.getX(),
-                     mouseEvent.getY()
-        );
-
-        if (mouseEvent.isPrimaryButtonDown()) {
-            this.vertex1 = createAndAddVertex(mouseEvent.getX(), mouseEvent.getY());
-        }
+    /**
+     * Initializes the event subscriptions for the controller.
+     */
+    private void initializeEventSubscriptions() {
+        this.eventPublisher.subscribe("startClicked", this);
+        this.eventPublisher.subscribe("destinationClicked", this);
+        this.eventPublisher.subscribe("removeEdge", this);
     }
 
-    void onGraphPaneMouseReleased(MouseEvent mouseEvent) {
-        logger.debug("Mouse released at coordinates: [X: {}, Y: {}]", mouseEvent.getX(),
-                     mouseEvent.getY()
-        );
-
-        if (this.tempVertex != null) {
-            this.vertex1.removeEdge(this.edge);
-            this.graphPane.getChildren().removeAll(this.vertex2, this.edge);
-
-            // remove additional candidate as new vertex from accordion
-            this.removeVertexFromAccordion(this.vertex2);
-
-            GraphNode.decrementCount();
-            this.vertex2 = tempVertex;
-
-            // no need to check if already exist because we cannot connect it
-            // multiple times from graph pane mouse released
-            this.edge = createAndAddEdge(this.vertex1, this.vertex2);
-        }
-
-        if (this.vertex2 != null) {
-            this.vertex2.getStyleClass().remove("drag");
-            this.edge.getStyleClass().remove("drag");
-            this.vertex2 = null;
-        }
-    }
-
-    void onGraphPaneDragDetected(MouseEvent mouseEvent) {
-        logger.debug("Drag detected at coordinates: [X: {}, Y: {}]", mouseEvent.getX(),
-                     mouseEvent.getY()
-        );
-        if (mouseEvent.isPrimaryButtonDown()) {
-
-            // here's position is translated to the cursor (initialization step)
-            this.vertex2 = createAndAddVertex(mouseEvent.getX(), mouseEvent.getY());
-
-            this.vertex2.startFullDrag();
-
-            this.vertex2.toBack();
-
-            // required to hold it - mouse release must remove this edge if vertex entered other one
-            // that's different from vertex1 and vertex2 -  create network from vertex1
-            // to already existing vertex`
-            this.edge = createAndAddEdge(this.vertex1, this.vertex2);
-
-            this.vertex2.getStyleClass().add("drag");
-            this.edge.getStyleClass().add("drag");
-        }
-    }
-
-    private Edge createAndAddEdge(GraphNode vertex1, GraphNode vertex2) {
-        Edge temp = new Edge(this.vertex1, this.vertex2);
-        temp.weightVisibleProperty().bind(toggleWeight.selectedProperty());
-        temp.distanceVisibleProperty().bind(toggleDistance.selectedProperty());
-
-        vertex1.addEdge(temp);
-        vertex2.addEdge(temp);
-
-        this.graphPane.getChildren().add(temp);
-        return temp;
-    }
-
-    void onGraphPaneMouseDragged(MouseEvent mouseEvent) {
-        logger.debug("Mouse dragged to coordinates: [X: {}, Y: {}]", mouseEvent.getX(),
-                     mouseEvent.getY()
-        );
-
-        if (this.vertex2 != null) {
-            this.vertex2.setLayoutX(mouseEvent.getX());
-            this.vertex2.setLayoutY(mouseEvent.getY());
-        }
-    }
-
-    // After a drag is detected, the system starts handling drag-and-drop events such as
-    // onDragOver and onDragDropped
-    // triggered continuously while dragging an object over a target
-    void onGraphPaneDragOver(DragEvent dragEvent) {
-        logger.debug("Drag over at coordinates: [X: {}, Y: {}]", dragEvent.getX(),
-                     dragEvent.getY()
-        );
-    }
-
-    // dragged object is dropped onto a target
-    void onGraphPaneDragDropped(DragEvent dragEvent) {
-        logger.debug("Drag dropped at coordinates: [X: {}, Y: {}]", dragEvent.getX(),
-                     dragEvent.getY()
-        );
-    }
-
-    private GraphNode createAndAddVertex(double x, double y) {
-        logger.debug("Creating a new GraphNode at coordinates: [X: {}, Y: {}]", x, y);
-
-        GraphNode graphNode = new GraphNode(x, y);
-
-        graphNode.setOnMousePressed(this::handleVertexPressed);
-        graphNode.setOnMouseReleased(e -> handleVertexReleased(e, graphNode));
-        graphNode.setOnDragDetected(e -> handleVertexDragDetected(e, graphNode));
-        graphNode.setOnMouseDragged(e -> handleVertexDragged(e, graphNode));
-        graphNode.setOnMouseDragEntered(e -> nodeMouseDragEntered(e, graphNode));
-        graphNode.setOnMouseDragExited(e -> nodeMouseDragExited(e, graphNode));
-
-        logger.debug("Adding new GraphNode with ID {} to the graphPane.", graphNode.getId());
-
-        this.addVertexToAccordion(graphNode);
-        graphPane.getChildren().add(graphNode);
-
-        return graphNode;
-    }
-
-    private void handleVertexPressed(MouseEvent mouseEvent) {
-        if (mouseEvent.isSecondaryButtonDown()) {
-            deleteNode = true;
-        }
-    }
-
-    private void handleVertexReleased(MouseEvent mouseEvent, GraphNode node) {
-        if (this.tempVertex != null) {
-            this.vertex1.removeEdge(edge);
-            this.graphPane.getChildren().removeAll(vertex2, edge);
-
-            removeVertexFromAccordion(this.vertex2);
-
-            GraphNode.decrementCount();
-            this.vertex2 = this.tempVertex;
-
-            // do not allow to create same edge multiple times between 2 nodes
-            if (!vertex1.getNeighbours().contains(vertex2)) {
-                this.edge = createAndAddEdge(vertex1, vertex2);
+    /**
+     * Initializes the selected algorithm from the algorithm list.
+     * It creates a new instance of the selected GraphAlgorithm with the required properties.
+     *
+     * @return Optional of GraphAlgorithm if an algorithm is selected, otherwise empty Optional.
+     */
+    public Optional<GraphAlgorithm> initializeSelectedAlgorithm() {
+        if (this.algorithmListBox.getValue() instanceof GraphAlgorithm selectedAlgorithm) {
+            try {
+                return Optional.of(selectedAlgorithm.getClass()
+                                           .getDeclaredConstructor(ListView.class, ListView.class,
+                                                                   SimpleObjectProperty.class,
+                                                                   SimpleObjectProperty.class
+                                           )
+                                           .newInstance(candidateNodeList, visitedNodeList, startNodeProperty,
+                                                        destinationNodeProperty
+                                           ));
+            } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
+                     InstantiationException e) {
+                throw new RuntimeException(e);
             }
         }
-
-        if (vertex2 != null) {
-            vertex2.getStyleClass().remove("drag");
-        }
-
-        for (Edge e : node.getEdges()) {
-            e.getStyleClass().remove("drag");
-        }
-
-        if (this.deleteNode) {
-            deleteNode(node);
-            deleteNode = false;
-            removeVertexFromAccordion(node);
-        }
-
-        this.vertex1 = null;
-        this.vertex2 = null;
-        this.edge = null;
-        this.tempVertex = null;
+        return Optional.empty();
     }
 
-    private void deleteNode(GraphNode node) {
+    /**
+     * Handles the mouse press event on the algorithm space.
+     * Creates a new graph node at the mouse location and sets it as the starting node.
+     *
+     * @param mouseEvent The mouse event triggered on pressing the algorithm space.
+     */
+    void onAlgorithmSpaceMousePressed(MouseEvent mouseEvent) {
+        logMouseEvent("Mouse pressed", mouseEvent);
+        if (mouseEvent.isPrimaryButtonDown()) {
+            this.startingNode = this.createGraphNodeAt(mouseEvent.getX(), mouseEvent.getY());
+        }
+    }
+
+    /**
+     * Handles the drag detected event on the algorithm space.
+     * Initiates drag by creating a new node from the starting node and an edge connecting them.
+     *
+     * @param mouseEvent The mouse event triggered on detecting a drag action.
+     */
+    void onAlgorithmSpaceDragDetected(MouseEvent mouseEvent) {
+        logMouseEvent("Drag detected", mouseEvent);
+        if (mouseEvent.isPrimaryButtonDown()) {
+            this.startNodeDrag(mouseEvent);
+        }
+    }
+
+    /**
+     * Handles the mouse drag event on the algorithm space.
+     * Updates the position of the currently dragged node as the mouse moves.
+     *
+     * @param mouseEvent The mouse event triggered during a drag action.
+     */
+    void onAlgorithmSpaceMouseDragged(MouseEvent mouseEvent) {
+        logMouseEvent("Mouse dragged", mouseEvent);
+        if (this.draggedNode != null) {
+            this.moveDraggedNodeTo(mouseEvent.getX(), mouseEvent.getY());
+        }
+    }
+
+    /**
+     * Handles the mouse release event on the algorithm space.
+     * Completes the node drag process and either connects to an existing node or finalizes the new node creation.
+     *
+     * @param mouseEvent The mouse event triggered on releasing the mouse button.
+     */
+    void onAlgorithmSpaceMouseReleased(MouseEvent mouseEvent) {
+        logMouseEvent("Mouse released", mouseEvent);
+        finalizeOrResetNodeMovement();
+    }
+
+    // Logs mouse events for debugging purposes
+    private void logMouseEvent(String eventDescription, MouseEvent mouseEvent) {
+        logger.trace("{} at coordinates: [X: {}, Y: {}]", eventDescription, mouseEvent.getX(),
+                     mouseEvent.getY()
+        );
+    }
+
+    /**
+     * Starts the drag operation by creating a new graph node and an edge between it and the starting node.
+     * Also enables full gesture drag to allow drag-related events across nodes.
+     *
+     * @param mouseEvent The mouse event that triggers the drag operation.
+     */
+    private void startNodeDrag(MouseEvent mouseEvent) {
+        this.draggedNode = createGraphNodeAt(mouseEvent.getX(), mouseEvent.getY());
+        this.connectingEdge = createEdgeBetweenNodes(this.startingNode, this.draggedNode);
+        this.draggedNode.startFullDrag();
+        this.draggedNode.toBack();
+        applyDragStyleToDraggedNodeAndCurrentEdge("drag", true);
+    }
+
+    /**
+     * Moves the dragged node to the specified x, y coordinates.
+     *
+     * @param x The x-coordinate to move the node to.
+     * @param y The y-coordinate to move the node to.
+     */
+    private void moveDraggedNodeTo(double x, double y) {
+        this.draggedNode.setLayoutX(x);
+        this.draggedNode.setLayoutY(y);
+    }
+
+    /**
+     * Creates a new GraphNode at the specified coordinates and sets up event handlers for it.
+     *
+     * @param x The x-coordinate of the new node.
+     * @param y The y-coordinate of the new node.
+     * @return The newly created GraphNode.
+     */
+    private GraphNode createGraphNodeAt(double x, double y) {
+        logger.debug("Creating a new GraphNode at coordinates: [X: {}, Y: {}]", x, y);
+        GraphNode newNode = new GraphNode(x, y);
+        addEventHandlersToNode(newNode);
+        addNodeToUI(newNode);
+        return newNode;
+    }
+
+    /**
+     * Adds event handlers to the specified GraphNode to handle interactions such as drag and click events.
+     *
+     * @param newNode The GraphNode to add event handlers to.
+     */
+    private void addEventHandlersToNode(GraphNode newNode) {
+        newNode.setOnMousePressed(this::onGraphNodePressed);
+        newNode.setOnMouseReleased(e -> onGraphNodeReleased(e, newNode));
+        newNode.setOnDragDetected(e -> onGraphNodeDragDetected(e, newNode));
+        newNode.setOnMouseDragged(e -> onGraphNodeDragged(e, newNode));
+        newNode.setOnMouseDragEntered(e -> onNodeMouseDragEntered(e, newNode));
+        newNode.setOnMouseDragExited(e -> onNodeMouseDragExited(e, newNode));
+    }
+
+    /**
+     * Adds the newly created GraphNode to the UI, including the algorithm space and the accordion list.
+     *
+     * @param graphNode The GraphNode to add to the UI.
+     */
+    private void addNodeToUI(GraphNode graphNode) {
+        addNodeToAccordion(graphNode);
+        this.algorithmSpace.getChildren().add(graphNode);
+    }
+
+    /**
+     * Creates an edge between two GraphNodes and binds its properties to the GraphNode properties.
+     *
+     * @param node1 The first node in the edge connection.
+     * @param node2 The second node in the edge connection.
+     * @return The newly created Edge.
+     */
+    private Edge createEdgeBetweenNodes(GraphNode node1, GraphNode node2) {
+        Edge edge = new Edge(this.startingNode, this.draggedNode);
+        bindEdgeProperties(edge);
+        addEdgeToNodes(node1, node2, edge);
+        return edge;
+    }
+
+    // Binds the edge's visibility properties to toggle buttons for showing weight and distance.
+    private void bindEdgeProperties(Edge edge) {
+        edge.weightVisibleProperty().bind(showEdgeWeightToggle.selectedProperty());
+        edge.distanceVisibleProperty().bind(showEdgeDistanceToggle.selectedProperty());
+    }
+
+    // Adds the edge to both nodes and to the algorithm space UI.
+    private void addEdgeToNodes(GraphNode node1, GraphNode node2, Edge edge) {
+        node1.addEdge(edge);
+        node2.addEdge(edge);
+        this.algorithmSpace.getChildren().add(edge);
+    }
+
+    /**
+     * Finalizes the node drag operation, either completing the connection to an existing node
+     * or resetting the operation if no connection was made.
+     */
+    private void finalizeOrResetNodeMovement() {
+
+        // if on movement - mouse release occur on existing vertex
+        if (this.hoveredNode != null) {
+            finalizeNodeMovement();
+        }
+
+        // release occur on algorithm space
+        if (this.draggedNode != null) {
+            applyDragStyleToDraggedNodeAndCurrentEdge("drag", false);
+        }
+    }
+
+    /**
+     * Finalizes the node movement by connecting the dragged node to the hovered node
+     * and removing the placeholder dragged node.
+     */
+    private void finalizeNodeMovement() {
+        this.startingNode.removeEdge(this.connectingEdge);
+        this.algorithmSpace.getChildren().removeAll(this.draggedNode, this.connectingEdge);
+        this.removeNodeFromAccordion(this.draggedNode);
+        GraphNode.decrementCount();
+
+        this.draggedNode = this.hoveredNode;
+        this.connectingEdge = createEdgeBetweenNodes(this.startingNode, this.draggedNode);
+    }
+
+    // Adds the GraphNode to the accordion in the UI for managing nodes.
+    private void addNodeToAccordion(GraphNode graphNode) {
+        VertexSetup setupView = new VertexSetup(graphNode, this.eventPublisher);
+        TitledPane pane = new TitledPane(graphNode.getId(), setupView);
+        configureAccordionPane(pane, setupView);
+        this.renderedNodes.getPanes().add(pane);
+    }
+
+    // Configures the accordion pane to update the node setup view when expanded.
+    private void configureAccordionPane(TitledPane pane, VertexSetup setupView) {
+        pane.setMaxWidth(Double.MAX_VALUE);
+        pane.expandedProperty().addListener((ChangeListener<? super Boolean>) (obs, wasExpanded, isNowExpanded) -> {
+            if (isNowExpanded) {
+                setupView.update();
+            }
+        });
+    }
+
+    // Removes the specified GraphNode from the accordion list in the UI.
+    private void removeNodeFromAccordion(GraphNode node) {
+        renderedNodes.getPanes().removeIf(pane -> pane.getText().equals(node.getId()));
+    }
+
+    // Applies or resets the specified style class on the current node and edge.
+    private void applyDragStyleToDraggedNodeAndCurrentEdge(String styleClass, boolean apply) {
+        if (apply) {
+            this.draggedNode.getStyleClass().add(styleClass);
+            this.connectingEdge.getStyleClass().add(styleClass);
+        } else {
+            resetNodeStyle(styleClass);
+        }
+    }
+
+    // Resets the specified style class on the current node and edge.
+    private void resetNodeStyle(String styleClass) {
+        if (this.draggedNode != null) {
+            this.draggedNode.getStyleClass().remove(styleClass);
+        }
+        if (this.connectingEdge != null) {
+            this.connectingEdge.getStyleClass().remove(styleClass);
+        }
+        this.draggedNode = null; // Reset the dragged node reference after the operation
+    }
+
+    /**
+     * Handles the mouse pressed event on a GraphNode.
+     * Sets the flag for marking the node for deletion if the secondary button is pressed.
+     *
+     * @param mouseEvent The mouse event triggered on pressing a GraphNode.
+     */
+    private void onGraphNodePressed(MouseEvent mouseEvent) {
+        if (mouseEvent.isSecondaryButtonDown()) {
+            this.isNodeMarkedForDeletion = true;
+        }
+    }
+
+    /**
+     * Handles the mouse release event on a GraphNode.
+     * Finalizes or resets the node movement and deletes the node if it is marked for deletion.
+     *
+     * @param mouseEvent The mouse event triggered on releasing the mouse button.
+     * @param node       The GraphNode that was released.
+     */
+    private void onGraphNodeReleased(MouseEvent mouseEvent, GraphNode node) {
+        finalizeOrResetNodeMovement();
+        removeDragStyle(node);
+
+        if (isNodeMarkedForDeletion) {
+            deleteGraphNode(node);
+            removeNodeFromAccordion(node);
+            isNodeMarkedForDeletion = false;
+        }
+
+        resetInteractionState();
+    }
+
+    // Removes the drag style from the specified GraphNode and its edges.
+    private void removeDragStyle(GraphNode node) {
+        node.getEdges().forEach(e -> e.getStyleClass().remove("drag"));
+        if (this.draggedNode != null) {
+            this.draggedNode.getStyleClass().remove("drag");
+        }
+    }
+
+    // Deletes the specified GraphNode and its edges from the UI and updates neighboring nodes.
+    private void deleteGraphNode(GraphNode node) {
         for (Edge edge : node.getEdges()) {
             edge.getNeighbour(node).getEdges().remove(edge);
-            this.graphPane.getChildren().remove(edge);
+            this.algorithmSpace.getChildren().remove(edge);
         }
-        this.graphPane.getChildren().remove(node);
+        this.algorithmSpace.getChildren().remove(node);
     }
 
-    private void handleVertexDragged(MouseEvent e, GraphNode graphNode) {
-        if (this.vertex2 != null) {
+    // Resets the interaction state by clearing references to the starting node, dragged node, and connecting edge.
+    private void resetInteractionState() {
+        this.startingNode = null;
+        this.draggedNode = null;
+        this.connectingEdge = null;
+        this.hoveredNode = null;
+    }
 
-            // relative from graphNode
-            this.vertex2.setLayoutX(graphNode.getLayoutX() + e.getX() + graphNode.getTranslateX());
-            this.vertex2.setLayoutY(graphNode.getLayoutY() + e.getY() + graphNode.getTranslateY());
+    // handle new graph node dragged from existing graph node
+    private void onGraphNodeDragged(MouseEvent e, GraphNode graphNode) {
+        if (this.draggedNode != null) {
+            moveNodeRelativeToGraphNode(e, graphNode);
         }
     }
 
-    private void handleVertexDragDetected(MouseEvent mouseEvent, GraphNode graphNode) {
+    // place relative to existing graph node new created node
+    private void moveNodeRelativeToGraphNode(MouseEvent e, GraphNode graphNode) {
+        this.draggedNode.setLayoutX(graphNode.getLayoutX() + e.getX() + graphNode.getTranslateX());
+        this.draggedNode.setLayoutY(graphNode.getLayoutY() + e.getY() + graphNode.getTranslateY());
+    }
+
+    /**
+     * Handles the drag detected event on a GraphNode.
+     * Starts the drag operation from the existing GraphNode or marks the node for deletion.
+     *
+     * @param mouseEvent The mouse event triggered on detecting a drag action.
+     * @param graphNode  The GraphNode from which the drag started.
+     */
+    private void onGraphNodeDragDetected(MouseEvent mouseEvent, GraphNode graphNode) {
         if (mouseEvent.isPrimaryButtonDown()) {
-            graphNode.startFullDrag();
-            this.vertex1 = graphNode;
-            this.vertex2 = createAndAddVertex(
-                    graphNode.getLayoutX() + mouseEvent.getX() + graphNode.getTranslateX(),
-                    graphNode.getLayoutY() + mouseEvent.getY() + graphNode.getTranslateX()
-            );
-            this.edge = createAndAddEdge(vertex1, vertex2);
+            startDragFromExistingGraphNode(mouseEvent, graphNode);
+        } else if (mouseEvent.isSecondaryButtonDown()) {
+            markNodeForDeletion(graphNode);
+        }
+    }
 
-            // whenever move this vertex on other put it on back
-            // might stay on top of other elements even when it is supposed to be hidden
-            this.vertex2.toBack();
+    /**
+     * Starts the drag operation from an existing GraphNode, creating a new node connected to it with an edge.
+     *
+     * @param mouseEvent The mouse event that initiates the drag.
+     * @param graphNode  The existing GraphNode from which the drag starts.
+     */
+    private void startDragFromExistingGraphNode(MouseEvent mouseEvent, GraphNode graphNode) {
+        graphNode.startFullDrag();
+        this.startingNode = graphNode;  // Set the initial node to the existing graph node.
+        this.draggedNode = createGraphNodeAt(
+                graphNode.getLayoutX() + mouseEvent.getX() + graphNode.getTranslateX(),
+                graphNode.getLayoutY() + mouseEvent.getY() + graphNode.getTranslateY()
+        );
+        this.connectingEdge = createEdgeBetweenNodes(startingNode, draggedNode);
+        this.draggedNode.toBack();
+        applyDragStyleToDraggedNodeAndCurrentEdge("drag", true);
+    }
 
-            vertex2.getStyleClass().add("drag");
+    /**
+     * Marks a GraphNode for deletion, applying the appropriate styles to indicate it is being removed.
+     *
+     * @param graphNode The GraphNode to mark for deletion.
+     */
+    private void markNodeForDeletion(GraphNode graphNode) {
+        this.isNodeMarkedForDeletion = false;
+        applyDragStyleToNodeAndEdges(graphNode);
+        this.draggedNode = graphNode; // Update the dragged node reference to the graphNode being deleted.
+    }
+
+    /**
+     * Applies the deletion style to a GraphNode and its edges, bringing them to the front visually.
+     *
+     * @param graphNode The GraphNode to apply the deletion style to.
+     */
+    private void applyDragStyleToNodeAndEdges(GraphNode graphNode) {
+        graphNode.getStyleClass().add("drag");
+        graphNode.toFront();
+        for (Edge edge : graphNode.getEdges()) {
+            edge.toFront();
             edge.getStyleClass().add("drag");
         }
+    }
 
-        if (mouseEvent.isSecondaryButtonDown()) {
-            this.deleteNode = false; // do not delete on release
-
-            graphNode.getStyleClass().add("drag");
-            for (Edge edge : graphNode.getEdges()) {
-                edge.toFront();
-                edge.getStyleClass().add("drag");
-            }
-
-            graphNode.toFront();
-
-            // set currently dragged vertex
-            this.vertex2 = graphNode;
+    /**
+     * Handles the mouse drag entered event for a GraphNode, setting it as the hovered node for connection.
+     *
+     * @param e         The mouse drag event triggered when drag enters the GraphNode.
+     * @param graphNode The GraphNode that is being hovered over.
+     */
+    private void onNodeMouseDragEntered(MouseDragEvent e, GraphNode graphNode) {
+        if (graphNode != startingNode && graphNode != draggedNode) {
+            applyHoverStyleToNode(graphNode);
         }
     }
 
-    private void nodeMouseDragEntered(MouseDragEvent e, GraphNode graphNode) {
-        if (graphNode != vertex1 && graphNode != vertex2) {
-            graphNode.getStyleClass().add("drag");
-            this.tempVertex = graphNode;
-            this.vertex2.setVisible(false);
-        }
+    /**
+     * Applies the hover style to a GraphNode when a drag operation enters it.
+     * Sets the hovered node reference for potential connection.
+     *
+     * @param graphNode The GraphNode being hovered over.
+     */
+    private void applyHoverStyleToNode(GraphNode graphNode) {
+        graphNode.getStyleClass().add("drag");
+        this.hoveredNode = graphNode;
+        this.draggedNode.setVisible(false);
     }
 
-    private void nodeMouseDragExited(MouseDragEvent e, GraphNode graphNode) {
-        if (vertex2 != null) {
-            vertex2.setVisible(true);
+    /**
+     * Handles the mouse drag exited event for a GraphNode, removing the hover style and resetting state.
+     *
+     * @param e         The mouse drag event triggered when drag exits the GraphNode.
+     * @param graphNode The GraphNode that was exited.
+     */
+    private void onNodeMouseDragExited(MouseDragEvent e, GraphNode graphNode) {
+        if (draggedNode != null) {
+            draggedNode.setVisible(true);
         }
 
-        if (tempVertex != null) {
+        if (hoveredNode != null) {
             graphNode.getStyleClass().remove("drag");
-            tempVertex = null;
+            hoveredNode = null;
         }
     }
 
-    private void addVertexToAccordion(GraphNode graphNode) {
-        VertexSetup vertexSetup = new VertexSetup(graphNode, this.publisher);
-        TitledPane titledPane = new TitledPane(graphNode.getId(), vertexSetup);
-        titledPane.setMaxWidth(Double.MAX_VALUE);
-        this.vertexList.getPanes().add(titledPane);
-
-        titledPane.expandedProperty().addListener(
-                (ChangeListener<? super Boolean>) (obs, wasExpanded, expandedNow) -> {
-                    if (expandedNow) {
-                        vertexSetup.update();
-                    }
-                }
-        );
-
-    }
-
-    private void removeVertexFromAccordion(GraphNode graphNode) {
-        vertexList.getPanes().stream()
-                .filter(tp -> tp.getText().equals(graphNode.getId()))
-                .findFirst()
-                .ifPresent(vertexList.getPanes()::remove);
-    }
-
+    /**
+     * Updates the controller based on specific events related to the graph nodes.
+     * Handles events such as node selection for start and destination.
+     *
+     * @param eventType The type of event (e.g., "startClicked", "destinationClicked").
+     * @param node      The GraphNode associated with the event.
+     */
     @Override
     public void update(String eventType, Node node) {
-        if (eventType.equals("startClicked")) {
-            logger.info("Start button clicked for node: {}", node.getId());
-            startVertex.set((GraphNode) node);
-        } else if (eventType.equals("destinationClicked")) {
-            logger.info("Destination button clicked for node: {}", node.getId());
-            destinationVertex.set((GraphNode) node);
-            logger.info("Destination node set: {}", destinationVertex.get().getId());
-        } else if (eventType.equals("removeEdge")) {
-            logger.info("removing edge");
-            this.graphPane.getChildren().remove(node);
+        switch (eventType) {
+            case "startClicked" -> {
+                logger.info("Start button clicked for node: {}", node.getId());
+                startNodeProperty.set((GraphNode) node);
+            }
+            case "destinationClicked" -> {
+                logger.info("Destination button clicked for node: {}", node.getId());
+                destinationNodeProperty.set((GraphNode) node);
+                logger.info("Destination node set: {}", destinationNodeProperty.get().getId());
+            }
+            case "removeEdge" -> {
+                logger.info("Removing edge");
+                this.algorithmSpace.getChildren().remove(node);
+            }
+            default -> logger.info("Not supported");
         }
     }
 
-    public GraphAlgorithmThread getResolveThread(final GraphAlgorithm algorithm,
-                                                 SimpleObjectProperty<GraphAlgorithmThread> resolveThread,
-                                                 boolean isStepDisabled) {
-        return new GraphAlgorithmThread(() -> {
-            algorithm.start(startVertex.get(), destinationVertex.get(), isStepDisabled,
-                            candidateNodes, visitedNodes
-            );
-            resolveThread.set(null);
-        }, algorithm, isStepDisabled);
+    // Optional drag and drop events (not currently used, but available for future implementations).
+    void onAlgorithmSpaceDragOver(DragEvent dragEvent) {
+        logger.trace("Drag over at coordinates: [X: {}, Y: {}]", dragEvent.getX(), dragEvent.getY());
+    }
+
+    void onAlgorithmSpaceDragDropped(DragEvent dragEvent) {
+        logger.trace("Drag dropped at coordinates: [X: {}, Y: {}]", dragEvent.getX(), dragEvent.getY());
     }
 }

@@ -2,59 +2,45 @@ package com.marcinseweryn.visualizer;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
-public abstract class GraphAlgorithm {
+public abstract class GraphAlgorithm extends Algorithm {
 
-    public static Logger logger = LogManager.getLogger(GraphAlgorithm.class);
+    public static final Logger logger = LogManager.getLogger(GraphAlgorithm.class);
 
-    protected GraphNode startVertex;
-    protected GraphNode destinationVertex;
+    protected SimpleObjectProperty<GraphNode> startNode = new SimpleObjectProperty<>();
+    protected SimpleObjectProperty<GraphNode> destinationNode = new SimpleObjectProperty<>();
 
     private List<GraphNode> path = new ArrayList<>();
-
-    private boolean isStepDisabled = false;
-    private final ReentrantLock lock = new ReentrantLock();
-
-    private final Condition stepCondition = lock.newCondition();
-    private volatile boolean isStopped;
 
     protected NodeVisualizer candidateNodes;
     protected NodeVisualizer visitedNodes;
 
-    private Publisher publisher;
     private GraphNode currentVertex;
     private GraphNode neighbourVertex;
 
-
     protected GraphAlgorithm() {
+        super();
     }
 
-    protected GraphAlgorithm(Publisher publisher) {
-        this.publisher = publisher;
+    protected GraphAlgorithm(
+            ListView<SimpleStringProperty> candidateNodes,
+            ListView<SimpleStringProperty> visitedNodes,
+            SimpleObjectProperty<GraphNode> startNode,
+            SimpleObjectProperty<GraphNode> destinationNode) {
+        this.candidateNodes = new Queue(ListType.CANDIDATE_NODES, candidateNodes, visitedNodes);
+        this.visitedNodes = new Stack(ListType.VISITED, candidateNodes, visitedNodes);
+
+        this.startNode.bind(startNode);
+        this.destinationNode.bind(destinationNode);
     }
-
-    void start(GraphNode startVertex, GraphNode destinationVertex, boolean isStepDisabled, ListView candidateNodes, ListView visitedNodes) {
-        this.candidateNodes = new Queue(NodeVisualizer.TYPE_CANDIDATE_NODES, candidateNodes, visitedNodes);
-        this.visitedNodes = new Stack(NodeVisualizer.TYPE_VISITED, candidateNodes, visitedNodes);
-
-        this.startVertex = startVertex;
-        this.destinationVertex = destinationVertex;
-
-        this.isStepDisabled = isStepDisabled;
-
-        resolve();
-    }
-
-    public abstract void resolve();
-
 
     // used by single thread - not modified by multiple threads
     protected void addToPath(GraphNode node) {
@@ -71,61 +57,11 @@ public abstract class GraphAlgorithm {
         }
     }
 
-    public void resumeAlgorithm() {
-        if(!this.isStepDisabled) {
-            lock.lock();
-            try {
-                logger.debug("Lock acquired, signaling condition to resume algorithm...");
-                stepCondition.signalAll();  // Signal the waiting thread
-                isStopped = false;
-                logger.debug("Condition signaled");
-            } finally {
-                logger.debug("Lock released after signaling");
-                lock.unlock();
-            }
-
-            try {
-                Thread.sleep(100);  // Add a short delay
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
-    protected void step(int stepNum) {
-        if(!this.isStepDisabled) {
-            lock.lock();
-            try {
-                logger.debug("Lock acquired, about to wait at step: " + stepNum);
-
-                isStopped = true;
-                while (isStopped) {
-                    stepCondition.await();  // Wait for the signal
-                }
-
-                logger.debug("Resumed from waiting at step: " + stepNum);
-            } catch (InterruptedException e) {
-                logger.error("Thread interrupted while waiting", e);
-                Thread.currentThread().interrupt();
-            } finally {
-                logger.debug("Lock released after step: " + stepNum);
-                lock.unlock();
-            }
-        } else {
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                logger.error("Thread interrupted while waiting", e);
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
     protected void setCurrent(GraphNode currentVertex) {
         if (this.currentVertex != null) //set previous value to false first
-            this.currentVertex.pseudoClassStateChanged(PathFindingController.ps_currentNode, false);
+            this.currentVertex.pseudoClassStateChanged(PathFindingController.currentNodeStyle, false);
         if(currentVertex != null) {
-            currentVertex.pseudoClassStateChanged(PathFindingController.ps_currentNode, true);
+            currentVertex.pseudoClassStateChanged(PathFindingController.currentNodeStyle, true);
         }
         this.currentVertex = currentVertex;
     }
@@ -136,9 +72,9 @@ public abstract class GraphAlgorithm {
 
     protected void setNeighbour(GraphNode neighbourVertex) {
         if (this.neighbourVertex != null) //set previous value to false first
-            this.neighbourVertex.pseudoClassStateChanged(PathFindingController.ps_neighbourNode, false);
+            this.neighbourVertex.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, false);
         if(neighbourVertex != null) {
-            neighbourVertex.pseudoClassStateChanged(PathFindingController.ps_neighbourNode, true);
+            neighbourVertex.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, true);
         }
         this.neighbourVertex = neighbourVertex;
     }
@@ -146,7 +82,6 @@ public abstract class GraphAlgorithm {
     protected GraphNode getNeighbour() {
         return neighbourVertex;
     }
-
 
 
 }

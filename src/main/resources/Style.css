@@ -124,7 +124,7 @@
     -fx-border-color: null;
 }
 
-.pending-nodes {
+.candidate-nodes {
     -fx-text-fill: white;
     -fx-background-color: #5959ff;
     -fx-border-color: null;
