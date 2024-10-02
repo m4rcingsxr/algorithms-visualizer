@@ -93,9 +93,7 @@ public abstract class GraphAlgorithm extends Algorithm {
      */
     protected void setCurrentNode(GraphNode node) {
         // Remove the "current" style from the previous current node
-        if (this.currentNode != null) {
-            this.currentNode.pseudoClassStateChanged(PathFindingController.currentNodeStyle, false);
-        }
+        this.resetCurrentNodeStyle();
 
         // Add the "current" style to the new current node
         if (node != null) {
@@ -103,6 +101,12 @@ public abstract class GraphAlgorithm extends Algorithm {
         }
 
         this.currentNode = node;
+    }
+
+    protected void resetCurrentNodeStyle() {
+        if (this.currentNode != null) {
+            this.currentNode.pseudoClassStateChanged(PathFindingController.currentNodeStyle, false);
+        }
     }
 
     /**

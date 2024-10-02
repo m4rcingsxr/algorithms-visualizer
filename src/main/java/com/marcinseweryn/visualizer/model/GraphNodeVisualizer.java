@@ -20,7 +20,7 @@ public abstract class GraphNodeVisualizer {
     // Type of the list (CANDIDATE_NODES or VISITED) to apply specific styles
     private final ListType listType;
 
-    protected GraphNodeVisualizer(ListType listType, ListView<SimpleStringProperty>  list) {
+    protected GraphNodeVisualizer(ListType listType, ListView<SimpleStringProperty> list) {
         this.listType = listType;
 
         // Ensure UI updates occur on the JavaFX application thread
@@ -30,17 +30,20 @@ public abstract class GraphNodeVisualizer {
     /**
      * Adds a graph node to the visualized list and updates its style based on the list type.
      *
-     * @param node The GraphNode to be added.
+     * @param node       The GraphNode to be added.
+     * @param applyStyle
      */
-    void visualizeAdd(GraphNode node) {
+    public void visualizeAdd(GraphNode node, boolean applyStyle) {
         Platform.runLater(() -> {
-            node.clearStyle();  // Clear any existing styles
             visualizedNodes.add(node.getInfo());
 
-            if (listType == ListType.CANDIDATE_NODES) {
-                node.getStyleClass().add("candidate-nodes");
-            } else if (listType == ListType.VISITED) {
-                node.getStyleClass().add("visited");
+            if (applyStyle) {
+                node.clearStyle();  // Clear any existing styles
+                if (listType == ListType.CANDIDATE_NODES) {
+                    node.getStyleClass().add("candidate-nodes");
+                } else if (listType == ListType.VISITED) {
+                    node.getStyleClass().add("visited");
+                }
             }
         });
     }
@@ -50,11 +53,16 @@ public abstract class GraphNodeVisualizer {
      *
      * @param node The GraphNode to be removed.
      */
-    void visualizeRemove(GraphNode node) {
+    public void visualizeRemove(GraphNode node) {
         Platform.runLater(() -> {
             node.clearStyle();
             visualizedNodes.remove(node.getInfo());
         });
+    }
+
+
+    public void addGraphNode(GraphNode node) {
+        this.addGraphNode(node, true);
     }
 
     /**
@@ -62,7 +70,7 @@ public abstract class GraphNodeVisualizer {
      *
      * @param node The GraphNode to be added.
      */
-    public abstract void addGraphNode(GraphNode node);
+    public abstract void addGraphNode(GraphNode node, boolean applyStyle);
 
     /**
      * Abstract method for removing a graph node from the manager.

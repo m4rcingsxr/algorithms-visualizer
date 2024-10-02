@@ -11,12 +11,19 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.css.PseudoClass;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -82,10 +89,79 @@ public class PathFindingController implements Subscriber {
         this.pseudocodeList = pseudocodeList;
         this.algorithmListBox = algorithmListBox;
 
+        initializeAlgorithmLegend();
+
         this.eventPublisher = new Publisher();
         initializeEventSubscriptions();
         logger.info("PathFindingController initialized.");
     }
+
+    private void initializeAlgorithmLegend() {
+        HBox legend = new HBox(20);
+        legend.setPadding(new Insets(0, 20, 10, 20));
+
+        VBox vbox1 = new VBox(10);
+        VBox vbox2 = new VBox(10);
+
+        // Create HBox to hold the GraphNode and Label side by side
+        HBox visited = new HBox(10); // 10 is the spacing between GraphNode and Label
+        visited.setAlignment(Pos.CENTER_LEFT);
+
+        GraphNode visitedNode = new GraphNode("visited"); // Your GraphNode
+        Label visitedLabel = new Label("Visited");
+        visitedLabel.setFont(Font.font(14));
+
+        visited.getChildren().addAll(visitedNode, visitedLabel); // Add GraphNode and Label side by side
+
+
+        GraphNode candidateNode = new GraphNode("candidate-nodes"); // Your GraphNode
+        Label candidateLabel = new Label("Candidate");
+        candidateLabel.setFont(Font.font(14));
+
+        HBox candidate = new HBox(10);
+        candidate.getChildren().addAll(candidateNode, candidateLabel);
+        candidate.setAlignment(Pos.CENTER_LEFT);
+
+        GraphNode pathNode = new GraphNode("path"); // Your GraphNode
+        Label pathLabel = new Label("Path");
+        pathLabel.setFont(Font.font(14));
+
+        HBox path = new HBox(10);
+        path.getChildren().addAll(pathNode, pathLabel);
+        path.setAlignment(Pos.CENTER_LEFT);
+
+        GraphNode currentNode = new GraphNode();
+        currentNode.pseudoClassStateChanged(PathFindingController.currentNodeStyle, true);
+        Label currentLabel = new Label("Current node");
+        currentLabel.setFont(Font.font(14));
+
+        HBox current = new HBox(10);
+        current.getChildren().addAll(currentNode, currentLabel);
+        current.setAlignment(Pos.CENTER_LEFT);
+
+        GraphNode neighborNode = new GraphNode();
+        neighborNode.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, true);
+        Label neighborLabel = new Label("Neighbor node");
+        neighborLabel.setFont(Font.font(14));
+
+        currentNode.setStyle("-fx-background-color: null;");
+        neighborNode.setStyle("-fx-background-color: null;");
+
+        HBox neighbor = new HBox(10);
+        neighbor.getChildren().addAll(neighborNode, neighborLabel);
+        neighbor.setAlignment(Pos.CENTER_LEFT);
+
+        vbox1.getChildren().addAll(visited, candidate, path);
+        vbox2.getChildren().addAll(current, neighbor);
+
+        legend.getChildren().addAll(vbox1, vbox2);
+
+        AnchorPane.setBottomAnchor(legend, 0.0);
+        AnchorPane.setLeftAnchor(legend, 0.0);
+
+        algorithmSpace.getChildren().add(legend);
+    }
+
 
     /**
      * Initializes the event subscriptions for the controller.

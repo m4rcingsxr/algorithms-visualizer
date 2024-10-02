@@ -22,37 +22,35 @@ public class BreadthFirstSearch extends GraphAlgorithm {
 
     @Override
     public void executeAlgorithm() {
-        this.candidateNodeList.addGraphNode(this.startNode.get());
-
         pauseAtStep(0);
+        this.candidateNodeList.addGraphNode(this.startNode.get());
+        pauseAtStep(1);
+        this.visitedNodeList.addGraphNode(this.startNode.get(), false);
         while (!candidateNodeList.isEmpty()) {
-            pauseAtStep(1);
-            setCurrentNode(this.candidateNodeList.removeGraphNode());
             pauseAtStep(2);
+            setCurrentNode(this.candidateNodeList.removeGraphNode());
+            this.visitedNodeList.visualizeAdd(getCurrentNode(), true);
             pauseAtStep(3);
+            pauseAtStep(4);
 
             if (getCurrentNode() == this.destinationNode.get()) {
-                visitedNodeList.addGraphNode(getCurrentNode());
-
+                resetCurrentNodeStyle();
                 reconstructPath(getCurrentNode());
                 visualizePath();
-                pauseAtStep(4);
+                pauseAtStep(5);
                 break;
             }
 
-            pauseAtStep(5);
-            visitedNodeList.addGraphNode(getCurrentNode());
             pauseAtStep(6);
-            pauseAtStep(7);
             for (GraphNode neighbour : getCurrentNode().getNeighbours()) {
                 setNeighborNode(neighbour);
-                pauseAtStep(8);
+                pauseAtStep(7);
                 if (!visitedNodeList.containsGraphNode(getNeighborNode())) {
-                    visitedNodeList.addGraphNode(getNeighborNode());
+                    visitedNodeList.addGraphNode(getNeighborNode(), false);
+                    pauseAtStep(8);
                     candidateNodeList.addGraphNode(getNeighborNode());
-                    pauseAtStep(9);
                     getNeighborNode().setParentNode(getCurrentNode());
-                    pauseAtStep(10);
+                    pauseAtStep(9);
                 }
             }
 
@@ -64,11 +62,11 @@ public class BreadthFirstSearch extends GraphAlgorithm {
     public void setPseudocode() {
         this.pseudocode.addAll(
                 "Q.enqueue(Start)",                       // Initialize the queue with Start
+                "Visited.add(Start)",
                 "while (!Q.isEmpty())",                             // Loop until the queue is empty
                 "   Current = Q.dequeue()",                         // Dequeue the front element
                 "   if (Current == Destination)",                   // Check if Current is the destination
                 "      tracePath() and exit",                       // Trace the path if found
-                "   Visited.add(Current)",                          // Mark Current as visited
                 "   for (N : neighbors(Current))",                  // Loop through neighbors of Current
                 "      if (N not in Visited)",                      // Check if N is unvisited and not in queue
                 "         Visited.add(N)",

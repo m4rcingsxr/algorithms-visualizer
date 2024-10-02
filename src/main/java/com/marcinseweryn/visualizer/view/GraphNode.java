@@ -32,6 +32,17 @@ public class GraphNode extends Button {
     // Holds information about the node (ID, parent)
     private final SimpleStringProperty info = new GraphNodeInfo();
 
+    public GraphNode() {
+        getStyleClass().add("vertex");
+        setText("   ");
+    }
+
+    public GraphNode(String styleClass) {
+        this();
+        setText("   ");
+        this.getStyleClass().add(styleClass);
+    }
+
     /**
      * Creates a new GraphNode at the specified coordinates (x, y).
      *
@@ -39,6 +50,7 @@ public class GraphNode extends Button {
      * @param y The y-coordinate for the node.
      */
     public GraphNode(double x, double y) {
+        this();
         // Set a unique ID for the node based on the counter
         this.setId(String.valueOf(count++));
         logger.debug("GraphNode created with ID {} at coordinates: [X: {}, Y: {}]", this.getId(), x, y);
@@ -56,9 +68,6 @@ public class GraphNode extends Button {
         this.setLayoutX(x);
         this.setLayoutY(y);
         logger.debug("GraphNode ID {} positioned at coordinates: [X: {}, Y: {}]", this.getId(), x, y);
-
-        // Add the CSS class for styling the node
-        getStyleClass().add("vertex");
 
         // Bind the info property to reflect the node's parent
         info.bind(Bindings.concat(parent));

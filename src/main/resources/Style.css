@@ -1,7 +1,4 @@
 * {
-    -primary: #FF6600;
-    -warning: #FF0033;
-    -info: #FF9900;
     -dark: #333333;
     -subtle-dark: #3a3a3a;
     -light: #666666;
@@ -65,7 +62,6 @@
     -fx-padding: 5;
 }
 
-
 .algorithmPane {
     -fx-background-radius: 10;
     -fx-border-radius: 10;
@@ -76,25 +72,25 @@
     -fx-background-radius: 20;
     -fx-border-radius: 22;
     -fx-border-width: 1;
-    -fx-background-color: black;
+    -fx-background-color: #277ca5;
     -fx-font-family: "Lato";
     -fx-font-weight: Bold;
-    -fx-font-size: 15;
+    -fx-font-size: 14;
     -fx-text-fill: white;
     -fx-fill: white;
     -fx-boder-color: black;
 }
 
 .vertex:hover {
-    -fx-background-color: -primary;
-    -fx-opacity: .4;
+    -fx-background-color: #0063a6;
+    -fx-opacity: .8;
     -fx-cursor: HAND;
 }
 
 
 .arrow-line {
     -fx-stroke: black;
-    -fx-stroke-width: 2;
+    -fx-stroke-width: 1.3;
     -fx-cursor: HAND;
 }
 
@@ -105,8 +101,7 @@
 }
 
 .drag {
-    -fx-stroke: -primary;
-    -fx-background-color: -primary;
+    -fx-background-color: #277ca5;
     -fx-opacity: .3;
     -fx-border-color: null;
 }
@@ -118,7 +113,7 @@
 
 
 .path {
-    -fx-background-color: -primary;
+    -fx-background-color: black;
     -fx-stroke: -primary;
     -fx-stroke-width: 2;
     -fx-border-color: null;
@@ -126,21 +121,21 @@
 
 .candidate-nodes {
     -fx-text-fill: white;
-    -fx-background-color: #5959ff;
+    -fx-background-color: #FFA62F;
     -fx-border-color: null;
 }
 
 .visited {
     -fx-text-fill: white;
-    -fx-background-color: #ffff83;
+    -fx-background-color: #FB633F;
 }
 
 .vertex:current {
-    -fx-border-color: -primary;
-    -fx-border-width: 2px;
+    -fx-border-color: #112A46;
+    -fx-border-width: 4px;
 }
 
 .vertex:neighbour {
-    -fx-border-color: green;
-    -fx-border-width: 3px;
+    -fx-border-color: #51ff51;
+    -fx-border-width: 4px;
 }
