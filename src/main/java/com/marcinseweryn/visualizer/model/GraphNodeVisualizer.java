@@ -35,7 +35,7 @@ public abstract class GraphNodeVisualizer {
     void visualizeAdd(GraphNode node) {
         Platform.runLater(() -> {
             node.clearStyle();  // Clear any existing styles
-            visualizedNodes.add(node.getSimpleString());
+            visualizedNodes.add(node.getInfo());
 
             if (listType == ListType.CANDIDATE_NODES) {
                 node.getStyleClass().add("candidate-nodes");
@@ -53,7 +53,7 @@ public abstract class GraphNodeVisualizer {
     void visualizeRemove(GraphNode node) {
         Platform.runLater(() -> {
             node.clearStyle();
-            visualizedNodes.remove(node.getSimpleString());
+            visualizedNodes.remove(node.getInfo());
         });
     }
 

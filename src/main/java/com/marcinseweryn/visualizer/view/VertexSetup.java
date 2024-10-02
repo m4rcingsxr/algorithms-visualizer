@@ -73,9 +73,9 @@ public class VertexSetup extends VBox {
         for (Edge e : vertex.getEdges()) {
 
             // check if current vertex layout is less than the neighbor (of same edge)
-            boolean isCurrentVertexMoreToTheLeft = vertex.getLayoutX() <= e.getNeighbour(vertex).getLayoutX();
-            GraphNode left = isCurrentVertexMoreToTheLeft ? vertex : e.getNeighbour(vertex);
-            GraphNode right = !isCurrentVertexMoreToTheLeft ? vertex : e.getNeighbour(vertex);
+            boolean isCurrentVertexMoreToTheLeft = vertex.getLayoutX() <= e.getNeighbor(vertex).getLayoutX();
+            GraphNode left = isCurrentVertexMoreToTheLeft ? vertex : e.getNeighbor(vertex);
+            GraphNode right = !isCurrentVertexMoreToTheLeft ? vertex : e.getNeighbor(vertex);
 
             Region space = new Region();
             HBox.setHgrow(space, Priority.ALWAYS);
@@ -102,7 +102,7 @@ public class VertexSetup extends VBox {
         btn.setMaxWidth(10);
         btn.setOnAction(e -> {
             vertex.getEdges().remove(edge);
-            edge.getNeighbour(vertex).getEdges().remove(edge);
+            edge.getNeighbor(vertex).getEdges().remove(edge);
             publisher.notify("removeEdge", edge);
             update();
         });
@@ -125,11 +125,11 @@ public class VertexSetup extends VBox {
     private Button createArrowDirectionChanger(String text, Edge edge, GraphNode node) {
         Button btn = new Button();
         btn.setPrefWidth(50);
-        btn.setText(edge.isHeadVisible(node) ? text : "");
+        btn.setText(edge.isArrowHeadVisible(node) ? text : "");
 
         btn.setOnAction(e -> {
-            edge.setHeadAVisible(node, !edge.isHeadVisible(node));
-            btn.setText(edge.isHeadVisible(node) ? text : "");
+            edge.setHeadAVisible(node, !edge.isArrowHeadVisible(node));
+            btn.setText(edge.isArrowHeadVisible(node) ? text : "");
         });
 
         return btn;

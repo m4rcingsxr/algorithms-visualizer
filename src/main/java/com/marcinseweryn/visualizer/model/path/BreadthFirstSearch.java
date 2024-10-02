@@ -59,7 +59,7 @@ public class BreadthFirstSearch extends GraphAlgorithm {
     }
 
     private void reconstructPath(GraphNode current) {
-        for (GraphNode node = current; node != null; node = node.getParentVertex()) {
+        for (GraphNode node = current; node != null; node = node.getParentNode()) {
             addToPath(node);
         }
 

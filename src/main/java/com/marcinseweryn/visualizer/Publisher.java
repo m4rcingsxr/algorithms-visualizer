@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Publisher {
-    private Map<String, List<Subscriber>> subscribers = new HashMap<>();
+    private final Map<String, List<Subscriber>> subscribers = new HashMap<>();
 
     // Subscribe a subscriber to a specific event
     public void subscribe(String eventType, Subscriber subscriber) {
