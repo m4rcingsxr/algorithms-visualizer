@@ -172,6 +172,11 @@ public class GraphNode extends Button {
         this.getStyleClass().removeAll("start", "destination", "visited", "candidate-nodes", "path");
     }
 
+    public void setPrimaryClass(String clazz) {
+        this.getStyleClass().removeAll("start", "destination", "visited", "candidate-nodes", "path");
+        this.getStyleClass().add(clazz);
+    }
+
 
     /**
      * Inner class that overrides SimpleStringProperty to provide a detailed

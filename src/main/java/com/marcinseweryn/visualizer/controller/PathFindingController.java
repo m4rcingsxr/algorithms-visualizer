@@ -7,6 +7,7 @@ import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -19,11 +20,9 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -639,5 +638,37 @@ public class PathFindingController implements Subscriber {
 
     void onAlgorithmSpaceDragDropped(DragEvent dragEvent) {
         logger.trace("Drag dropped at coordinates: [X: {}, Y: {}]", dragEvent.getX(), dragEvent.getY());
+    }
+
+    public void resetGraphState() {
+        for (Node n : algorithmSpace.getChildren()) {
+            if(n instanceof GraphNode node) {
+                node.setParentNode(null);
+            }
+        }
+
+        Platform.runLater(() -> {
+            for (Node n : algorithmSpace.getChildren()) {
+                if (n instanceof GraphNode node) {
+                    node.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, false);
+                    node.pseudoClassStateChanged(PathFindingController.currentNodeStyle, false);
+                    node.setPrimaryClass("vertex");
+                }
+
+                if (n instanceof Edge edge) {
+                    edge.getStyleClass().removeAll("path");
+                }
+
+                candidateNodeList.getItems().clear();
+                visitedNodeList.getItems().clear();
+                pseudocodeList.getItems().clear();
+
+                startNodeProperty.get().setPrimaryClass("start");
+                destinationNodeProperty.get().setPrimaryClass("destination");
+            }
+
+
+        });
+
     }
 }

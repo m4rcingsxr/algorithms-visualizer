@@ -46,6 +46,19 @@
                 </graphic>
             </Button>
 
+            <Button fx:id="resetButton"
+                    onAction="#onResetButtonClick"
+                    style="-fx-background-radius: 0%;">
+                <graphic>
+                    <Region prefWidth="15" prefHeight="15" style="-fx-border-color:black;">
+                        <shape>
+                            <SVGPath
+                                    content="M1920 0v1920H0V0h1920Zm-137.143 137.143H137.143v1645.714h1645.714V137.143Z"/>
+                        </shape>
+                    </Region>
+                </graphic>
+            </Button>
+
             <Region prefWidth="30" minWidth="30"/>
 
         </HBox>

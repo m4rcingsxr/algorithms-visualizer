@@ -69,8 +69,14 @@ public class MainController {
     // Algorithm control buttons
     @FXML
     private Button startButton;
+
     @FXML
     private Button stepButton;
+
+    @FXML
+    private Button resetButton;
+
+
 
     // Controllers for managing specific algorithm types
     private PathFindingController pathFindingController;
@@ -228,6 +234,12 @@ public class MainController {
     private void onStartButtonClick(ActionEvent event) {
         boolean isStepModeDisabled = event.getSource() == startButton;
 
+        if(isStepModeDisabled) {
+            startButton.setDisable(true);
+            stepButton.setDisable(true);
+            resetButton.setDisable(true);
+        }
+
         // If no algorithm is running or the user wants to disable step mode, start a new algorithm
         if (runningAlgorithmThread.get() == null || isStepModeDisabled) {
             startNewAlgorithm(isStepModeDisabled);
@@ -238,6 +250,17 @@ public class MainController {
         }
     }
 
+    @FXML
+    public void onResetButtonClick(ActionEvent event) {
+        if(isPathFindingTabSelected()) {
+            startButton.setDisable(false);
+            stepButton.setDisable(false);
+            pathFindingController.resetGraphState();
+        } else {
+            // ...
+        }
+    }
+
     /**
      * Starts a new algorithm based on the selected tab (Path Finding or Sorting).
      * This method handles the initialization of the selected algorithm and starts a new thread to run it.
@@ -245,7 +268,7 @@ public class MainController {
      * @param isStepModeDisabled Boolean flag indicating whether step mode is disabled.
      */
     private void startNewAlgorithm(boolean isStepModeDisabled) {
-        if (algorithmTab.getSelectionModel().getSelectedItem().getText().equals("Path Finding")) {
+        if (isPathFindingTabSelected()) {
             Optional<GraphAlgorithm> selectedAlgorithm = pathFindingController.initializeSelectedAlgorithm();
 
             if (selectedAlgorithm.isEmpty()) {
@@ -259,12 +282,17 @@ public class MainController {
             runningAlgorithmThread.set(new AlgorithmThread(() -> {
                 selectedAlgorithm.get().start(isStepModeDisabled);
                 runningAlgorithmThread.set(null); // Reset the running thread when the algorithm completes
+                resetButton.setDisable(false);
             }, selectedAlgorithm.get()));
         } else {
             // Add sorting logic here if needed
         }
 
         runningAlgorithmThread.get().start();
+    }
+
+    private boolean isPathFindingTabSelected() {
+        return algorithmTab.getSelectionModel().getSelectedItem().getText().equals("Path Finding");
     }
 
     /**
@@ -336,4 +364,6 @@ public class MainController {
     private void onGraphPaneDragDropped(DragEvent dragEvent) {
         this.pathFindingController.onAlgorithmSpaceDragDropped(dragEvent);
     }
+
+
 }
