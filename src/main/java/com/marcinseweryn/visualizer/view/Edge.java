@@ -47,8 +47,12 @@ public class Edge extends PaneArrow {
         this.weight.addListener((obs, oldVal, newVal) -> {
             if (newVal.doubleValue() != 0) {
                 mainLine.getStyleClass().add("weighted");
+                headA.getStyleClass().add("weighted");
+                headB.getStyleClass().add("weighted");
             } else {
                 mainLine.getStyleClass().remove("weighted");
+                headA.getStyleClass().remove("weighted");
+                headB.getStyleClass().remove("weighted");
             }
         });
 
@@ -183,5 +187,5 @@ public class Edge extends PaneArrow {
     public BooleanProperty distanceVisibleProperty() {
         return distanceVisible;
     }
-
 }
+

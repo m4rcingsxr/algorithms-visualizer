@@ -23,13 +23,20 @@ public class BreadthFirstSearch extends GraphAlgorithm {
     @Override
     public void executeAlgorithm() {
         pauseAtStep(0);
-        this.candidateNodeList.addGraphNode(this.startNode.get());
+
+        this.candidateNodeList.addNodeAndVisualize(this.startNode.get());
+
         pauseAtStep(1);
-        this.visitedNodeList.addGraphNode(this.startNode.get(), false);
+
+        this.visitedNodeList.addNode(this.startNode.get());
+
         while (!candidateNodeList.isEmpty()) {
             pauseAtStep(2);
-            setCurrentNode(this.candidateNodeList.removeGraphNode());
-            this.visitedNodeList.visualizeAdd(getCurrentNode(), true);
+
+            setCurrentNode(this.candidateNodeList.removeNode());
+
+            visitedNodeList.addNodeAndApplyStyle(getCurrentNode());
+
             pauseAtStep(3);
             pauseAtStep(4);
 
@@ -45,10 +52,14 @@ public class BreadthFirstSearch extends GraphAlgorithm {
             for (GraphNode neighbour : getCurrentNode().getNeighbours()) {
                 setNeighborNode(neighbour);
                 pauseAtStep(7);
-                if (!visitedNodeList.containsGraphNode(getNeighborNode())) {
-                    visitedNodeList.addGraphNode(getNeighborNode(), false);
+                if (!visitedNodeList.containsNode(getNeighborNode())) {
+
+                    visitedNodeList.addNode(getNeighborNode());
+
                     pauseAtStep(8);
-                    candidateNodeList.addGraphNode(getNeighborNode());
+
+                    this.candidateNodeList.addNodeAndVisualize(getNeighborNode());
+
                     getNeighborNode().setParentNode(getCurrentNode());
                     pauseAtStep(9);
                 }

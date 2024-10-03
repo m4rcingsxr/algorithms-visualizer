@@ -4,10 +4,53 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.SVGPath?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.marcinseweryn.visualizer.controller.MainController"
-            stylesheets="Style.css" styleClass="main">
+            stylesheets="Style.css" styleClass="main" fx:id="main">
+
     <padding>
         <Insets top="10" right="25" bottom="25" left="25"/>
     </padding>
+
+    <top>
+        <HBox alignment="BOTTOM_LEFT" spacing="10">
+            <padding>
+                <Insets top="10" bottom="10"/>
+            </padding>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <ChoiceBox fx:id="algorithmListBox"/>
+
+            <Button fx:id="startButton"
+                    onAction="#onStartButtonClick"
+                    style="-fx-background-radius: 0%;">
+                <graphic>
+                    <Region prefWidth="15" prefHeight="15" style="-fx-border-color:black;">
+                        <shape>
+                            <SVGPath
+                                    content="M16.6582 9.28638C18.098 10.1862 18.8178 10.6361 19.0647 11.2122C19.2803 11.7152 19.2803 12.2847 19.0647 12.7878C18.8178 13.3638 18.098 13.8137 16.6582 14.7136L9.896 18.94C8.29805 19.9387 7.49907 20.4381 6.83973 20.385C6.26501 20.3388 5.73818 20.0469 5.3944 19.584C5 19.053 5 18.1108 5 16.2264V7.77357C5 5.88919 5 4.94701 5.3944 4.41598C5.73818 3.9531 6.26501 3.66111 6.83973 3.6149C7.49907 3.5619 8.29805 4.06126 9.896 5.05998L16.6582 9.28638Z"/>
+                        </shape>
+                    </Region>
+                </graphic>
+            </Button>
+
+            <Button fx:id="stepButton"
+                    onAction="#onStartButtonClick"
+                    style="-fx-background-radius: 0%;">
+                <graphic>
+                    <Region prefWidth="15" prefHeight="15" style="-fx-border-color:black;">
+                        <shape>
+                            <SVGPath
+                                    content="M16 4.25C15.59 4.25 15.25 4.59 15.25 5V11.19L8.53 4.47C8.32 4.26 7.99 4.19 7.71 4.31C7.43 4.43 7.25 4.7 7.25 5V19C7.25 19.3 7.43 19.58 7.71 19.69C7.8 19.73 7.9 19.75 8 19.75C8.2 19.75 8.39 19.67 8.53 19.53L15.25 12.81V19C15.25 19.41 15.59 19.75 16 19.75C16.41 19.75 16.75 19.41 16.75 19V5C16.75 4.59 16.41 4.25 16 4.25ZM8.75 17.19V6.81L13.94 12L8.75 17.19Z"/>
+                        </shape>
+                    </Region>
+                </graphic>
+            </Button>
+
+            <Region prefWidth="30" minWidth="30"/>
+
+        </HBox>
+    </top>
+
     <left>
         <TabPane fx:id="algorithmTab" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
             <Tab text="Path Finding">
@@ -21,29 +64,32 @@
                             <VBox>
                                 <Label text="Candidate Nodes" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView fx:id="candidateNodeList" minHeight="105" maxHeight="145"/>
+                                <ListView fx:id="candidateNodeList"/>
                             </VBox>
                             <VBox>
                                 <Label text="Visited" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView fx:id="visitedNodeList" minHeight="105" maxHeight="145"></ListView>
+                                <ListView fx:id="visitedNodeList"/>
                             </VBox>
                             <VBox>
                                 <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView fx:id="pseudoCodeList" minHeight="360" maxHeight="420"></ListView>
+                                <ListView fx:id="pseudoCodeList"/>
                             </VBox>
                         </VBox>
                     </Tab>
                     <Tab text="Vertex">
-                        <VBox>
-                            <HBox>
-                                <ToggleButton fx:id="showEdgeWeightToggle" text="Show weight"/>
-                                <ToggleButton fx:id="showEdgeDistanceToggle" text="Show distance"/>
+                        <VBox spacing="10">
+                            <padding>
+                                <Insets topRightBottomLeft="10"/>
+                            </padding>
+                            <HBox spacing="10">
+                                <ToggleButton fx:id="showEdgeWeightToggle" text="Show weight" />
+                                <ToggleButton fx:id="showEdgeDistanceToggle" text="Show distance" />
                             </HBox>
 
-                            <ScrollPane>
-                                <Accordion fx:id="renderedNodes"/>
+                            <ScrollPane hbarPolicy="NEVER" fitToWidth="true" minHeight="300">
+                                <Accordion fx:id="renderedNodes" style="-fx-background-color: transparent;" />
                             </ScrollPane>
                         </VBox>
                     </Tab>
@@ -55,42 +101,12 @@
             </Tab>
         </TabPane>
     </left>
+
     <center>
         <VBox fx:id="algorithmContainer" spacing="20">
             <padding>
                 <Insets right="40" left="40"/>
             </padding>
-
-            <HBox alignment="BOTTOM_LEFT" spacing="10">
-                <ChoiceBox fx:id="algorithmListBox"/>
-
-                <Region HBox.hgrow="ALWAYS"/>
-
-                <Button fx:id="startButton"
-                        onAction="#onStartButtonClick"
-                        style="-fx-background-radius: 0%;">
-                    <graphic>
-                        <Region prefWidth="15" prefHeight="15" style="-fx-border-color:black;">
-                            <shape>
-                                <SVGPath content="M16.6582 9.28638C18.098 10.1862 18.8178 10.6361 19.0647 11.2122C19.2803 11.7152 19.2803 12.2847 19.0647 12.7878C18.8178 13.3638 18.098 13.8137 16.6582 14.7136L9.896 18.94C8.29805 19.9387 7.49907 20.4381 6.83973 20.385C6.26501 20.3388 5.73818 20.0469 5.3944 19.584C5 19.053 5 18.1108 5 16.2264V7.77357C5 5.88919 5 4.94701 5.3944 4.41598C5.73818 3.9531 6.26501 3.66111 6.83973 3.6149C7.49907 3.5619 8.29805 4.06126 9.896 5.05998L16.6582 9.28638Z"/>
-                            </shape>
-                        </Region>
-                    </graphic>
-                </Button>
-
-                <Button fx:id="stepButton"
-                        onAction="#onStartButtonClick"
-                        style="-fx-background-radius: 0%;">
-                    <graphic>
-                        <Region prefWidth="15" prefHeight="15" style="-fx-border-color:black;">
-                            <shape>
-                                <SVGPath content="M46.677 64.652c0-9.362 7.132-17.387 16.447-17.394 9.315-.007 24.677.007 34.55.007 9.875 0 17.138 7.594 17.138 16.998 0 9.403-.083 119.094-.083 127.82 0 8.726-7.58 16.895-16.554 16.837-8.975-.058-25.349.115-34.963.058-9.614-.058-16.646-7.74-16.646-17.254 0-9.515.11-117.71.11-127.072zm14.759.818s-.09 118.144-.09 123.691c0 5.547 3.124 5.315 6.481 5.832 3.358.518 21.454.47 24.402.47 2.947 0 7.085-1.658 7.167-6.14.08-4.483-.082-119.507-.082-123.249 0-3.742-4.299-4.264-7.085-4.66-2.787-.395-25.796 0-25.796 0l-4.997 4.056zm76.664-.793c.027-9.804 7.518-17.541 17.125-17.689 9.606-.147 25.283.148 35.004.148 9.72 0 17.397 8.52 17.397 17.77s-.178 117.809-.178 127c0 9.192-7.664 17.12-16.323 17.072-8.66-.05-26.354 0-34.991.048-8.638.05-17.98-8.582-18.007-17.783-.027-9.201-.055-116.763-.027-126.566zm16.917.554s-.089 118.145-.089 123.692c0 5.547 3.123 5.314 6.48 5.832 3.359.518 21.455.47 24.402.47 2.948 0 7.086-1.659 7.167-6.141.081-4.482-.08-119.506-.08-123.248 0-3.742-4.3-4.265-7.087-4.66-2.786-.396-25.796 0-25.796 0l-4.997 4.055z"/>
-                            </shape>
-                        </Region>
-                    </graphic>
-                </Button>
-
-            </HBox>
 
             <!-- Path Finding Pane initially added -->
             <AnchorPane fx:id="graphPane"
@@ -100,23 +116,19 @@
                         onMouseReleased="#onGraphPaneMouseReleased"
                         onDragOver="#onGraphPaneDragOver"
                         onDragDropped="#onGraphPaneDragDropped"
-                        prefHeight="720"
                         styleClass="algorithmPane"
                         VBox.vgrow="ALWAYS"
                         HBox.hgrow="ALWAYS"
-                        minWidth="700"
                         maxWidth="Infinity"
-                       />
+            />
 
             <!-- Sorting Pane is hidden initially -->
             <AnchorPane fx:id="sortingPane"
-                        prefHeight="720"
                         styleClass="algorithmPane"
                         VBox.vgrow="ALWAYS"
                         HBox.hgrow="ALWAYS"
-                        minWidth="700"
                         maxWidth="Infinity"
-                        />
+            />
         </VBox>
     </center>
 </BorderPane>

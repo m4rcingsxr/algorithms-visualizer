@@ -1,39 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
-    <Label text="Setup Vertex">
+
+    <padding>
+        <Insets topRightBottomLeft="10"/>
+    </padding>
+
+    <VBox>
         <padding>
-            <Insets topRightBottomLeft="5"/>
+            <Insets top="5" bottom="5"/>
         </padding>
-    </Label>
+
+        <Label style="-fx-text-fill: white">Vertex Setup</Label>
+    </VBox>
+
+    <HBox spacing="20" HBox.hgrow="ALWAYS">
+        <padding>
+            <Insets top="10" bottom="10"></Insets>
+        </padding>
+        <Button fx:id="startBtn" text="start" styleClass="btn"></Button>
+        <Button fx:id="destinationBtn" text="destination" styleClass="btn"></Button>
+    </HBox>
+
     <HBox alignment="CENTER" spacing="5">
         <padding>
             <Insets topRightBottomLeft="5"/>
         </padding>
-        <Label text="ID:"/>
 
-        <HBox fx:id="vertexContainer"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <HBox fx:id="vertexContainer" alignment="CENTER"/>
         <Region HBox.hgrow="ALWAYS"/>
 
-        <Label text="x"></Label>
-        <Spinner fx:id="x"></Spinner>
-        <Label text="y"></Label>
-        <Spinner fx:id="y"></Spinner>
+        <VBox spacing="10">
+            <HBox spacing="10">
+                <Label text="x"></Label>
+                <Spinner fx:id="x"></Spinner>
+            </HBox>
+            <HBox spacing="10">
+                <Label text="y"></Label>
+                <Spinner fx:id="y"></Spinner>
+            </HBox>
+        </VBox>
     </HBox>
-    <VBox fx:id="edgeContainer">
 
+    <VBox>
+        <padding>
+            <Insets top="10" bottom="10"/>
+        </padding>
+
+        <Label style="-fx-text-fill: white">Edges</Label>
     </VBox>
 
-    <HBox spacing="20">
-        <Button fx:id="startBtn" text="start"></Button>
-        <Button fx:id="destinationBtn" text="destination"></Button>
-    </HBox>
+    <VBox fx:id="edgeContainer" spacing="10">
+
+    </VBox>
 
 </fx:root>

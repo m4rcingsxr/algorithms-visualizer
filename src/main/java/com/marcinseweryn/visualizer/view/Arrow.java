@@ -17,8 +17,8 @@ public class Arrow extends Group {
     private static final double ARROW_HEAD_ANGLE = Math.toRadians(20);
 
     protected final Polyline mainLine = new Polyline();
-    private final Polyline headA = new Polyline();
-    private final Polyline headB = new Polyline();
+    protected final Polyline headA = new Polyline();
+    protected final Polyline headB = new Polyline();
 
     protected final SimpleDoubleProperty x1 = new SimpleDoubleProperty();
     protected final SimpleDoubleProperty x2 = new SimpleDoubleProperty();
@@ -181,5 +181,11 @@ public class Arrow extends Group {
 
     public SimpleDoubleProperty y2Property() {
         return y2;
+    }
+
+    public void setStyleClass(String clazz) {
+        mainLine.getStyleClass().add(clazz);
+        headA.getStyleClass().add(clazz);
+        headB.getStyleClass().add(clazz);
     }
 }

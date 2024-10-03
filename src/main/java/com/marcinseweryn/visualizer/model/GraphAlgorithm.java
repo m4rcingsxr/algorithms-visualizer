@@ -1,6 +1,7 @@
 package com.marcinseweryn.visualizer.model;
 
 import com.marcinseweryn.visualizer.controller.PathFindingController;
+import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -82,6 +83,10 @@ public abstract class GraphAlgorithm extends Algorithm {
             Platform.runLater(() -> {
                 node.clearStyle();  // Clear any existing styles
                 node.getStyleClass().add("path");  // Apply the "path" style to the node
+                if(node.getParentNode() != null) {
+                    Edge connection = node.getConnection(node.getParentNode());
+                    connection.setStyleClass("path");
+                }
             });
         }
     }

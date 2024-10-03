@@ -4,6 +4,7 @@ import com.marcinseweryn.visualizer.Publisher;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
@@ -80,12 +81,19 @@ public class VertexSetup extends VBox {
             Region space = new Region();
             HBox.setHgrow(space, Priority.ALWAYS);
 
-            HBox edge = new HBox();
-            edge.getChildren().addAll(
-                    new GraphNode(left),
+            HBox edge = new HBox(10);
+            edge.setAlignment(Pos.CENTER);
+
+            HBox hBox = new HBox();
+            hBox.getChildren().addAll(
                     createArrowDirectionChanger("<", e, left),
                     createWeightChanger(e),
-                    createArrowDirectionChanger(">", e, right),
+                    createArrowDirectionChanger(">", e, right)
+            );
+
+            edge.getChildren().addAll(
+                    new GraphNode(left),
+                    hBox,
                     new GraphNode(right),
                     space,
                     createArrowRemoveBtn(e, this.vertex)
@@ -93,13 +101,11 @@ public class VertexSetup extends VBox {
 
             this.edgeContainer.getChildren().add(edge);
         }
-
-        System.out.println("Updating selected vertex setup");
     }
 
     private Node createArrowRemoveBtn(Edge edge, GraphNode vertex) {
-        Button btn = new Button("Remove");
-        btn.setMaxWidth(10);
+        Button btn = new Button("X");
+        btn.getStyleClass().add("delete-edge-btn");
         btn.setOnAction(e -> {
             vertex.getEdges().remove(edge);
             edge.getNeighbor(vertex).getEdges().remove(edge);
@@ -124,12 +130,13 @@ public class VertexSetup extends VBox {
 
     private Button createArrowDirectionChanger(String text, Edge edge, GraphNode node) {
         Button btn = new Button();
+        btn.getStyleClass().add("arrowhead-edge-btn");
         btn.setPrefWidth(50);
-        btn.setText(edge.isArrowHeadVisible(node) ? text : "");
+        btn.setText(edge.isArrowHeadVisible(node) ? text : "  ");
 
         btn.setOnAction(e -> {
             edge.setHeadAVisible(node, !edge.isArrowHeadVisible(node));
-            btn.setText(edge.isArrowHeadVisible(node) ? text : "");
+            btn.setText(edge.isArrowHeadVisible(node) ? text : "  ");
         });
 
         return btn;

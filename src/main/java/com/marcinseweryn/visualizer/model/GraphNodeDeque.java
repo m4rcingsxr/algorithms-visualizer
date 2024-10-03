@@ -14,29 +14,25 @@ public abstract class GraphNodeDeque extends GraphNodeVisualizer {
         super(listType, list);
     }
 
-    void push(GraphNode node, boolean applyStyle) {
+    void push(GraphNode node) {
         pendingNodes.push(node);
-        super.visualizeAdd(node, applyStyle);
     }
 
     GraphNode pop() {
-        GraphNode node = pendingNodes.pop();
-        super.visualizeAdd(node, true);
-        return node;
+        return pendingNodes.pop();
     }
 
-    void enqueue(GraphNode node, boolean applyStyle) {
+    void enqueue(GraphNode node) {
         pendingNodes.add(node);
-        super.visualizeAdd(node, applyStyle);
     }
 
     GraphNode dequeue() {
         GraphNode node = pendingNodes.remove();
-        super.visualizeRemove(node);
+        super.removeNodeFromListAndClearStyle(node);
         return node;
     }
 
-    public boolean containsGraphNode(GraphNode node) {
+    public boolean containsNode(GraphNode node) {
         return pendingNodes.contains(node);
     }
 

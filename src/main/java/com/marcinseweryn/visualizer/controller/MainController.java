@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,6 +52,9 @@ public class MainController {
     private ListView<String> pseudoCodeList;
 
     // Sorting and common UI elements
+    @FXML
+    private BorderPane main;
+
     @FXML
     private TabPane algorithmTab;
     @FXML
@@ -95,6 +99,16 @@ public class MainController {
         // Initially display the graph pane by default
         algorithmContainer.getChildren().remove(sortingPane);
         logger.debug("Graph pane selected by default.");
+
+        candidateNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
+        visitedNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
+        pseudoCodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.4));
+
+        // Bind the left pane to 30% of the BorderPane width
+        algorithmTab.prefWidthProperty().bind(main.widthProperty().multiply(0.2));
+
+        // Bind the center pane to 70% of the BorderPane width
+        algorithmContainer.prefWidthProperty().bind(main.widthProperty().multiply(0.8));
 
         logger.info("Controller initialization completed.");
     }

@@ -11,12 +11,12 @@ public class GraphNodeStack extends GraphNodeDeque {
     }
 
     @Override
-    public void addGraphNode(GraphNode node, boolean applyStyle) {
-        super.push(node, applyStyle);
+    public void addNode(GraphNode node) {
+        super.push(node);
     }
 
     @Override
-    public GraphNode removeGraphNode() {
+    public GraphNode removeNode() {
         return super.pop();
     }
 }

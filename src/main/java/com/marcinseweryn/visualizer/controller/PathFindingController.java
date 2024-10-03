@@ -99,9 +99,12 @@ public class PathFindingController implements Subscriber {
     private void initializeAlgorithmLegend() {
         HBox legend = new HBox(20);
         legend.setPadding(new Insets(0, 20, 10, 20));
+        legend.setStyle("-fx-background-color: grey;-fx-background-radius: 15; -fx-padding: 10;");
 
         VBox vbox1 = new VBox(10);
+        vbox1.setPadding(new Insets(10, 10, 10, 10));
         VBox vbox2 = new VBox(10);
+        vbox1.setPadding(new Insets(10, 10, 10, 10));
 
         // Create HBox to hold the GraphNode and Label side by side
         HBox visited = new HBox(10); // 10 is the spacing between GraphNode and Label
@@ -601,11 +604,24 @@ public class PathFindingController implements Subscriber {
         switch (eventType) {
             case "startClicked" -> {
                 logger.info("Start button clicked for node: {}", node.getId());
+
+                if(startNodeProperty.get() != null) {
+                    startNodeProperty.get().getStyleClass().remove("start");
+                }
+
                 startNodeProperty.set((GraphNode) node);
+                node.getStyleClass().add("start");
             }
             case "destinationClicked" -> {
                 logger.info("Destination button clicked for node: {}", node.getId());
+
+                if(destinationNodeProperty.get() != null) {
+                    destinationNodeProperty.get().getStyleClass().remove("destination");
+                }
+
                 destinationNodeProperty.set((GraphNode) node);
+                node.getStyleClass().add("destination");
+
                 logger.info("Destination node set: {}", destinationNodeProperty.get().getId());
             }
             case "removeEdge" -> {

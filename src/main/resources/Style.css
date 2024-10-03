@@ -10,13 +10,13 @@
 
 .tab-pane {
     -fx-background-color: transparent;
-    -fx-tab-min-width: 100px;
+    -fx-tab-min-width: 60px;
 }
 
 .tab-label {
     -fx-text-fill: white;
     -fx-font-family: "Lato";
-    -fx-font-size: 16;
+    -fx-font-size: 12;
 }
 
 .list-view-label {
@@ -66,7 +66,10 @@
     -fx-background-radius: 10;
     -fx-border-radius: 10;
     -fx-background-color: -light;
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
 }
+
 
 .vertex {
     -fx-background-radius: 20;
@@ -82,7 +85,6 @@
 }
 
 .vertex:hover {
-    -fx-background-color: #0063a6;
     -fx-opacity: .8;
     -fx-cursor: HAND;
 }
@@ -91,14 +93,8 @@
 .arrow-line {
     -fx-stroke: black;
     -fx-stroke-width: 1.3;
-    -fx-cursor: HAND;
 }
 
-.arrow-line:hover {
-    -fx-stroke: -primary;
-    -fx-stroke-width: 4;
-    -fx-opacity: .4;
-}
 
 .drag {
     -fx-background-color: #277ca5;
@@ -107,15 +103,15 @@
 }
 
 .weighted {
-    -fx-stroke: green;
-    -fx-stroke-width: 4;
+    -fx-stroke: #005422;
+    -fx-stroke-width: 2;
 }
 
 
 .path {
     -fx-background-color: black;
-    -fx-stroke: -primary;
-    -fx-stroke-width: 2;
+    -fx-stroke: black;
+    -fx-stroke-width: 3;
     -fx-border-color: null;
 }
 
@@ -138,4 +134,85 @@
 .vertex:neighbour {
     -fx-border-color: #51ff51;
     -fx-border-width: 4px;
+}
+
+.choice-box {
+    -fx-pref-width: 200px;
+    -fx-focus-color: -subtle-dark;
+    -fx-selection-bar: -dark;
+}
+
+
+.accordion .titled-pane {
+    -fx-max-width: 100%;
+    -fx-background-color: -dark;
+}
+
+.scroll-pane {
+    -fx-background: -dark;
+    -fx-border-color: -dark;
+}
+
+.titled-pane .title {
+    -fx-background-color: -light;
+    -fx-background-insets: 0;
+    -fx-border-color: -dark;
+}
+
+.titled-pane .title *.text {
+    -fx-fill: #fff;
+}
+
+.titled-pane .content {
+    -fx-background-color: #4b4b4b;
+    -fx-border-color: -dark;
+}
+
+.btn {
+    -fx-background-color: -light;
+    -fx-text-fill: white;
+    -fx-pref-width: 300;
+}
+
+.btn:pressed {
+    -fx-background-color: -dark;
+}
+
+.btn:hover {
+    -fx-background-color: -dark;
+    -fx-cursor: HAND;
+}
+
+.delete-edge-btn {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+}
+
+.delete-edge-btn:hover {
+    -fx-background-color: -dark;
+    -fx-cursor: HAND;
+}
+
+.arrowhead-edge-btn {
+    -fx-background-color: -light;
+    -fx-padding: 4;
+    -fx-text-fill: white;
+}
+
+.arrowhead-edge-btn:hover {
+    -fx-background-color: -dark;
+    -fx-cursor: HAND;
+}
+
+
+
+.start {
+    -fx-background-color: green;
+}
+
+.destination {
+    -fx-background-color: red;
 }

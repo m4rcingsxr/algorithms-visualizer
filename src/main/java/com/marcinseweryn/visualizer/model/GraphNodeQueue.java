@@ -11,12 +11,12 @@ public class GraphNodeQueue extends GraphNodeDeque {
     }
 
     @Override
-    public void addGraphNode(GraphNode node, boolean applyStyle) {
-        super.enqueue(node, applyStyle);
+    public void addNode(GraphNode node) {
+        super.enqueue(node);
     }
 
     @Override
-    public GraphNode removeGraphNode() {
+    public GraphNode removeNode() {
         return super.dequeue();
     }
 }
