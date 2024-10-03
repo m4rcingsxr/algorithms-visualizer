@@ -13,8 +13,8 @@ import javafx.scene.layout.HBox;
 public class Edge extends PaneArrow {
 
     // The two nodes that this edge connects
-    private final GraphNode vertex1;
-    private final GraphNode vertex2;
+    private final GraphNode nodeA;
+    private final GraphNode nodeB;
 
     // The weight of the edge (for weighted graphs)
     private final DoubleProperty weight = new SimpleDoubleProperty();
@@ -28,20 +28,20 @@ public class Edge extends PaneArrow {
      * Constructs an Edge between two vertices.
      * Automatically binds the arrow's coordinates to the positions of the vertices.
      *
-     * @param vertex1 The first vertex (start of the edge).
-     * @param vertex2 The second vertex (end of the edge).
+     * @param nodeA The first vertex (start of the edge).
+     * @param nodeB The second vertex (end of the edge).
      */
-    public Edge(GraphNode vertex1, GraphNode vertex2) {
-        super(vertex1.getLayoutX(), vertex1.getLayoutY(), vertex2.getLayoutX(), vertex2.getLayoutY());
+    public Edge(GraphNode nodeA, GraphNode nodeB) {
+        super(nodeA.getLayoutX(), nodeA.getLayoutY(), nodeB.getLayoutX(), nodeB.getLayoutY());
 
-        this.vertex1 = vertex1;
-        this.vertex2 = vertex2;
+        this.nodeA = nodeA;
+        this.nodeB = nodeB;
 
         // Bind the arrow's start and end points to the layout positions of the vertices
-        this.x1.bind(vertex1.layoutXProperty());
-        this.y1.bind(vertex1.layoutYProperty());
-        this.x2.bind(vertex2.layoutXProperty());
-        this.y2.bind(vertex2.layoutYProperty());
+        this.x1.bind(nodeA.layoutXProperty());
+        this.y1.bind(nodeA.layoutYProperty());
+        this.x2.bind(nodeB.layoutXProperty());
+        this.y2.bind(nodeB.layoutYProperty());
 
         // Add style class "weighted" to the main line if the weight is non-zero
         this.weight.addListener((obs, oldVal, newVal) -> {
@@ -88,11 +88,11 @@ public class Edge extends PaneArrow {
     }
 
     public GraphNode getNeighbour(GraphNode vertex) {
-        return vertex == vertex1 ? vertex2 : vertex1;
+        return vertex == nodeA ? nodeB : nodeA;
     }
 
     public void setHeadAVisible(GraphNode vertex, boolean b) {
-        if (vertex == vertex1) {
+        if (vertex == nodeA) {
             setHeadAVisible(b);
         } else {
             setHeadBVisible(b);
@@ -107,7 +107,7 @@ public class Edge extends PaneArrow {
      * @return The neighboring vertex connected by this edge.
      */
     public GraphNode getNeighbor(GraphNode vertex) {
-        return vertex == vertex1 ? vertex2 : vertex1;
+        return vertex == nodeA ? nodeB : nodeA;
     }
 
     /**
@@ -117,7 +117,7 @@ public class Edge extends PaneArrow {
      * @param visible True to make the arrowhead visible, false to hide it.
      */
     public void setArrowHeadVisible(GraphNode vertex, boolean visible) {
-        if (vertex == vertex1) {
+        if (vertex == nodeA) {
             setHeadAVisible(visible);
         } else {
             setHeadBVisible(visible);
@@ -131,7 +131,7 @@ public class Edge extends PaneArrow {
      * @return True if the arrowhead is visible, false otherwise.
      */
     public boolean isArrowHeadVisible(GraphNode vertex) {
-        return vertex == this.vertex1 ? isHeadAVisible() : isHeadBVisible();
+        return vertex == this.nodeA ? isHeadAVisible() : isHeadBVisible();
     }
 
     /**
@@ -186,6 +186,14 @@ public class Edge extends PaneArrow {
      */
     public BooleanProperty distanceVisibleProperty() {
         return distanceVisible;
+    }
+
+    public GraphNode getNodeA() {
+        return this.nodeA;
+    }
+
+    public GraphNode getNodeB() {
+        return this.nodeB;
     }
 }
 

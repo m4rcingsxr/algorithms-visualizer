@@ -48,7 +48,8 @@
 
             <Button fx:id="resetButton"
                     onAction="#onResetButtonClick"
-                    style="-fx-background-radius: 0%;">
+                    style="-fx-background-radius: 0%;"
+                    disable="true">
                 <graphic>
                     <Region prefWidth="15" prefHeight="15" style="-fx-border-color:black;">
                         <shape>
@@ -99,6 +100,10 @@
                             <HBox spacing="10">
                                 <ToggleButton fx:id="showEdgeWeightToggle" text="Show weight" />
                                 <ToggleButton fx:id="showEdgeDistanceToggle" text="Show distance" />
+                            </HBox>
+                            <HBox spacing="10">
+                                <Button fx:id="exportGraphBtn" text="Export Graph" onAction="#onExportGraphButtonClick"/>
+                                <Button fx:id="clearGraphBtn" text="Clear Graph" onAction="#onClearGraphButtonClick"/>
                             </HBox>
 
                             <ScrollPane hbarPolicy="NEVER" fitToWidth="true" minHeight="300">

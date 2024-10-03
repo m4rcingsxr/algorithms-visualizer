@@ -88,6 +88,10 @@ public class GraphNode extends Button {
         count--;
     }
 
+    public static void setCount(int i) {
+        count = i;
+    }
+
     /**
      * Adds an edge to the node, connecting it to another node.
      *

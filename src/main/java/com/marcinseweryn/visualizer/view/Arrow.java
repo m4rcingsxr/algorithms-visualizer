@@ -188,4 +188,5 @@ public class Arrow extends Group {
         headA.getStyleClass().add(clazz);
         headB.getStyleClass().add(clazz);
     }
+
 }

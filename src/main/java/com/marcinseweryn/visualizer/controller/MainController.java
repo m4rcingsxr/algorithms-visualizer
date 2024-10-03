@@ -2,27 +2,33 @@ package com.marcinseweryn.visualizer.controller;
 
 import com.marcinseweryn.visualizer.model.Algorithm;
 import com.marcinseweryn.visualizer.model.GraphAlgorithm;
+import com.marcinseweryn.visualizer.view.Edge;
+import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * Main controller for the Algorithm Visualizer application.
@@ -39,6 +45,10 @@ public class MainController {
     private TabPane graphTab;
     @FXML
     private Accordion renderedNodes;
+    @FXML
+    public Button exportGraphBtn;
+    @FXML
+    public Button clearGraphBtn;
     @FXML
     private ToggleButton showEdgeWeightToggle;
     @FXML
@@ -75,7 +85,6 @@ public class MainController {
 
     @FXML
     private Button resetButton;
-
 
 
     // Controllers for managing specific algorithm types
@@ -234,7 +243,7 @@ public class MainController {
     private void onStartButtonClick(ActionEvent event) {
         boolean isStepModeDisabled = event.getSource() == startButton;
 
-        if(isStepModeDisabled) {
+        if (isStepModeDisabled) {
             startButton.setDisable(true);
             stepButton.setDisable(true);
             resetButton.setDisable(true);
@@ -252,9 +261,10 @@ public class MainController {
 
     @FXML
     public void onResetButtonClick(ActionEvent event) {
-        if(isPathFindingTabSelected()) {
+        if (isPathFindingTabSelected()) {
             startButton.setDisable(false);
             stepButton.setDisable(false);
+            resetButton.setDisable(true);
             pathFindingController.resetGraphState();
         } else {
             // ...
@@ -365,5 +375,27 @@ public class MainController {
         this.pathFindingController.onAlgorithmSpaceDragDropped(dragEvent);
     }
 
+    @FXML
+    private void onExportGraphButtonClick() {
+        Window mainStage = graphPane.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save graph");
+        fileChooser.setInitialFileName("graph-" + LocalDate.now() + ".txt");
+        File file = fileChooser.showSaveDialog(mainStage);
+        if (file != null) {
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
+                bufferedWriter.write(pathFindingController.exportGraphToString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @FXML
+    private void onClearGraphButtonClick() {
+        this.runningAlgorithmThread.set(null);
+        this.resetButton.setDisable(true);
+        this.pathFindingController.clearAlgorithmSpace();
+    }
 
 }

@@ -27,6 +27,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -670,5 +672,56 @@ public class PathFindingController implements Subscriber {
 
         });
 
+    }
+
+    // noNodes,start,destination,[node,x,y],[nodeA,nodeB,headAVisible,HeadBVisible,weight]
+    public String exportGraphToString() {
+        if (algorithmSpace.getChildren().isEmpty()) {
+            return "";
+        } else {
+            StringBuilder graph = new StringBuilder();
+
+            graph.append(startNodeProperty.get().getId())
+                    .append(",")
+                    .append(destinationNodeProperty.get().getId())
+                    .append(",");
+
+
+            List<GraphNode> nodes = new ArrayList<>();
+
+
+            for (Node child : algorithmSpace.getChildren()) {
+                if (child instanceof GraphNode node) {
+                    nodes.add(node);
+                    graph.append(node.getId()).append(",").append(node.getLayoutX()).append(",").append(
+                            node.getLayoutY()).append(",");
+                }
+            }
+
+            graph.insert(0, nodes.size() + ",");
+
+            for (Node child : algorithmSpace.getChildren()) {
+                if(child instanceof Edge edge) {
+                    graph.append(edge.getNodeA().getId()).append(",")
+                            .append(edge.getNodeB().getId()).append(",")
+                            .append(edge.isArrowHeadVisible(edge.getNodeA())).append(",")
+                            .append(edge.isArrowHeadVisible(edge.getNodeB())).append(",")
+                            .append(edge.getWeight()).append(",");
+                }
+            }
+
+            return graph.toString();
+        }
+    }
+
+    public void clearAlgorithmSpace() {
+        this.destinationNodeProperty.set(null);
+        this.startNodeProperty.set(null);
+        this.pseudocodeList.getItems().clear();
+        this.candidateNodeList.getItems().clear();
+        this.visitedNodeList.getItems().clear();
+        this.algorithmSpace.getChildren().clear();
+        this.renderedNodes.getPanes().clear();
+        GraphNode.setCount(0);
     }
 }
