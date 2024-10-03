@@ -189,4 +189,10 @@ public class Arrow extends Group {
         headB.getStyleClass().add(clazz);
     }
 
+    public void removeStyleClass(String clazz) {
+        mainLine.getStyleClass().remove(clazz);
+        headA.getStyleClass().remove(clazz);
+        headB.getStyleClass().remove(clazz);
+    }
+
 }

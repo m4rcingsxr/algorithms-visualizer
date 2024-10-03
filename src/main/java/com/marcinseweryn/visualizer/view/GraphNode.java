@@ -107,19 +107,18 @@ public class GraphNode extends Button {
      *
      * @return A list of edges.
      */
-    public List<Edge> getEdges() {
+    public List<Edge> getAllEdges() {
         return this.edges;
     }
-
+    
     /**
      * Returns a list of neighbor nodes connected to this node via edges.
      *
      * @return A list of neighboring GraphNodes.
      */
     public List<GraphNode> getNeighbours() {
-        return this.edges.stream().map(e -> e.getNeighbor(this)).toList();
+        return this.edges.stream().filter(e -> e.isOppositeArrowHeadVisible(this)).map(e -> e.getNeighbor(this)).toList();
     }
-
 
     /**
      * Removes an edge from the node.

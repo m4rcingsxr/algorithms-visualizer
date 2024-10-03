@@ -134,6 +134,10 @@ public class Edge extends PaneArrow {
         return vertex == this.nodeA ? isHeadAVisible() : isHeadBVisible();
     }
 
+    public boolean isOppositeArrowHeadVisible(GraphNode vertex) {
+        return vertex == this.nodeA ? isHeadBVisible() : isHeadAVisible();
+    }
+
     /**
      * Gets the property for the weight of the edge, allowing for binding and updating.
      *
@@ -195,5 +199,6 @@ public class Edge extends PaneArrow {
     public GraphNode getNodeB() {
         return this.nodeB;
     }
+
 }
 

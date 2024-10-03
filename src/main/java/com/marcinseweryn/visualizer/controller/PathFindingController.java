@@ -465,7 +465,7 @@ public class PathFindingController implements Subscriber {
 
     // Removes the drag style from the specified GraphNode and its edges.
     private void removeDragStyle(GraphNode node) {
-        node.getEdges().forEach(e -> e.getStyleClass().remove("drag"));
+        node.getAllEdges().forEach(e -> e.getStyleClass().remove("drag"));
         if (this.draggedNode != null) {
             this.draggedNode.getStyleClass().remove("drag");
         }
@@ -473,8 +473,8 @@ public class PathFindingController implements Subscriber {
 
     // Deletes the specified GraphNode and its edges from the UI and updates neighboring nodes.
     private void deleteGraphNode(GraphNode node) {
-        for (Edge edge : node.getEdges()) {
-            edge.getNeighbour(node).getEdges().remove(edge);
+        for (Edge edge : node.getAllEdges()) {
+            edge.getNeighbour(node).getAllEdges().remove(edge);
             this.algorithmSpace.getChildren().remove(edge);
         }
         this.algorithmSpace.getChildren().remove(node);
@@ -553,7 +553,7 @@ public class PathFindingController implements Subscriber {
     private void applyDragStyleToNodeAndEdges(GraphNode graphNode) {
         graphNode.getStyleClass().add("drag");
         graphNode.toFront();
-        for (Edge edge : graphNode.getEdges()) {
+        for (Edge edge : graphNode.getAllEdges()) {
             edge.toFront();
             edge.getStyleClass().add("drag");
         }
@@ -723,7 +723,7 @@ public class PathFindingController implements Subscriber {
                 }
 
                 if (n instanceof Edge edge) {
-                    edge.getStyleClass().removeAll("path");
+                    edge.removeStyleClass("path");
                 }
 
                 candidateNodeList.getItems().clear();

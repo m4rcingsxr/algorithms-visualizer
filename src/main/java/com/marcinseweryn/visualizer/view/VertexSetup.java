@@ -71,7 +71,7 @@ public class VertexSetup extends VBox {
 
         edgeContainer.getChildren().clear();
 
-        for (Edge e : vertex.getEdges()) {
+        for (Edge e : vertex.getAllEdges()) {
 
             // check if current vertex layout is less than the neighbor (of same edge)
             boolean isCurrentVertexMoreToTheLeft = vertex.getLayoutX() <= e.getNeighbor(vertex).getLayoutX();
@@ -107,8 +107,8 @@ public class VertexSetup extends VBox {
         Button btn = new Button("X");
         btn.getStyleClass().add("delete-edge-btn");
         btn.setOnAction(e -> {
-            vertex.getEdges().remove(edge);
-            edge.getNeighbor(vertex).getEdges().remove(edge);
+            vertex.getAllEdges().remove(edge);
+            edge.getNeighbor(vertex).getAllEdges().remove(edge);
             publisher.notify("removeEdge", edge);
             update();
         });
