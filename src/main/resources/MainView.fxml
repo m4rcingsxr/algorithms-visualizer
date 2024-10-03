@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.SVGPath?>
@@ -98,16 +98,23 @@
                                 <Insets topRightBottomLeft="10"/>
                             </padding>
                             <HBox spacing="10">
-                                <ToggleButton fx:id="showEdgeWeightToggle" text="Show weight" />
-                                <ToggleButton fx:id="showEdgeDistanceToggle" text="Show distance" />
+                                <ToggleButton fx:id="showEdgeWeightToggle" text="Show weight"/>
+                                <ToggleButton fx:id="showEdgeDistanceToggle" text="Show distance"/>
                             </HBox>
                             <HBox spacing="10">
-                                <Button fx:id="exportGraphBtn" text="Export Graph" onAction="#onExportGraphButtonClick"/>
+                                <Button fx:id="exportGraphBtn" text="Export Graph"
+                                        onAction="#onExportGraphButtonClick"/>
                                 <Button fx:id="clearGraphBtn" text="Clear Graph" onAction="#onClearGraphButtonClick"/>
                             </HBox>
 
+                            <HBox spacing="10">
+                                <Button text="Generate Tree Graph"
+                                        onAction="#onClickGenerateTreeGraph"/>
+                                <Button text="Generate Complete Graph" onAction="#onClickGenerateCompleteGraph"/>
+                            </HBox>
+
                             <ScrollPane hbarPolicy="NEVER" fitToWidth="true" minHeight="300">
-                                <Accordion fx:id="renderedNodes" style="-fx-background-color: transparent;" />
+                                <Accordion fx:id="renderedNodes" style="-fx-background-color: transparent;"/>
                             </ScrollPane>
                         </VBox>
                     </Tab>

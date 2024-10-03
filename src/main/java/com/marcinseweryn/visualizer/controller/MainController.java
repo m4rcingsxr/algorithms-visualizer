@@ -386,4 +386,14 @@ public class MainController {
         this.pathFindingController.clearAlgorithmSpace();
     }
 
+    public void onClickGenerateTreeGraph(ActionEvent actionEvent) {
+        pathFindingController.clearAlgorithmSpace();
+        pathFindingController.generateTreeGraph();
+    }
+
+    public void onClickGenerateCompleteGraph(ActionEvent actionEvent) {
+        pathFindingController.clearAlgorithmSpace();
+        pathFindingController.generateCompleteGraph(7, 300, 420, 420);
+    }
+
 }

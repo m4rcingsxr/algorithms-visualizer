@@ -805,4 +805,100 @@ public class PathFindingController implements Subscriber {
             return graph.toString();
         }
     }
+
+    public void generateCompleteGraph(int numberOfNodes, double radius, double centerX, double centerY) {
+        clearAlgorithmSpace();
+
+        List<GraphNode> graphNodes = new ArrayList<>();
+
+        // Calculate angle step in radians
+        double angleStep = 2 * Math.PI / numberOfNodes;
+
+        // Create nodes in a circular layout
+        for (int i = 0; i < numberOfNodes; i++) {
+            double angle = i * angleStep;
+            double x = centerX + radius * Math.cos(angle);
+            double y = centerY + radius * Math.sin(angle);
+
+            GraphNode node = createGraphNodeAt(x, y);
+            graphNodes.add(node);
+        }
+
+        for (int i = 0; i < graphNodes.size(); i++) {
+            for (int j = i + 1; j < graphNodes.size(); j++) {
+                GraphNode nodeA = graphNodes.get(i);
+                GraphNode nodeB = graphNodes.get(j);
+
+                createEdgeBetweenNodes(nodeA, nodeB);
+            }
+        }
+
+        startNodeProperty.set(graphNodes.get(5));
+        destinationNodeProperty.set(graphNodes.get(2));
+        startNodeProperty.get().setPrimaryClass("start");
+        destinationNodeProperty.get().setPrimaryClass("destination");
+
+    }
+
+    public void generateDenseGraph() {
+        generateDenseGraph(25, 180);
+    }
+
+    /**
+     * Generates a dense graph programmatically with a given number of nodes.
+     *
+     * @param numberOfNodes The number of nodes to generate.
+     * @param nodeSpacing The spacing between nodes in the grid.
+     */
+    private void generateDenseGraph(int numberOfNodes, double nodeSpacing) {
+        clearAlgorithmSpace();
+
+        List<GraphNode> graphNodes = new ArrayList<>();
+
+        int gridSize = (int) Math.ceil(Math.sqrt(numberOfNodes));
+
+        for (int row = 0; row < gridSize; row++) {
+            for (int col = 0; col < gridSize; col++) {
+                double x = col * nodeSpacing + 40;
+                double y = row * nodeSpacing + 40;
+
+                GraphNode node = createGraphNodeAt(x, y);
+                graphNodes.add(node);
+            }
+        }
+
+        // Create edges between every pair of nodes (dense graph)
+        for (int i = 0; i < graphNodes.size(); i++) {
+            for (int j = i + 1; j < graphNodes.size(); j++) {
+                GraphNode nodeA = graphNodes.get(i);
+                GraphNode nodeB = graphNodes.get(j);
+
+                createEdgeBetweenNodes(nodeA, nodeB);
+            }
+        }
+    }
+
+    public void generateTreeGraph() {
+        GraphNode root = buildTree(440, 30, 200);
+        root.setPrimaryClass("start");
+
+        startNodeProperty.set(root);
+        destinationNodeProperty.get().setPrimaryClass("destination");
+
+    }
+
+    private GraphNode buildTree(double x, double y, double nodeSpacing) {
+        GraphNode node = createGraphNodeAt(x, y);
+
+        if(y > 600) {
+            destinationNodeProperty.set(node);
+            return node;
+        }
+
+        createEdgeBetweenNodes(node, buildTree(x - nodeSpacing, y + 150, nodeSpacing/2));
+        createEdgeBetweenNodes(node, buildTree(x + nodeSpacing, y + 150, nodeSpacing/2));
+
+        return node;
+    }
+
 }
