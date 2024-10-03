@@ -19,17 +19,22 @@ import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Controller for handling the Path Finding algorithm visualization.
@@ -94,6 +99,7 @@ public class PathFindingController implements Subscriber {
 
         this.eventPublisher = new Publisher();
         initializeEventSubscriptions();
+
         logger.info("PathFindingController initialized.");
     }
 
@@ -187,7 +193,8 @@ public class PathFindingController implements Subscriber {
             try {
                 return Optional.of(selectedAlgorithm.getClass()
                                            .getDeclaredConstructor(ListView.class, ListView.class, ListView.class,
-                                                                   SimpleObjectProperty.class, SimpleObjectProperty.class
+                                                                   SimpleObjectProperty.class,
+                                                                   SimpleObjectProperty.class
                                            )
                                            .newInstance(candidateNodeList, visitedNodeList, pseudocodeList,
                                                         startNodeProperty, destinationNodeProperty
@@ -330,7 +337,7 @@ public class PathFindingController implements Subscriber {
      * @return The newly created Edge.
      */
     private Edge createEdgeBetweenNodes(GraphNode node1, GraphNode node2) {
-        Edge edge = new Edge(this.startingNode, this.draggedNode);
+        Edge edge = new Edge(node1, node2);
         bindEdgeProperties(edge);
         addEdgeToNodes(node1, node2, edge);
         return edge;
@@ -606,7 +613,7 @@ public class PathFindingController implements Subscriber {
             case "startClicked" -> {
                 logger.info("Start button clicked for node: {}", node.getId());
 
-                if(startNodeProperty.get() != null) {
+                if (startNodeProperty.get() != null) {
                     startNodeProperty.get().getStyleClass().remove("start");
                 }
 
@@ -616,7 +623,7 @@ public class PathFindingController implements Subscriber {
             case "destinationClicked" -> {
                 logger.info("Destination button clicked for node: {}", node.getId());
 
-                if(destinationNodeProperty.get() != null) {
+                if (destinationNodeProperty.get() != null) {
                     destinationNodeProperty.get().getStyleClass().remove("destination");
                 }
 
@@ -636,15 +643,73 @@ public class PathFindingController implements Subscriber {
     // Optional drag and drop events (not currently used, but available for future implementations).
     void onAlgorithmSpaceDragOver(DragEvent dragEvent) {
         logger.trace("Drag over at coordinates: [X: {}, Y: {}]", dragEvent.getX(), dragEvent.getY());
+        // allow files to be dropped into the algorithm space
+        if (dragEvent.getDragboard().hasFiles()) {
+            dragEvent.acceptTransferModes(TransferMode.ANY);
+        }
+
+
     }
 
     void onAlgorithmSpaceDragDropped(DragEvent dragEvent) {
         logger.trace("Drag dropped at coordinates: [X: {}, Y: {}]", dragEvent.getX(), dragEvent.getY());
+
+        clearAlgorithmSpace();
+
+        List<File> draggedFiles = dragEvent.getDragboard().getFiles();
+
+        try (Scanner scanner = new Scanner(draggedFiles.get(0))) {
+            scanner.useDelimiter(",");
+
+            int numberOfGraphNodes = scanner.nextInt();
+            int startNodeId = scanner.nextInt();
+            int destinationNodeId = scanner.nextInt();
+
+            HashMap<Integer, Double[]> coordinates = new HashMap<>();
+
+            for (int i = 0; i < numberOfGraphNodes; i++)
+                coordinates.put(scanner.nextInt(), new Double[]{scanner.nextDouble(), scanner.nextDouble()});
+
+            Map<Integer, GraphNode> graphNodes = coordinates
+                    .entrySet()
+                    .stream()
+                    .collect(toMap(Map.Entry::getKey,
+                                   entry -> createGraphNodeAt(entry.getValue()[0], entry.getValue()[1])
+                    ));
+
+            if(startNodeId != -1) {
+                GraphNode graphNode = graphNodes.get(startNodeId);
+                startNodeProperty.set(graphNode);
+
+                graphNode.getStyleClass().add("start");
+            }
+
+            if(destinationNodeId != -1) {
+                GraphNode graphNode = graphNodes.get(destinationNodeId);
+                destinationNodeProperty.set(graphNode);
+
+                graphNode.getStyleClass().add("destination");
+            }
+
+            while (scanner.hasNextInt()) {
+                GraphNode nodeA = graphNodes.get(scanner.nextInt());
+                GraphNode nodeB = graphNodes.get(scanner.nextInt());
+                Edge edge = createEdgeBetweenNodes(nodeA, nodeB);
+                edge.setArrowHeadVisible(nodeA, scanner.nextBoolean());
+                edge.setArrowHeadVisible(nodeB, scanner.nextBoolean());
+                edge.setWeight(scanner.nextDouble());
+            }
+
+
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void resetGraphState() {
         for (Node n : algorithmSpace.getChildren()) {
-            if(n instanceof GraphNode node) {
+            if (n instanceof GraphNode node) {
                 node.setParentNode(null);
             }
         }
@@ -674,18 +739,45 @@ public class PathFindingController implements Subscriber {
 
     }
 
+    public void clearAlgorithmSpace() {
+        this.destinationNodeProperty.set(null);
+        this.startNodeProperty.set(null);
+        this.pseudocodeList.getItems().clear();
+        this.candidateNodeList.getItems().clear();
+        this.visitedNodeList.getItems().clear();
+        this.algorithmSpace.getChildren().clear();
+        this.renderedNodes.getPanes().clear();
+        GraphNode.setCount(0);
+    }
+
+    public void onExportGraphButtonClick() {
+        Window mainStage = algorithmSpace.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save graph");
+        fileChooser.setInitialFileName("graph-" + LocalDate.now() + ".txt");
+        File file = fileChooser.showSaveDialog(mainStage);
+        if (file != null) {
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
+                bufferedWriter.write(exportGraphToString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     // noNodes,start,destination,[node,x,y],[nodeA,nodeB,headAVisible,HeadBVisible,weight]
-    public String exportGraphToString() {
+    private String exportGraphToString() {
         if (algorithmSpace.getChildren().isEmpty()) {
             return "";
         } else {
             StringBuilder graph = new StringBuilder();
 
-            graph.append(startNodeProperty.get().getId())
-                    .append(",")
-                    .append(destinationNodeProperty.get().getId())
-                    .append(",");
 
+
+            graph.append(startNodeProperty.get() != null ? startNodeProperty.get().getId() : "-1")
+                    .append(",")
+                    .append(destinationNodeProperty.get() != null ? destinationNodeProperty.get().getId() : "-1")
+                    .append(",");
 
             List<GraphNode> nodes = new ArrayList<>();
 
@@ -701,7 +793,7 @@ public class PathFindingController implements Subscriber {
             graph.insert(0, nodes.size() + ",");
 
             for (Node child : algorithmSpace.getChildren()) {
-                if(child instanceof Edge edge) {
+                if (child instanceof Edge edge) {
                     graph.append(edge.getNodeA().getId()).append(",")
                             .append(edge.getNodeB().getId()).append(",")
                             .append(edge.isArrowHeadVisible(edge.getNodeA())).append(",")
@@ -712,16 +804,5 @@ public class PathFindingController implements Subscriber {
 
             return graph.toString();
         }
-    }
-
-    public void clearAlgorithmSpace() {
-        this.destinationNodeProperty.set(null);
-        this.startNodeProperty.set(null);
-        this.pseudocodeList.getItems().clear();
-        this.candidateNodeList.getItems().clear();
-        this.visitedNodeList.getItems().clear();
-        this.algorithmSpace.getChildren().clear();
-        this.renderedNodes.getPanes().clear();
-        GraphNode.setCount(0);
     }
 }

@@ -2,33 +2,27 @@ package com.marcinseweryn.visualizer.controller;
 
 import com.marcinseweryn.visualizer.model.Algorithm;
 import com.marcinseweryn.visualizer.model.GraphAlgorithm;
-import com.marcinseweryn.visualizer.view.Edge;
-import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Main controller for the Algorithm Visualizer application.
@@ -372,23 +366,17 @@ public class MainController {
      */
     @FXML
     private void onGraphPaneDragDropped(DragEvent dragEvent) {
+        this.runningAlgorithmThread.set(null);
+        this.startButton.setDisable(false);
+        this.stepButton.setDisable(false);
+        this.resetButton.setDisable(true);
         this.pathFindingController.onAlgorithmSpaceDragDropped(dragEvent);
     }
 
+
     @FXML
     private void onExportGraphButtonClick() {
-        Window mainStage = graphPane.getScene().getWindow();
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save graph");
-        fileChooser.setInitialFileName("graph-" + LocalDate.now() + ".txt");
-        File file = fileChooser.showSaveDialog(mainStage);
-        if (file != null) {
-            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
-                bufferedWriter.write(pathFindingController.exportGraphToString());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        this.pathFindingController.onExportGraphButtonClick();
     }
 
     @FXML
