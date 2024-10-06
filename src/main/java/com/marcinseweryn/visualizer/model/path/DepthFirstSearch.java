@@ -7,8 +7,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
 
-import java.util.Stack;
-
 public class DepthFirstSearch extends GraphAlgorithm {
 
     public DepthFirstSearch() {
@@ -26,7 +24,6 @@ public class DepthFirstSearch extends GraphAlgorithm {
         return "Depth First Search";
     }
 
-    // todo: fix - correct visualization on graph and in lists - correct steps
     @Override
     public void executeAlgorithm() {
         initializeCandidateNodesAs(DataStructureType.STACK);
@@ -53,7 +50,7 @@ public class DepthFirstSearch extends GraphAlgorithm {
                 this.visitedNodeList.addNodeAndVisualize(getCurrentNode());
 
                 pauseAtStep(7);
-                for (GraphNode neighbour : getCurrentNode().getNeighbours()) {
+                for (GraphNode neighbour : getCurrentNode().getNeighbors()) {
                     setNeighborNode(neighbour);
                     pauseAtStep(8);
                     if(!visitedNodeList.containsNode(neighbour)) {

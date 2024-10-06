@@ -32,6 +32,8 @@ public class GraphNode extends Button {
     // Holds information about the node (ID, parent)
     private final SimpleStringProperty info = new GraphNodeInfo();
 
+    private double distance;
+
     public GraphNode() {
         getStyleClass().add("vertex");
         setText("   ");
@@ -116,7 +118,7 @@ public class GraphNode extends Button {
      *
      * @return A list of neighboring GraphNodes.
      */
-    public List<GraphNode> getNeighbours() {
+    public List<GraphNode> getNeighbors() {
         return this.edges.stream().filter(e -> e.isOppositeArrowHeadVisible(this)).map(e -> e.getNeighbor(this)).toList();
     }
 
@@ -181,6 +183,14 @@ public class GraphNode extends Button {
     }
 
 
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
     /**
      * Inner class that overrides SimpleStringProperty to provide a detailed
      * string representation of the GraphNode and bind it on other properties.
@@ -194,4 +204,5 @@ public class GraphNode extends Button {
                     (parent.getValue() != null ? parent.getValue().getId() : "null");
         }
     }
+
 }

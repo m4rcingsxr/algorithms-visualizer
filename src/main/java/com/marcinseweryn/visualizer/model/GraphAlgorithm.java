@@ -160,6 +160,7 @@ public abstract class GraphAlgorithm extends Algorithm {
         switch (type) {
             case STACK -> this.candidateNodeList = new GraphNodeStack(ListType.CANDIDATE_NODES, candidateNodeListView);
             case QUEUE -> this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNodeListView);
+            case PRIORITY_QUEUE -> this.candidateNodeList = new GraphNodePriorityQueue(ListType.CANDIDATE_NODES, candidateNodeListView);
             default -> throw new RuntimeException("Not supported ds");
         }
     }

@@ -49,7 +49,7 @@ public class BreadthFirstSearch extends GraphAlgorithm {
             }
 
             pauseAtStep(6);
-            for (GraphNode neighbour : getCurrentNode().getNeighbours()) {
+            for (GraphNode neighbour : getCurrentNode().getNeighbors()) {
                 setNeighborNode(neighbour);
                 pauseAtStep(7);
                 if (!visitedNodeList.containsNode(getNeighborNode())) {
