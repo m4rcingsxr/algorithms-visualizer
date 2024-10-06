@@ -1,13 +1,12 @@
 package com.marcinseweryn.visualizer.model.path;
 
 import com.marcinseweryn.visualizer.model.DataStructureType;
+import com.marcinseweryn.visualizer.model.DistanceList;
 import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
-
-import java.util.ArrayList;
 
 public class LazyDijkstra extends GraphAlgorithm {
 
@@ -129,37 +128,9 @@ public class LazyDijkstra extends GraphAlgorithm {
         );
     }
 
-    private static class DistanceList {
-        private final ArrayList<Double> list;
-
-        public DistanceList() {
-            list = new ArrayList<>();
-        }
-
-        public void set(int index, Double value) {
-            while (list.size() <= index) {
-                list.add(null);
-            }
-            list.set(index, value);
-        }
-
-        public Double get(int index) {
-            if (index >= list.size() || list.get(index) == null) {
-                return Double.POSITIVE_INFINITY;
-            }
-
-            return list.get(index);
-        }
-
-        public int size() {
-            return list.size();
-        }
-
-        @Override
-        public String toString() {
-            return list.toString();
-        }
-
+    @Override
+    public String toString() {
+        return "Lazy Dijkstra";
     }
 
 }

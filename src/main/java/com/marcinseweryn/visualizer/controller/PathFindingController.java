@@ -824,12 +824,16 @@ public class PathFindingController implements Subscriber {
             graphNodes.add(node);
         }
 
+        Random random = new Random();  // Random generator for edge weights
+
         for (int i = 0; i < graphNodes.size(); i++) {
             for (int j = i + 1; j < graphNodes.size(); j++) {
                 GraphNode nodeA = graphNodes.get(i);
                 GraphNode nodeB = graphNodes.get(j);
 
-                createEdgeBetweenNodes(nodeA, nodeB);
+                double weight = generateRandomIntWeight(random);
+                Edge edgeBetweenNodes = createEdgeBetweenNodes(nodeA, nodeB);
+                edgeBetweenNodes.setWeight(weight);
             }
         }
 
@@ -838,6 +842,10 @@ public class PathFindingController implements Subscriber {
         startNodeProperty.get().setPrimaryClass("start");
         destinationNodeProperty.get().setPrimaryClass("destination");
 
+    }
+
+    private int generateRandomIntWeight(Random random) {
+        return 1 +  random.nextInt(20);
     }
 
     public void generateDenseGraph() {
