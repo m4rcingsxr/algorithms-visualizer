@@ -33,6 +33,8 @@ public abstract class GraphAlgorithm extends Algorithm {
     protected GraphNodeVisualizer candidateNodeList;
     protected GraphNodeVisualizer visitedNodeList;
 
+    private ListView<SimpleStringProperty> candidateNodeListView;
+
     // Currently active and neighboring graph nodes during traversal
     private GraphNode currentNode;
     private GraphNode neighborNode;
@@ -47,20 +49,23 @@ public abstract class GraphAlgorithm extends Algorithm {
     /**
      * Constructor for GraphAlgorithm that initializes the visualizers and binds the start and destination nodes.
      *
-     * @param candidateNodeList  The ListView for visualizing candidate nodes.
+     * @param candidateNoteListView  The ListView for visualizing candidate nodes.
      * @param visitedNodeList    The ListView for visualizing visited nodes.
      * @param startNode          The starting node for the traversal.
      * @param destinationNode    The destination node for the traversal.
      */
     protected GraphAlgorithm(
-            ListView<SimpleStringProperty> candidateNodeList,
+            ListView<SimpleStringProperty> candidateNoteListView,
             ListView<SimpleStringProperty> visitedNodeList,
             ListView<String> pseudocodeList,
             SimpleObjectProperty<GraphNode> startNode,
             SimpleObjectProperty<GraphNode> destinationNode) {
         super(pseudocodeList);
-        this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNodeList);
+
+        this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNoteListView);
         this.visitedNodeList = new GraphNodeStack(ListType.VISITED, visitedNodeList);
+
+        this.candidateNodeListView = candidateNoteListView;
 
         this.startNode.bind(startNode);
         this.destinationNode.bind(destinationNode);
@@ -149,6 +154,14 @@ public abstract class GraphAlgorithm extends Algorithm {
      */
     protected GraphNode getNeighborNode() {
         return neighborNode;
+    }
+
+    protected void initializeCandidateNodesAs(DataStructureType type) {
+        switch (type) {
+            case STACK -> this.candidateNodeList = new GraphNodeStack(ListType.CANDIDATE_NODES, candidateNodeListView);
+            case QUEUE -> this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNodeListView);
+            default -> throw new RuntimeException("Not supported ds");
+        }
     }
 
 }

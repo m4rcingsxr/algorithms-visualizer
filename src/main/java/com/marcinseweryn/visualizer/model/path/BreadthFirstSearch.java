@@ -72,17 +72,17 @@ public class BreadthFirstSearch extends GraphAlgorithm {
     @Override
     public void setPseudocode() {
         this.pseudocode.addAll(
-                "Q.enqueue(Start)",                       // Initialize the queue with Start
+                "queue.enqueue(start)",                       // Initialize the queue with Start
                 "Visited.add(Start)",
-                "while (!Q.isEmpty())",                             // Loop until the queue is empty
-                "   Current = Q.dequeue()",                         // Dequeue the front element
-                "   if (Current == Destination)",                   // Check if Current is the destination
-                "      tracePath() and exit",                       // Trace the path if found
-                "   for (N : neighbors(Current))",                  // Loop through neighbors of Current
-                "      if (N not in Visited)",                      // Check if N is unvisited and not in queue
+                "while (!queue.isEmpty())",                             // Loop until the queue is empty
+                "   current = queue.dequeue()",                         // Dequeue the front element
+                "   if (current == destination)",                   // Check if Current is the destination
+                "      reconstructPath() and return",                       // Trace the path if found
+                "   for (N : neighbors(current))",                  // Loop through neighbors of Current
+                "      if (N not in visited)",                      // Check if N is unvisited and not in queue
                 "         Visited.add(N)",
                 "         Q.enqueue(N)",                            // Enqueue N
-                "         parent[N] = Current"                      // Set Current as the parent of N
+                "         parent[N] = current"                      // Set Current as the parent of N
         );
     }
 
