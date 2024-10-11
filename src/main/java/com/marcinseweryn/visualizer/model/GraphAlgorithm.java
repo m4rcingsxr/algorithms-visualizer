@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.AnchorPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,6 +40,8 @@ public abstract class GraphAlgorithm extends Algorithm {
     private GraphNode currentNode;
     private GraphNode neighborNode;
 
+    private AnchorPane algorithmSpace;
+
     /**
      * Used only for load algorithms to box list
      */
@@ -59,7 +62,8 @@ public abstract class GraphAlgorithm extends Algorithm {
             ListView<SimpleStringProperty> visitedNodeList,
             ListView<String> pseudocodeList,
             SimpleObjectProperty<GraphNode> startNode,
-            SimpleObjectProperty<GraphNode> destinationNode) {
+            SimpleObjectProperty<GraphNode> destinationNode,
+            AnchorPane algorithmSpace) {
         super(pseudocodeList);
 
         this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNoteListView);
@@ -69,6 +73,8 @@ public abstract class GraphAlgorithm extends Algorithm {
 
         this.startNode.bind(startNode);
         this.destinationNode.bind(destinationNode);
+
+        this.algorithmSpace = algorithmSpace;
     }
 
     /**
@@ -163,6 +169,14 @@ public abstract class GraphAlgorithm extends Algorithm {
             case PRIORITY_QUEUE -> this.candidateNodeList = new GraphNodePriorityQueue(ListType.CANDIDATE_NODES, candidateNodeListView);
             default -> throw new RuntimeException("Not supported ds");
         }
+    }
+
+    protected int getNumberOfVertices() {
+        return this.algorithmSpace.getChildren().stream().filter(GraphNode.class::isInstance).map(n -> 1).reduce(0, Integer::sum);
+    }
+
+    protected List<GraphNode> getGraph() {
+        return algorithmSpace.getChildren().stream().filter(GraphNode.class::isInstance).map(node -> (GraphNode) node).toList();
     }
 
 }

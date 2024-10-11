@@ -194,10 +194,11 @@ public class PathFindingController implements Subscriber {
                 return Optional.of(selectedAlgorithm.getClass()
                                            .getDeclaredConstructor(ListView.class, ListView.class, ListView.class,
                                                                    SimpleObjectProperty.class,
-                                                                   SimpleObjectProperty.class
+                                                                   SimpleObjectProperty.class,
+                                                                   AnchorPane.class
                                            )
                                            .newInstance(candidateNodeList, visitedNodeList, pseudocodeList,
-                                                        startNodeProperty, destinationNodeProperty
+                                                        startNodeProperty, destinationNodeProperty, algorithmSpace
                                            ));
             } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
                      InstantiationException e) {

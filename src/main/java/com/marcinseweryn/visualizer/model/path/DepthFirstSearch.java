@@ -6,6 +6,7 @@ import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.AnchorPane;
 
 public class DepthFirstSearch extends GraphAlgorithm {
 
@@ -15,8 +16,8 @@ public class DepthFirstSearch extends GraphAlgorithm {
 
     public DepthFirstSearch(ListView<SimpleStringProperty> candidateNodes, ListView<SimpleStringProperty> visitedNodes,
                             ListView<String> pseudocodeList, SimpleObjectProperty<GraphNode> startNode,
-                            SimpleObjectProperty<GraphNode> destinationNode) {
-        super(candidateNodes, visitedNodes, pseudocodeList, startNode, destinationNode);
+                            SimpleObjectProperty<GraphNode> destinationNode, AnchorPane algorithmSpace) {
+        super(candidateNodes, visitedNodes, pseudocodeList, startNode, destinationNode, algorithmSpace);
     }
 
     @Override

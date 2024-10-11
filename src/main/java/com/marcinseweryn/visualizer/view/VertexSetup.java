@@ -144,7 +144,7 @@ public class VertexSetup extends VBox {
 
     private Spinner<Double> createWeightChanger(Edge edge) {
         // Create a spinner for double values with a range (min, max, step)
-        Spinner<Double> spinner = new Spinner<>(0.0, 1000.0, edge.getWeight(), 0.1); // Adjust min, max, step as needed
+        Spinner<Double> spinner = new Spinner<>(-100.00, 100.00, edge.getWeight(), 0.1); // Adjust min, max, step as needed
 
         // Enable typing and number control through Spinner's text field
         spinner.setEditable(true);
