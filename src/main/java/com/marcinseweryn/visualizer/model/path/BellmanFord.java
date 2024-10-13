@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class BellmanFord extends GraphAlgorithm {
@@ -27,28 +26,38 @@ public class BellmanFord extends GraphAlgorithm {
         super(candidateNoteListView, visitedNodeList, pseudocodeList, startNode, destinationNode, algorithmSpace);
     }
 
-    // todo: fix - wont work for mixed graph ids - replace with distance list
     @Override
     public void executeAlgorithm() {
+        pauseAtStep(0);
+        pauseAtStep(1);
+
         int start = Integer.parseInt(startNode.get().getId());
 
         List<GraphNode> graph = getGraph();
         int N = graph.size();
 
-        double[] distance = new double[N];
-        Arrays.fill(distance, Double.POSITIVE_INFINITY);
+        DistanceList distanceList = new DistanceList();
+        distanceList.set(start, 0.0);
 
-        distance[start] = 0;
-
+        pauseAtStep(2);
         for (int i = 0; i < N - 1; i++) {
+            pauseAtStep(3);
             for (GraphNode graphNode : graph) {
                 int from = Integer.parseInt(graphNode.getId());
+                setCurrentNode(graphNode);
+
+                pauseAtStep(4);
                 for (GraphNode neighbor : graphNode.getNeighbors()) {
                     int to = Integer.parseInt(neighbor.getId());
+                    setNeighborNode(neighbor);
                     Edge edge = graphNode.getConnection(neighbor);
-                    if(distance[from] + edge.getWeight() < distance[to]) {
-                        distance[to] = distance[from] + edge.getWeight();
+
+                    pauseAtStep(5);
+                    if(distanceList.get(from) + edge.getWeight() < distanceList.get(to)) {
+                        pauseAtStep(6);
+                        distanceList.set(to, distanceList.get(from) + edge.getWeight());
                     }
+                    setNeighborNode(null);
                 }
             }
         }
@@ -60,12 +69,17 @@ public class BellmanFord extends GraphAlgorithm {
                 for (GraphNode neighbor : graphNode.getNeighbors()) {
                     int to = Integer.parseInt(neighbor.getId());
                     Edge edge = graphNode.getConnection(neighbor);
-                    if(distance[from] + edge.getWeight() < distance[to]) {
-                        distance[to] = Double.NEGATIVE_INFINITY;
+                    if(distanceList.get(from) + edge.getWeight() < distanceList.get(to)) {
+                        distanceList.set(to, Double.NEGATIVE_INFINITY);
+
+                        // visited - nodes that are part of negative cycles
+                        visitedNodeList.applyVisualStyleOnNode(neighbor);
                     }
                 }
             }
         }
+
+        System.out.println(distanceList);
     }
 
     @Override
