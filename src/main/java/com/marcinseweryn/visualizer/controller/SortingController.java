@@ -73,5 +73,17 @@ public class SortingController {
     }
 
 
+    public void clearAlgorithmSpace() {
+        algorithmSpace.getChildren().clear();
+        this.unsortedList = new ArrayList<>();
+    }
 
+    public void generateUnsortedList(int noElements) {
+        sortInputProperty.set(IntStream
+                                      .range(0, noElements)
+                                      .map(i -> random.nextInt(100))
+                                      .mapToObj(String::valueOf)
+                                      .collect(joining(","))
+        );
+    }
 }

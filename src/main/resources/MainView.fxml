@@ -143,6 +143,11 @@
                                 <Insets topRightBottomLeft="10"/>
                             </padding>
 
+                            <Button text="Generate big unsorted list"
+                                    onAction="#onClickGenerateBigUnsortedList"/>
+
+                            <Button text="Generate small unsorted list"
+                                    onAction="#onClickGenerateSmallUnsortedList"/>
 
                             <Label text="Number List" contentDisplay="RIGHT" styleClass="list-view-label"/>
                             <TextField fx:id="sortInput"/>

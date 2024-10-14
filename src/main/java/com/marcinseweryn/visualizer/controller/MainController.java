@@ -403,5 +403,13 @@ public class MainController {
         pathFindingController.generateCompleteGraph(7, 300, 420, 420);
     }
 
+    public void onClickGenerateBigUnsortedList(ActionEvent actionEvent) {
+        sortingController.clearAlgorithmSpace();
+        sortingController.generateUnsortedList(100);
+    }
 
+    public void onClickGenerateSmallUnsortedList(ActionEvent actionEvent) {
+        sortingController.clearAlgorithmSpace();
+        sortingController.generateUnsortedList(10);
+    }
 }
