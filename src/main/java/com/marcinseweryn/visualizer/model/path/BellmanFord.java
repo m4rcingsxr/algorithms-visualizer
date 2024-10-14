@@ -5,9 +5,9 @@ import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 
@@ -17,13 +17,12 @@ public class BellmanFord extends GraphAlgorithm {
         super();
     }
 
-    public BellmanFord(ListView<SimpleStringProperty> candidateNoteListView,
-                       ListView<SimpleStringProperty> visitedNodeList,
+    public BellmanFord(VBox algorithmTab,
                        ListView<String> pseudocodeList,
                        SimpleObjectProperty<GraphNode> startNode,
                        SimpleObjectProperty<GraphNode> destinationNode,
                        AnchorPane algorithmSpace) {
-        super(candidateNoteListView, visitedNodeList, pseudocodeList, startNode, destinationNode, algorithmSpace);
+        super(algorithmTab, pseudocodeList, startNode, destinationNode, algorithmSpace);
     }
 
     @Override
@@ -73,7 +72,7 @@ public class BellmanFord extends GraphAlgorithm {
                         distanceList.set(to, Double.NEGATIVE_INFINITY);
 
                         // visited - nodes that are part of negative cycles
-                        visitedNodeList.applyVisualStyleOnNode(neighbor);
+//                        visitedNodeList.applyVisualStyleOnNode(neighbor);
                     }
                 }
             }

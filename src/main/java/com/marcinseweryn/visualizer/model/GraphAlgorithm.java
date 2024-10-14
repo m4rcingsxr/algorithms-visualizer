@@ -6,8 +6,11 @@ import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,13 +32,12 @@ public abstract class GraphAlgorithm extends Algorithm {
 
     // List to store the nodes forming the path
     private final List<GraphNode> path = new ArrayList<>();
+    private VBox algorithmTab;
 
     // Visualizers for the candidate and visited nodes during traversal
-    protected GraphNodeVisualizer candidateNodeList;
-    protected GraphNodeVisualizer visitedNodeList;
-
-    private ListView<SimpleStringProperty> candidateNodeListView;
-
+//    protected GraphNodeVisualizer candidateNodeList;
+//    protected GraphNodeVisualizer visitedNodeList;
+//
     // Currently active and neighboring graph nodes during traversal
     private GraphNode currentNode;
     private GraphNode neighborNode;
@@ -58,18 +60,19 @@ public abstract class GraphAlgorithm extends Algorithm {
      * @param destinationNode    The destination node for the traversal.
      */
     protected GraphAlgorithm(
-            ListView<SimpleStringProperty> candidateNoteListView,
-            ListView<SimpleStringProperty> visitedNodeList,
+            VBox algorithmTab,
             ListView<String> pseudocodeList,
             SimpleObjectProperty<GraphNode> startNode,
             SimpleObjectProperty<GraphNode> destinationNode,
             AnchorPane algorithmSpace) {
         super(pseudocodeList);
 
-        this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNoteListView);
-        this.visitedNodeList = new GraphNodeStack(ListType.VISITED, visitedNodeList);
 
-        this.candidateNodeListView = candidateNoteListView;
+        this.algorithmTab = algorithmTab;
+//        this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNodeListView);
+//        this.visitedNodeList = new GraphNodeStack(ListType.VISITED, visitedNodeListView);
+
+//        this.candidateNodeListView = candidateNodeListView;
 
         this.startNode.bind(startNode);
         this.destinationNode.bind(destinationNode);
@@ -162,21 +165,48 @@ public abstract class GraphAlgorithm extends Algorithm {
         return neighborNode;
     }
 
-    protected void initializeCandidateNodesAs(DataStructureType type) {
-        switch (type) {
-            case STACK -> this.candidateNodeList = new GraphNodeStack(ListType.CANDIDATE_NODES, candidateNodeListView);
-            case QUEUE -> this.candidateNodeList = new GraphNodeQueue(ListType.CANDIDATE_NODES, candidateNodeListView);
-            case PRIORITY_QUEUE -> this.candidateNodeList = new GraphNodePriorityQueue(ListType.CANDIDATE_NODES, candidateNodeListView);
-            default -> throw new RuntimeException("Not supported ds");
-        }
-    }
-
-    protected int getNumberOfVertices() {
-        return (int) this.algorithmSpace.getChildren().stream().filter(GraphNode.class::isInstance).count();
-    }
-
     protected List<GraphNode> getGraph() {
-        return algorithmSpace.getChildren().stream().filter(GraphNode.class::isInstance).map(node -> (GraphNode) node).toList();
+        return algorithmSpace.getChildren().stream().filter(GraphNode.class::isInstance).map(GraphNode.class::cast).toList();
+    }
+
+    protected GraphNodeVisualizer initializeGraphNodeVisualizer(String visualizerType, DataStructureType dsType) {
+        VBox algorithmView = new VBox();
+        Label label = new Label();
+        label.setContentDisplay(ContentDisplay.RIGHT);
+        label.getStyleClass().add("list-view-label");
+        ListView<SimpleStringProperty> view = new ListView<>();
+        algorithmView.getChildren().addAll(label, view);
+
+        ListType listType;
+        switch (visualizerType) {
+            case "VISITED" -> {
+                label.setText("Visited");
+                listType = ListType.VISITED;
+            }
+            case "DISTANCE" -> {
+                label.setText("Distance");
+                listType = ListType.DISTANCE;
+            }
+            case "CANDIDATE" -> {
+                label.setText("Candidate Nodes");
+                listType = ListType.CANDIDATE_NODES;
+            }
+            default -> throw new RuntimeException("Not supported list view");
+        }
+
+        Platform.runLater(() -> {
+            this.algorithmTab.getChildren().add(algorithmView);
+        });
+
+        GraphNodeVisualizer visualizer;
+        switch (dsType) {
+            case STACK -> visualizer = new GraphNodeStack(listType, view);
+            case QUEUE -> visualizer = new GraphNodeQueue(listType, view);
+            case PRIORITY_QUEUE -> visualizer = new GraphNodePriorityQueue(listType, view);
+            default -> throw new RuntimeException("Not supported list visualizer");
+        }
+
+        return visualizer;
     }
 
 }

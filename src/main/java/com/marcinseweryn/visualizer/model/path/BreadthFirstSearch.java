@@ -1,41 +1,48 @@
 package com.marcinseweryn.visualizer.model.path;
 
+import com.marcinseweryn.visualizer.model.DataStructureType;
 import com.marcinseweryn.visualizer.model.GraphAlgorithm;
+import com.marcinseweryn.visualizer.model.GraphNodeVisualizer;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 public class BreadthFirstSearch extends GraphAlgorithm {
+
+    private GraphNodeVisualizer candidateNodeList;
+    private GraphNodeVisualizer visitedNodeList;
 
     public BreadthFirstSearch() {
         super();
     }
 
-    public BreadthFirstSearch(ListView<SimpleStringProperty> candidateNodes,
-                              ListView<SimpleStringProperty> visitedNodes,
-                              ListView<String> pseudocodeList,
-                              SimpleObjectProperty<GraphNode> startNode,
-                              SimpleObjectProperty<GraphNode> destinationNode,
-                              AnchorPane algorithmSpace) {
-        super(candidateNodes, visitedNodes, pseudocodeList, startNode, destinationNode, algorithmSpace);
+    public BreadthFirstSearch(
+            VBox algorithmTab,
+            ListView<String> pseudocodeList,
+            SimpleObjectProperty<GraphNode> startNode,
+            SimpleObjectProperty<GraphNode> destinationNode,
+            AnchorPane algorithmSpace) {
+        super(algorithmTab, pseudocodeList, startNode, destinationNode, algorithmSpace);
+        candidateNodeList = initializeGraphNodeVisualizer("CANDIDATE", DataStructureType.QUEUE);
+        visitedNodeList = initializeGraphNodeVisualizer("VISITED", DataStructureType.STACK);
     }
 
     @Override
     public void executeAlgorithm() {
         pauseAtStep(0);
 
-        this.candidateNodeList.addNodeAndVisualize(this.startNode.get());
+        candidateNodeList.addNodeAndVisualize(this.startNode.get());
 
         pauseAtStep(1);
 
-        this.visitedNodeList.addNode(this.startNode.get());
+        visitedNodeList.addNode(this.startNode.get());
 
         while (!candidateNodeList.isEmpty()) {
             pauseAtStep(2);
 
-            setCurrentNode(this.candidateNodeList.removeNode());
+            setCurrentNode(candidateNodeList.removeNode());
 
             visitedNodeList.addNodeAndApplyStyle(getCurrentNode());
 
@@ -60,7 +67,7 @@ public class BreadthFirstSearch extends GraphAlgorithm {
 
                     pauseAtStep(8);
 
-                    this.candidateNodeList.addNodeAndVisualize(getNeighborNode());
+                    candidateNodeList.addNodeAndVisualize(getNeighborNode());
 
                     getNeighborNode().setParentNode(getCurrentNode());
                     pauseAtStep(9);

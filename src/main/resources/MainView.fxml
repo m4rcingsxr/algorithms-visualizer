@@ -68,6 +68,7 @@
     <left>
         <TabPane fx:id="algorithmTab" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
             <Tab text="Path Finding">
+                <!-- id required for controller injection -->
                 <fx:include fx:id="graphTab" source="pathfinding_tab.fxml"/>
             </Tab>
             <Tab text="Sorting">
@@ -101,5 +102,7 @@
             />
         </VBox>
     </center>
+
+
 </BorderPane>
 

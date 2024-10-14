@@ -75,7 +75,9 @@ public class MainController {
         logger.info("Initializing MainController...");
 
         graphTabController.injectController(this);
+        graphTabController.setAlgorithmSpace(graphPane);
         sortTabController.injectController(this);
+        sortTabController.setAlgorithmSpace(sortingPane);
 
         // Set up tab selection listener to switch between graph and sorting algorithms
         setupTabSelectionListener();

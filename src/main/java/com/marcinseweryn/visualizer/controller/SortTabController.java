@@ -43,6 +43,7 @@ public class SortTabController {
 
     private SortingRectangles sortingRectangles;
     private MainController mainController;
+    private VBox algorithmSpace;
 
     public SortTabController() {
     }
@@ -60,7 +61,7 @@ public class SortTabController {
         if (newVal.isEmpty() || newVal.isBlank()) return;
 
         // Clear previous rectangles
-        this.mainController.getSortingPane().getChildren().clear();
+        algorithmSpace.getChildren().clear();
 
         // Parse CSV to list
         String[] split = newVal.split(",");
@@ -78,15 +79,14 @@ public class SortTabController {
             throw new IllegalStateException();
         }
 
-        sortingRectangles = new SortingRectangles(unsortedList, max.get(), min.get(), this.mainController.getSortingPane().getHeight(),
-                                                  this.mainController.getSortingPane().getWidth()
+        sortingRectangles = new SortingRectangles(unsortedList, max.get(), min.get(), algorithmSpace.getHeight(),
+                                                  algorithmSpace.getWidth()
         );
-        this.mainController.getSortingPane().getChildren().add(sortingRectangles);
+        algorithmSpace.getChildren().add(sortingRectangles);
     }
 
-
     public void clearAlgorithmSpace() {
-        this.mainController.getSortingPane().getChildren().clear();
+        algorithmSpace.getChildren().clear();
         this.unsortedList = new ArrayList<>();
     }
 
@@ -141,5 +141,9 @@ public class SortTabController {
 
     public void injectController(MainController mainController) {
         this.mainController = mainController;
+    }
+
+    public void setAlgorithmSpace(VBox algorithmSpace) {
+        this.algorithmSpace = algorithmSpace;
     }
 }

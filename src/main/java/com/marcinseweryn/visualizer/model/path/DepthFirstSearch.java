@@ -2,22 +2,29 @@ package com.marcinseweryn.visualizer.model.path;
 
 import com.marcinseweryn.visualizer.model.DataStructureType;
 import com.marcinseweryn.visualizer.model.GraphAlgorithm;
+import com.marcinseweryn.visualizer.model.GraphNodeVisualizer;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 public class DepthFirstSearch extends GraphAlgorithm {
+
+    private GraphNodeVisualizer candidateNodeList;
+    private GraphNodeVisualizer visitedNodeList;
 
     public DepthFirstSearch() {
         super();
     }
 
-    public DepthFirstSearch(ListView<SimpleStringProperty> candidateNodes, ListView<SimpleStringProperty> visitedNodes,
+    public DepthFirstSearch(VBox algorithmTab,
                             ListView<String> pseudocodeList, SimpleObjectProperty<GraphNode> startNode,
                             SimpleObjectProperty<GraphNode> destinationNode, AnchorPane algorithmSpace) {
-        super(candidateNodes, visitedNodes, pseudocodeList, startNode, destinationNode, algorithmSpace);
+        super(algorithmTab, pseudocodeList, startNode, destinationNode, algorithmSpace);
+        candidateNodeList = initializeGraphNodeVisualizer("CANDIDATE", DataStructureType.STACK);
+        visitedNodeList = initializeGraphNodeVisualizer("VISITED", DataStructureType.STACK);
     }
 
     @Override
@@ -27,13 +34,11 @@ public class DepthFirstSearch extends GraphAlgorithm {
 
     @Override
     public void executeAlgorithm() {
-        initializeCandidateNodesAs(DataStructureType.STACK);
-
         pauseAtStep(0);
-        this.candidateNodeList.addNodeAndVisualize(this.startNode.get());
+        candidateNodeList.addNodeAndVisualize(this.startNode.get());
 
         pauseAtStep(1);
-        while (!this.candidateNodeList.isEmpty()) {
+        while (!candidateNodeList.isEmpty()) {
             pauseAtStep(2);
             setCurrentNode(candidateNodeList.removeNode());
 
@@ -48,7 +53,7 @@ public class DepthFirstSearch extends GraphAlgorithm {
             pauseAtStep(5);
             if(!visitedNodeList.containsNode(getCurrentNode())) {
                 pauseAtStep(6);
-                this.visitedNodeList.addNodeAndVisualize(getCurrentNode());
+                visitedNodeList.addNodeAndVisualize(getCurrentNode());
 
                 pauseAtStep(7);
                 for (GraphNode neighbour : getCurrentNode().getNeighbors()) {
@@ -56,7 +61,7 @@ public class DepthFirstSearch extends GraphAlgorithm {
                     pauseAtStep(8);
                     if(!visitedNodeList.containsNode(neighbour)) {
                         pauseAtStep(9);
-                        this.candidateNodeList.addNodeAndVisualize(neighbour);
+                        candidateNodeList.addNodeAndVisualize(neighbour);
                         pauseAtStep(10);
                         getNeighborNode().setParentNode(getCurrentNode());
                     }

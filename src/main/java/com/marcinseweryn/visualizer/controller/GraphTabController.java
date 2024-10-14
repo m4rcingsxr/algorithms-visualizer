@@ -2,14 +2,12 @@ package com.marcinseweryn.visualizer.controller;
 
 import com.marcinseweryn.visualizer.Publisher;
 import com.marcinseweryn.visualizer.Subscriber;
-import com.marcinseweryn.visualizer.model.Algorithm;
 import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -50,6 +48,9 @@ public class GraphTabController implements Subscriber {
     private static final Logger logger = LogManager.getLogger(GraphTabController.class);
 
     @FXML
+    public VBox algorithmTab;
+
+    @FXML
     private TabPane graphTab;
     @FXML
     private Accordion renderedNodes;
@@ -61,13 +62,9 @@ public class GraphTabController implements Subscriber {
     private ToggleButton showEdgeWeightToggle;
     @FXML
     private ToggleButton showEdgeDistanceToggle;
-    @FXML
-    private ListView<SimpleStringProperty> candidateNodeList;
-    @FXML
-    private ListView<SimpleStringProperty> visitedNodeList;
+
     @FXML
     private ListView<String> pseudoCodeListGraph;
-
 
     // Internal state variables
     private Publisher eventPublisher;
@@ -88,6 +85,7 @@ public class GraphTabController implements Subscriber {
     public static final PseudoClass currentNodeStyle = PseudoClass.getPseudoClass("current");
     public static final PseudoClass neighborNodeStyle = PseudoClass.getPseudoClass("neighbour");
     private MainController mainController;
+    private AnchorPane algorithmSpace;
 
     /**
      * Initializes the PathFindingController, setting up the necessary event subscriptions
@@ -192,13 +190,13 @@ public class GraphTabController implements Subscriber {
         if (this.mainController.getAlgorithmListBox().getValue() instanceof GraphAlgorithm selectedAlgorithm) {
             try {
                 return Optional.of(selectedAlgorithm.getClass()
-                                           .getDeclaredConstructor(ListView.class, ListView.class, ListView.class,
+                                           .getDeclaredConstructor(VBox.class, ListView.class,
                                                                    SimpleObjectProperty.class,
                                                                    SimpleObjectProperty.class,
                                                                    AnchorPane.class
                                            )
-                                           .newInstance(candidateNodeList, visitedNodeList, pseudoCodeListGraph,
-                                                        startNodeProperty, destinationNodeProperty, this.mainController.getGraphPane()
+                                           .newInstance(algorithmTab, pseudoCodeListGraph, startNodeProperty, destinationNodeProperty,
+                                                        algorithmSpace
                                            ));
             } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
                      InstantiationException e) {
@@ -327,7 +325,7 @@ public class GraphTabController implements Subscriber {
      */
     private void addNodeToUI(GraphNode graphNode) {
         addNodeToAccordion(graphNode);
-        this.mainController.getGraphPane().getChildren().add(graphNode);
+        algorithmSpace.getChildren().add(graphNode);
     }
 
     /**
@@ -354,7 +352,7 @@ public class GraphTabController implements Subscriber {
     private void addEdgeToNodes(GraphNode node1, GraphNode node2, Edge edge) {
         node1.addEdge(edge);
         node2.addEdge(edge);
-        this.mainController.getGraphPane().getChildren().add(edge);
+        algorithmSpace.getChildren().add(edge);
     }
 
     /**
@@ -380,7 +378,7 @@ public class GraphTabController implements Subscriber {
      */
     private void finalizeNodeMovement() {
         this.startingNode.removeEdge(this.connectingEdge);
-        this.mainController.getGraphPane().getChildren().removeAll(this.draggedNode, this.connectingEdge);
+        algorithmSpace.getChildren().removeAll(this.draggedNode, this.connectingEdge);
         this.removeNodeFromAccordion(this.draggedNode);
         GraphNode.decrementCount();
 
@@ -476,9 +474,9 @@ public class GraphTabController implements Subscriber {
     private void deleteGraphNode(GraphNode node) {
         for (Edge edge : node.getAllEdges()) {
             edge.getNeighbour(node).getAllEdges().remove(edge);
-            this.mainController.getGraphPane().getChildren().remove(edge);
+            algorithmSpace.getChildren().remove(edge);
         }
-        this.mainController.getGraphPane().getChildren().remove(node);
+        algorithmSpace.getChildren().remove(node);
     }
 
     // Resets the interaction state by clearing references to the starting node, dragged node, and connecting edge.
@@ -635,7 +633,7 @@ public class GraphTabController implements Subscriber {
             }
             case "removeEdge" -> {
                 logger.info("Removing edge");
-                this.mainController.getGraphPane().getChildren().remove(node);
+                algorithmSpace.getChildren().remove(node);
             }
             default -> logger.info("Not supported");
         }
@@ -678,14 +676,14 @@ public class GraphTabController implements Subscriber {
                                    entry -> createGraphNodeAt(entry.getValue()[0], entry.getValue()[1])
                     ));
 
-            if(startNodeId != -1) {
+            if (startNodeId != -1) {
                 GraphNode graphNode = graphNodes.get(startNodeId);
                 startNodeProperty.set(graphNode);
 
                 graphNode.getStyleClass().add("start");
             }
 
-            if(destinationNodeId != -1) {
+            if (destinationNodeId != -1) {
                 GraphNode graphNode = graphNodes.get(destinationNodeId);
                 destinationNodeProperty.set(graphNode);
 
@@ -709,14 +707,14 @@ public class GraphTabController implements Subscriber {
     }
 
     public void resetGraphState() {
-        for (Node n : this.mainController.getGraphPane().getChildren()) {
+        for (Node n : algorithmSpace.getChildren()) {
             if (n instanceof GraphNode node) {
                 node.setParentNode(null);
             }
         }
 
         Platform.runLater(() -> {
-            for (Node n : this.mainController.getGraphPane().getChildren()) {
+            for (Node n : algorithmSpace.getChildren()) {
                 if (n instanceof GraphNode node) {
                     node.pseudoClassStateChanged(GraphTabController.neighborNodeStyle, false);
                     node.pseudoClassStateChanged(GraphTabController.currentNodeStyle, false);
@@ -727,8 +725,8 @@ public class GraphTabController implements Subscriber {
                     edge.removeStyleClass("path");
                 }
 
-                candidateNodeList.getItems().clear();
-                visitedNodeList.getItems().clear();
+//                candidateNodeList.getItems().clear();
+//                visitedNodeList.getItems().clear();
                 pseudoCodeListGraph.getItems().clear();
 
                 startNodeProperty.get().setPrimaryClass("start");
@@ -744,20 +742,19 @@ public class GraphTabController implements Subscriber {
         this.destinationNodeProperty.set(null);
         this.startNodeProperty.set(null);
         this.pseudoCodeListGraph.getItems().clear();
-        this.candidateNodeList.getItems().clear();
-        this.visitedNodeList.getItems().clear();
-        this.mainController.getGraphPane().getChildren().clear();
+//        this.candidateNodeList.getItems().clear();
+//        this.visitedNodeList.getItems().clear();
+        algorithmSpace.getChildren().clear();
         this.renderedNodes.getPanes().clear();
         GraphNode.setCount(0);
     }
 
     // noNodes,start,destination,[node,x,y],[nodeA,nodeB,headAVisible,HeadBVisible,weight]
     private String exportGraphToString() {
-        if (this.mainController.getGraphPane().getChildren().isEmpty()) {
+        if (algorithmSpace.getChildren().isEmpty()) {
             return "";
         } else {
             StringBuilder graph = new StringBuilder();
-
 
 
             graph.append(startNodeProperty.get() != null ? startNodeProperty.get().getId() : "-1")
@@ -768,7 +765,7 @@ public class GraphTabController implements Subscriber {
             List<GraphNode> nodes = new ArrayList<>();
 
 
-            for (Node child : this.mainController.getGraphPane().getChildren()) {
+            for (Node child : algorithmSpace.getChildren()) {
                 if (child instanceof GraphNode node) {
                     nodes.add(node);
                     graph.append(node.getId()).append(",").append(node.getLayoutX()).append(",").append(
@@ -778,7 +775,7 @@ public class GraphTabController implements Subscriber {
 
             graph.insert(0, nodes.size() + ",");
 
-            for (Node child : this.mainController.getGraphPane().getChildren()) {
+            for (Node child : algorithmSpace.getChildren()) {
                 if (child instanceof Edge edge) {
                     graph.append(edge.getNodeA().getId()).append(",")
                             .append(edge.getNodeB().getId()).append(",")
@@ -831,7 +828,7 @@ public class GraphTabController implements Subscriber {
     }
 
     private int generateRandomIntWeight(Random random) {
-        return 1 +  random.nextInt(20);
+        return 1 + random.nextInt(20);
     }
 
     public void generateDenseGraph() {
@@ -842,7 +839,7 @@ public class GraphTabController implements Subscriber {
      * Generates a dense graph programmatically with a given number of nodes.
      *
      * @param numberOfNodes The number of nodes to generate.
-     * @param nodeSpacing The spacing between nodes in the grid.
+     * @param nodeSpacing   The spacing between nodes in the grid.
      */
     private void generateDenseGraph(int numberOfNodes, double nodeSpacing) {
         clearAlgorithmSpace();
@@ -884,13 +881,13 @@ public class GraphTabController implements Subscriber {
     private GraphNode buildTree(double x, double y, double nodeSpacing) {
         GraphNode node = createGraphNodeAt(x, y);
 
-        if(y > 600) {
+        if (y > 600) {
             destinationNodeProperty.set(node);
             return node;
         }
 
-        createEdgeBetweenNodes(node, buildTree(x - nodeSpacing, y + 150, nodeSpacing/2));
-        createEdgeBetweenNodes(node, buildTree(x + nodeSpacing, y + 150, nodeSpacing/2));
+        createEdgeBetweenNodes(node, buildTree(x - nodeSpacing, y + 150, nodeSpacing / 2));
+        createEdgeBetweenNodes(node, buildTree(x + nodeSpacing, y + 150, nodeSpacing / 2));
 
         return node;
     }
@@ -901,7 +898,7 @@ public class GraphTabController implements Subscriber {
 
     @FXML
     private void onExportGraphButtonClick() {
-        Window mainStage = this.mainController.getGraphPane().getScene().getWindow();
+        Window mainStage = algorithmSpace.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save graph");
         fileChooser.setInitialFileName("graph-" + LocalDate.now() + ".txt");
@@ -936,5 +933,9 @@ public class GraphTabController implements Subscriber {
 
     public void injectController(MainController mainController) {
         this.mainController = mainController;
+    }
+
+    public void setAlgorithmSpace(AnchorPane algorithmSpace) {
+        this.algorithmSpace = algorithmSpace;
     }
 }
