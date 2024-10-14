@@ -34,6 +34,7 @@ public class MainController {
 
     private static final Logger logger = LogManager.getLogger(MainController.class);
 
+
     // Graph-specific UI elements
     @FXML
     private TabPane graphTab;
@@ -51,24 +52,30 @@ public class MainController {
     private ListView<SimpleStringProperty> candidateNodeList;
     @FXML
     private ListView<SimpleStringProperty> visitedNodeList;
-
     @FXML
-    private ListView<String> pseudoCodeList;
+    private ListView<String> pseudoCodeListGraph;
+    @FXML
+    private AnchorPane graphPane;
 
-    // Sorting and common UI elements
+    // Sorting-specific UI elements
+    @FXML
+    private ListView<SimpleStringProperty> pseudoCodeListSort;
+    @FXML
+    private TabPane sortTab;
+    @FXML
+    private TextField sortInput;
+    @FXML
+    private VBox sortingPane;
+
+    //common UI elements
     @FXML
     private BorderPane main;
-
     @FXML
     private TabPane algorithmTab;
     @FXML
     private ChoiceBox<Algorithm> algorithmListBox;
     @FXML
     private VBox algorithmContainer;
-    @FXML
-    private AnchorPane graphPane;
-    @FXML
-    private AnchorPane sortingPane;
 
     // Algorithm control buttons
     @FXML
@@ -111,7 +118,7 @@ public class MainController {
 
         candidateNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
         visitedNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
-        pseudoCodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.4));
+        pseudoCodeListGraph.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.4));
 
         // Bind the left pane to 30% of the BorderPane width
         algorithmTab.prefWidthProperty().bind(main.widthProperty().multiply(0.2));
@@ -129,9 +136,9 @@ public class MainController {
     private void initializeControllers() {
         this.pathFindingController = new PathFindingController(
                 graphPane, renderedNodes, showEdgeWeightToggle, showEdgeDistanceToggle, candidateNodeList,
-                visitedNodeList, pseudoCodeList, algorithmListBox
+                visitedNodeList, pseudoCodeListGraph, algorithmListBox
         );
-        this.sortingController = new SortingController(sortingPane);
+        this.sortingController = new SortingController(sortingPane, sortInput, pseudoCodeListSort);
 
         logger.debug("PathFindingController and SortingController initialized.");
     }
@@ -395,5 +402,6 @@ public class MainController {
         pathFindingController.clearAlgorithmSpace();
         pathFindingController.generateCompleteGraph(7, 300, 420, 420);
     }
+
 
 }

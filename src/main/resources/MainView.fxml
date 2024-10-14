@@ -88,7 +88,7 @@
                             <VBox>
                                 <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
                                 </Label>
-                                <ListView fx:id="pseudoCodeList"/>
+                                <ListView fx:id="pseudoCodeListGraph"/>
                             </VBox>
                         </VBox>
                     </Tab>
@@ -123,6 +123,35 @@
                 </TabPane>
             </Tab>
             <Tab text="Sorting">
+                <TabPane fx:id="sortTab" tabClosingPolicy="UNAVAILABLE">
+                    <Tab text="Algorithm">
+                        <VBox>
+                            <padding>
+                                <Insets topRightBottomLeft="10"/>
+                            </padding>
+                            <spacing>10</spacing>
+                            <VBox>
+                                <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
+                                </Label>
+                                <ListView fx:id="pseudoCodeListSort"/>
+                            </VBox>
+                        </VBox>
+                    </Tab>
+                    <Tab text="Settings">
+                        <VBox spacing="10">
+                            <padding>
+                                <Insets topRightBottomLeft="10"/>
+                            </padding>
+
+
+                            <Label text="Number List" contentDisplay="RIGHT" styleClass="list-view-label"/>
+                            <TextField fx:id="sortInput"/>
+
+                        </VBox>
+                    </Tab>
+                    <Tab text="Help">
+                    </Tab>
+                </TabPane>
             </Tab>
         </TabPane>
     </left>
@@ -133,7 +162,6 @@
                 <Insets right="40" left="40"/>
             </padding>
 
-            <!-- Path Finding Pane initially added -->
             <AnchorPane fx:id="graphPane"
                         onMousePressed="#onGraphPaneMousePressed"
                         onDragDetected="#onGraphPaneDragDetected"
@@ -144,15 +172,12 @@
                         styleClass="algorithmPane"
                         VBox.vgrow="ALWAYS"
                         HBox.hgrow="ALWAYS"
-                        maxWidth="Infinity"
             />
 
-            <!-- Sorting Pane is hidden initially -->
-            <AnchorPane fx:id="sortingPane"
-                        styleClass="algorithmPane"
-                        VBox.vgrow="ALWAYS"
-                        HBox.hgrow="ALWAYS"
-                        maxWidth="Infinity"
+            <VBox fx:id="sortingPane"
+                  styleClass="algorithmPane"
+                  VBox.vgrow="ALWAYS"
+                  HBox.hgrow="ALWAYS"
             />
         </VBox>
     </center>

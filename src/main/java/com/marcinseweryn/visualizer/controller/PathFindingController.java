@@ -59,7 +59,7 @@ public class PathFindingController implements Subscriber {
 
     // Internal state variables
     private final Publisher eventPublisher;
-    ;
+
     private GraphNode startingNode; // Graph node that starts the drag process
     private GraphNode draggedNode; // Node that is created by drag from the starting node
     private GraphNode hoveredNode; // Node currently hovered over during drag

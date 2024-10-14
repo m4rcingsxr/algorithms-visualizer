@@ -35,7 +35,7 @@ public class LazyDijkstra extends GraphAlgorithm {
         initializeCandidateNodesAs(DataStructureType.PRIORITY_QUEUE);
         pauseAtStep(1);
         pauseAtStep(2);
-        this.startNode.get().setDistance(0.0F);
+        this.startNode.get().setDistance(0.0);
         pauseAtStep(3);
         this.candidateNodeList.addNodeAndVisualize(this.startNode.get());
         this.distance.set(0, 0.0);
