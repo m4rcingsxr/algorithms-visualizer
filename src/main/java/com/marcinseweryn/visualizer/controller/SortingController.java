@@ -1,21 +1,23 @@
 package com.marcinseweryn.visualizer.controller;
 
+import com.marcinseweryn.visualizer.model.Algorithm;
+import com.marcinseweryn.visualizer.model.GraphAlgorithm;
+import com.marcinseweryn.visualizer.model.SortingAlgorithm;
 import com.marcinseweryn.visualizer.view.SortingRectangles;
 import javafx.animation.PauseTransition;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.joining;
@@ -27,6 +29,7 @@ public class SortingController {
     private final VBox algorithmSpace;
     private final ListView<SimpleStringProperty> pseudoCodeList;
     private final TextField sortInput;
+    private final ChoiceBox<Algorithm> algorithmListBox;
     private List<Integer> unsortedList;
     private final Random random = new Random();
 
@@ -34,10 +37,13 @@ public class SortingController {
 
     private final SimpleStringProperty sortInputProperty = new SimpleStringProperty();
 
-    public SortingController(VBox algorithmSpace, TextField sortInput, ListView<SimpleStringProperty> pseudoCodeList) {
+    private SortingRectangles sortingRectangles;
+
+    public SortingController(VBox algorithmSpace, TextField sortInput, ChoiceBox<Algorithm> algorithmListBox, ListView<SimpleStringProperty> pseudoCodeList) {
         this.algorithmSpace = algorithmSpace;
         this.pseudoCodeList = pseudoCodeList;
         this.sortInput = sortInput;
+        this.algorithmListBox = algorithmListBox;
 
         sortInputProperty.bindBidirectional(sortInput.textProperty());
         sortInputProperty.addListener(((observable, oldValue, newValue) -> {
@@ -68,7 +74,7 @@ public class SortingController {
             throw new IllegalStateException();
         }
 
-        SortingRectangles sortingRectangles = new SortingRectangles(unsortedList, max.get(), min.get(), algorithmSpace.getHeight(), algorithmSpace.getWidth());
+        sortingRectangles = new SortingRectangles(unsortedList, max.get(), min.get(), algorithmSpace.getHeight(), algorithmSpace.getWidth());
         algorithmSpace.getChildren().add(sortingRectangles);
     }
 
@@ -85,5 +91,28 @@ public class SortingController {
                                       .mapToObj(String::valueOf)
                                       .collect(joining(","))
         );
+    }
+
+    public Optional<SortingAlgorithm> initializeSelectedAlgorithm() {
+        if (this.algorithmListBox.getValue() instanceof SortingAlgorithm selectedAlgorithm) {
+            try {
+                return Optional.of(selectedAlgorithm.getClass()
+                                           .getDeclaredConstructor(
+                                                   ListView.class, SortingRectangles.class
+                                           )
+                                           .newInstance(
+                                                   pseudoCodeList, sortingRectangles
+                                           ));
+            } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
+                     InstantiationException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public void resetListState() {
+
     }
 }

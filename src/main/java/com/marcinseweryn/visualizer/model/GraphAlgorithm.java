@@ -172,7 +172,7 @@ public abstract class GraphAlgorithm extends Algorithm {
     }
 
     protected int getNumberOfVertices() {
-        return this.algorithmSpace.getChildren().stream().filter(GraphNode.class::isInstance).map(n -> 1).reduce(0, Integer::sum);
+        return (int) this.algorithmSpace.getChildren().stream().filter(GraphNode.class::isInstance).count();
     }
 
     protected List<GraphNode> getGraph() {

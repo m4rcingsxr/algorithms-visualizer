@@ -55,4 +55,8 @@ public class SortingRectangles extends HBox {
         double minHeightOffset = 0.1 * containerHeight;
         return Math.max(scaledHeight + minHeightOffset, minHeightOffset); // Ensure each rectangle has a non-zero height
     }
+
+    public List<Integer> getUnsortedList() {
+        return unsortedList;
+    }
 }

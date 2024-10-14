@@ -2,6 +2,7 @@ package com.marcinseweryn.visualizer.controller;
 
 import com.marcinseweryn.visualizer.model.Algorithm;
 import com.marcinseweryn.visualizer.model.GraphAlgorithm;
+import com.marcinseweryn.visualizer.model.SortingAlgorithm;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -87,7 +88,6 @@ public class MainController {
     @FXML
     private Button resetButton;
 
-
     // Controllers for managing specific algorithm types
     private PathFindingController pathFindingController;
     private SortingController sortingController;
@@ -138,7 +138,7 @@ public class MainController {
                 graphPane, renderedNodes, showEdgeWeightToggle, showEdgeDistanceToggle, candidateNodeList,
                 visitedNodeList, pseudoCodeListGraph, algorithmListBox
         );
-        this.sortingController = new SortingController(sortingPane, sortInput, pseudoCodeListSort);
+        this.sortingController = new SortingController(sortingPane, sortInput,algorithmListBox, pseudoCodeListSort);
 
         logger.debug("PathFindingController and SortingController initialized.");
     }
@@ -262,13 +262,13 @@ public class MainController {
 
     @FXML
     public void onResetButtonClick(ActionEvent event) {
+        startButton.setDisable(false);
+        stepButton.setDisable(false);
+        resetButton.setDisable(true);
         if (isPathFindingTabSelected()) {
-            startButton.setDisable(false);
-            stepButton.setDisable(false);
-            resetButton.setDisable(true);
             pathFindingController.resetGraphState();
         } else {
-            // ...
+            sortingController.resetListState();
         }
     }
 
@@ -296,7 +296,19 @@ public class MainController {
                 resetButton.setDisable(false);
             }, selectedAlgorithm.get()));
         } else {
-            // Add sorting logic here if needed
+            Optional<SortingAlgorithm> selectedAlgorithm = sortingController.initializeSelectedAlgorithm();
+
+            if (selectedAlgorithm.isEmpty()) {
+                throw new RuntimeException("Failed to initialize the algorithm.");
+            }
+
+            sortTab.getSelectionModel().selectFirst();
+
+            runningAlgorithmThread.set(new AlgorithmThread(() -> {
+                selectedAlgorithm.get().start(isStepModeDisabled);
+                runningAlgorithmThread.set(null);
+                resetButton.setDisable(false);
+            }, selectedAlgorithm.get()));
         }
 
         runningAlgorithmThread.get().start();
