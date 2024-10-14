@@ -1,6 +1,6 @@
 package com.marcinseweryn.visualizer.model;
 
-import com.marcinseweryn.visualizer.controller.PathFindingController;
+import com.marcinseweryn.visualizer.controller.GraphTabController;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.application.Platform;
@@ -113,7 +113,7 @@ public abstract class GraphAlgorithm extends Algorithm {
 
         // Add the "current" style to the new current node
         if (node != null) {
-            node.pseudoClassStateChanged(PathFindingController.currentNodeStyle, true);
+            node.pseudoClassStateChanged(GraphTabController.currentNodeStyle, true);
         }
 
         this.currentNode = node;
@@ -121,7 +121,7 @@ public abstract class GraphAlgorithm extends Algorithm {
 
     protected void resetCurrentNodeStyle() {
         if (this.currentNode != null) {
-            this.currentNode.pseudoClassStateChanged(PathFindingController.currentNodeStyle, false);
+            this.currentNode.pseudoClassStateChanged(GraphTabController.currentNodeStyle, false);
         }
     }
 
@@ -142,12 +142,12 @@ public abstract class GraphAlgorithm extends Algorithm {
     protected void setNeighborNode(GraphNode node) {
         // Remove the "neighbor" style from the previous neighbor node
         if (this.neighborNode != null) {
-            this.neighborNode.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, false);
+            this.neighborNode.pseudoClassStateChanged(GraphTabController.neighborNodeStyle, false);
         }
 
         // Add the "neighbor" style to the new neighbor node
         if (node != null) {
-            node.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, true);
+            node.pseudoClassStateChanged(GraphTabController.neighborNodeStyle, true);
         }
 
         this.neighborNode = node;

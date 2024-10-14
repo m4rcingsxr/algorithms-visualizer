@@ -28,7 +28,6 @@ public abstract class SortingAlgorithm extends Algorithm {
         sortedList.set(j, new VBox());
         sortedList.set(i, tempJ);
         sortedList.set(j, tempI);
-
     }
 
     protected void setComparison(int index) {

@@ -4,7 +4,6 @@ import com.marcinseweryn.visualizer.model.Algorithm;
 import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.model.SortingAlgorithm;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -35,36 +34,9 @@ public class MainController {
 
     private static final Logger logger = LogManager.getLogger(MainController.class);
 
-
-    // Graph-specific UI elements
-    @FXML
-    private TabPane graphTab;
-    @FXML
-    private Accordion renderedNodes;
-    @FXML
-    public Button exportGraphBtn;
-    @FXML
-    public Button clearGraphBtn;
-    @FXML
-    private ToggleButton showEdgeWeightToggle;
-    @FXML
-    private ToggleButton showEdgeDistanceToggle;
-    @FXML
-    private ListView<SimpleStringProperty> candidateNodeList;
-    @FXML
-    private ListView<SimpleStringProperty> visitedNodeList;
-    @FXML
-    private ListView<String> pseudoCodeListGraph;
     @FXML
     private AnchorPane graphPane;
 
-    // Sorting-specific UI elements
-    @FXML
-    private ListView<SimpleStringProperty> pseudoCodeListSort;
-    @FXML
-    private TabPane sortTab;
-    @FXML
-    private TextField sortInput;
     @FXML
     private VBox sortingPane;
 
@@ -88,12 +60,11 @@ public class MainController {
     @FXML
     private Button resetButton;
 
-    // Controllers for managing specific algorithm types
-    private PathFindingController pathFindingController;
-    private SortingController sortingController;
-
     // Property to manage the currently running algorithm thread
     private final SimpleObjectProperty<AlgorithmThread> runningAlgorithmThread = new SimpleObjectProperty<>();
+
+    @FXML private GraphTabController graphTabController;
+    @FXML private SortTabController sortTabController;
 
     /**
      * Initializes the MainController. Sets up controllers for sorting and graph algorithms,
@@ -103,8 +74,8 @@ public class MainController {
     public void initialize() {
         logger.info("Initializing MainController...");
 
-        // Initialize controllers for pathfinding and sorting algorithms
-        initializeControllers();
+        graphTabController.injectController(this);
+        sortTabController.injectController(this);
 
         // Set up tab selection listener to switch between graph and sorting algorithms
         setupTabSelectionListener();
@@ -116,9 +87,9 @@ public class MainController {
         algorithmContainer.getChildren().remove(sortingPane);
         logger.debug("Graph pane selected by default.");
 
-        candidateNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
-        visitedNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
-        pseudoCodeListGraph.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.4));
+//        candidateNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
+//        visitedNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
+//        pseudoCodeListGraph.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.4));
 
         // Bind the left pane to 30% of the BorderPane width
         algorithmTab.prefWidthProperty().bind(main.widthProperty().multiply(0.2));
@@ -127,20 +98,6 @@ public class MainController {
         algorithmContainer.prefWidthProperty().bind(main.widthProperty().multiply(0.8));
 
         logger.info("Controller initialization completed.");
-    }
-
-    /**
-     * Initializes the PathFindingController and SortingController.
-     * These controllers manage specific algorithm categories: pathfinding and sorting.
-     */
-    private void initializeControllers() {
-        this.pathFindingController = new PathFindingController(
-                graphPane, renderedNodes, showEdgeWeightToggle, showEdgeDistanceToggle, candidateNodeList,
-                visitedNodeList, pseudoCodeListGraph, algorithmListBox
-        );
-        this.sortingController = new SortingController(sortingPane, sortInput,algorithmListBox, pseudoCodeListSort);
-
-        logger.debug("PathFindingController and SortingController initialized.");
     }
 
     /**
@@ -266,9 +223,9 @@ public class MainController {
         stepButton.setDisable(false);
         resetButton.setDisable(true);
         if (isPathFindingTabSelected()) {
-            pathFindingController.resetGraphState();
+            graphTabController.resetGraphState();
         } else {
-            sortingController.resetListState();
+            sortTabController.resetListState();
         }
     }
 
@@ -280,14 +237,14 @@ public class MainController {
      */
     private void startNewAlgorithm(boolean isStepModeDisabled) {
         if (isPathFindingTabSelected()) {
-            Optional<GraphAlgorithm> selectedAlgorithm = pathFindingController.initializeSelectedAlgorithm();
+            Optional<GraphAlgorithm> selectedAlgorithm = graphTabController.initializeSelectedAlgorithm();
 
             if (selectedAlgorithm.isEmpty()) {
                 throw new RuntimeException("Failed to initialize the algorithm.");
             }
 
             // Switch to the first graph tab
-            graphTab.getSelectionModel().selectFirst();
+            graphTabController.selectAlgorithmTab();
 
             // Create and start a new thread for the algorithm
             runningAlgorithmThread.set(new AlgorithmThread(() -> {
@@ -296,13 +253,13 @@ public class MainController {
                 resetButton.setDisable(false);
             }, selectedAlgorithm.get()));
         } else {
-            Optional<SortingAlgorithm> selectedAlgorithm = sortingController.initializeSelectedAlgorithm();
+            Optional<SortingAlgorithm> selectedAlgorithm = sortTabController.initializeSelectedAlgorithm();
 
             if (selectedAlgorithm.isEmpty()) {
                 throw new RuntimeException("Failed to initialize the algorithm.");
             }
 
-            sortTab.getSelectionModel().selectFirst();
+            sortTabController.selectAlgorithmTab();
 
             runningAlgorithmThread.set(new AlgorithmThread(() -> {
                 selectedAlgorithm.get().start(isStepModeDisabled);
@@ -335,7 +292,7 @@ public class MainController {
      */
     @FXML
     private void onGraphPaneMousePressed(MouseEvent mouseEvent) {
-        this.pathFindingController.onAlgorithmSpaceMousePressed(mouseEvent);
+        this.graphTabController.onAlgorithmSpaceMousePressed(mouseEvent);
     }
 
     /**
@@ -345,7 +302,7 @@ public class MainController {
      */
     @FXML
     private void onGraphPaneDragDetected(MouseEvent mouseEvent) {
-        this.pathFindingController.onAlgorithmSpaceDragDetected(mouseEvent);
+        this.graphTabController.onAlgorithmSpaceDragDetected(mouseEvent);
     }
 
     /**
@@ -355,7 +312,7 @@ public class MainController {
      */
     @FXML
     private void onGraphPaneMouseDragged(MouseEvent mouseEvent) {
-        this.pathFindingController.onAlgorithmSpaceMouseDragged(mouseEvent);
+        this.graphTabController.onAlgorithmSpaceMouseDragged(mouseEvent);
     }
 
     /**
@@ -365,7 +322,7 @@ public class MainController {
      */
     @FXML
     private void onGraphPaneMouseReleased(MouseEvent mouseEvent) {
-        this.pathFindingController.onAlgorithmSpaceMouseReleased(mouseEvent);
+        this.graphTabController.onAlgorithmSpaceMouseReleased(mouseEvent);
     }
 
     /**
@@ -375,7 +332,7 @@ public class MainController {
      */
     @FXML
     private void onGraphPaneDragOver(DragEvent dragEvent) {
-        this.pathFindingController.onAlgorithmSpaceDragOver(dragEvent);
+        this.graphTabController.onAlgorithmSpaceDragOver(dragEvent);
     }
 
     /**
@@ -389,39 +346,103 @@ public class MainController {
         this.startButton.setDisable(false);
         this.stepButton.setDisable(false);
         this.resetButton.setDisable(true);
-        this.pathFindingController.onAlgorithmSpaceDragDropped(dragEvent);
+        this.graphTabController.onAlgorithmSpaceDragDropped(dragEvent);
     }
 
-
-    @FXML
-    private void onExportGraphButtonClick() {
-        this.pathFindingController.onExportGraphButtonClick();
+    public AnchorPane getGraphPane() {
+        return graphPane;
     }
 
-    @FXML
-    private void onClearGraphButtonClick() {
-        this.runningAlgorithmThread.set(null);
-        this.resetButton.setDisable(true);
-        this.pathFindingController.clearAlgorithmSpace();
+    public void setGraphPane(AnchorPane graphPane) {
+        this.graphPane = graphPane;
     }
 
-    public void onClickGenerateTreeGraph(ActionEvent actionEvent) {
-        pathFindingController.clearAlgorithmSpace();
-        pathFindingController.generateTreeGraph();
+    public VBox getSortingPane() {
+        return sortingPane;
     }
 
-    public void onClickGenerateCompleteGraph(ActionEvent actionEvent) {
-        pathFindingController.clearAlgorithmSpace();
-        pathFindingController.generateCompleteGraph(7, 300, 420, 420);
+    public void setSortingPane(VBox sortingPane) {
+        this.sortingPane = sortingPane;
     }
 
-    public void onClickGenerateBigUnsortedList(ActionEvent actionEvent) {
-        sortingController.clearAlgorithmSpace();
-        sortingController.generateUnsortedList(100);
+    public BorderPane getMain() {
+        return main;
     }
 
-    public void onClickGenerateSmallUnsortedList(ActionEvent actionEvent) {
-        sortingController.clearAlgorithmSpace();
-        sortingController.generateUnsortedList(10);
+    public void setMain(BorderPane main) {
+        this.main = main;
+    }
+
+    public TabPane getAlgorithmTab() {
+        return algorithmTab;
+    }
+
+    public void setAlgorithmTab(TabPane algorithmTab) {
+        this.algorithmTab = algorithmTab;
+    }
+
+    public ChoiceBox<Algorithm> getAlgorithmListBox() {
+        return algorithmListBox;
+    }
+
+    public void setAlgorithmListBox(
+            ChoiceBox<Algorithm> algorithmListBox) {
+        this.algorithmListBox = algorithmListBox;
+    }
+
+    public VBox getAlgorithmContainer() {
+        return algorithmContainer;
+    }
+
+    public void setAlgorithmContainer(VBox algorithmContainer) {
+        this.algorithmContainer = algorithmContainer;
+    }
+
+    public Button getStartButton() {
+        return startButton;
+    }
+
+    public void setStartButton(Button startButton) {
+        this.startButton = startButton;
+    }
+
+    public Button getStepButton() {
+        return stepButton;
+    }
+
+    public void setStepButton(Button stepButton) {
+        this.stepButton = stepButton;
+    }
+
+    public Button getResetButton() {
+        return resetButton;
+    }
+
+    public void setResetButton(Button resetButton) {
+        this.resetButton = resetButton;
+    }
+
+    public AlgorithmThread getRunningAlgorithmThread() {
+        return runningAlgorithmThread.get();
+    }
+
+    public SimpleObjectProperty<AlgorithmThread> runningAlgorithmThreadProperty() {
+        return runningAlgorithmThread;
+    }
+
+    public GraphTabController getGraphTabController() {
+        return graphTabController;
+    }
+
+    public void setGraphTabController(GraphTabController graphTabController) {
+        this.graphTabController = graphTabController;
+    }
+
+    public SortTabController getSortTabController() {
+        return sortTabController;
+    }
+
+    public void setSortTabController(SortTabController sortTabController) {
+        this.sortTabController = sortTabController;
     }
 }

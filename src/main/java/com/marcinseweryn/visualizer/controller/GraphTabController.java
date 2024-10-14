@@ -12,6 +12,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.css.PseudoClass;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -43,22 +45,32 @@ import static java.util.stream.Collectors.toMap;
  * and node creation, while also updating the UI components like
  * the accordion and list views.
  */
-public class PathFindingController implements Subscriber {
+public class GraphTabController implements Subscriber {
 
-    private static final Logger logger = LogManager.getLogger(PathFindingController.class);
+    private static final Logger logger = LogManager.getLogger(GraphTabController.class);
 
-    // UI Elements
-    private final AnchorPane algorithmSpace;
-    private final Accordion renderedNodes;
-    private final ToggleButton showEdgeWeightToggle;
-    private final ToggleButton showEdgeDistanceToggle;
-    private final ListView<SimpleStringProperty> candidateNodeList;
-    private final ListView<SimpleStringProperty> visitedNodeList;
-    private final ListView<String> pseudocodeList;
-    private final ChoiceBox<Algorithm> algorithmListBox;
+    @FXML
+    private TabPane graphTab;
+    @FXML
+    private Accordion renderedNodes;
+    @FXML
+    private Button exportGraphBtn;
+    @FXML
+    private Button clearGraphBtn;
+    @FXML
+    private ToggleButton showEdgeWeightToggle;
+    @FXML
+    private ToggleButton showEdgeDistanceToggle;
+    @FXML
+    private ListView<SimpleStringProperty> candidateNodeList;
+    @FXML
+    private ListView<SimpleStringProperty> visitedNodeList;
+    @FXML
+    private ListView<String> pseudoCodeListGraph;
+
 
     // Internal state variables
-    private final Publisher eventPublisher;
+    private Publisher eventPublisher;
 
     private GraphNode startingNode; // Graph node that starts the drag process
     private GraphNode draggedNode; // Node that is created by drag from the starting node
@@ -75,25 +87,13 @@ public class PathFindingController implements Subscriber {
     // pseudo classes to activate - used for state visualization of the executing algorithm
     public static final PseudoClass currentNodeStyle = PseudoClass.getPseudoClass("current");
     public static final PseudoClass neighborNodeStyle = PseudoClass.getPseudoClass("neighbour");
+    private MainController mainController;
 
     /**
      * Initializes the PathFindingController, setting up the necessary event subscriptions
      * and injecting UI elements for managing node and edge rendering.
      */
-    public PathFindingController(AnchorPane algorithmSpace, Accordion renderedNodes,
-                                 ToggleButton showEdgeWeightToggle, ToggleButton showEdgeDistanceToggle,
-                                 ListView<SimpleStringProperty> candidateNodeList,
-                                 ListView<SimpleStringProperty> visitedNodeList,
-                                 ListView<String> pseudocodeList,
-                                 ChoiceBox<Algorithm> algorithmListBox) {
-        this.algorithmSpace = algorithmSpace;
-        this.renderedNodes = renderedNodes;
-        this.showEdgeWeightToggle = showEdgeWeightToggle;
-        this.showEdgeDistanceToggle = showEdgeDistanceToggle;
-        this.candidateNodeList = candidateNodeList;
-        this.visitedNodeList = visitedNodeList;
-        this.pseudocodeList = pseudocodeList;
-        this.algorithmListBox = algorithmListBox;
+    public GraphTabController() {
 
         initializeAlgorithmLegend();
 
@@ -141,7 +141,7 @@ public class PathFindingController implements Subscriber {
         path.setAlignment(Pos.CENTER_LEFT);
 
         GraphNode currentNode = new GraphNode();
-        currentNode.pseudoClassStateChanged(PathFindingController.currentNodeStyle, true);
+        currentNode.pseudoClassStateChanged(GraphTabController.currentNodeStyle, true);
         Label currentLabel = new Label("Current node");
         currentLabel.setFont(Font.font(14));
 
@@ -150,7 +150,7 @@ public class PathFindingController implements Subscriber {
         current.setAlignment(Pos.CENTER_LEFT);
 
         GraphNode neighborNode = new GraphNode();
-        neighborNode.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, true);
+        neighborNode.pseudoClassStateChanged(GraphTabController.neighborNodeStyle, true);
         Label neighborLabel = new Label("Neighbor node");
         neighborLabel.setFont(Font.font(14));
 
@@ -169,7 +169,7 @@ public class PathFindingController implements Subscriber {
         AnchorPane.setBottomAnchor(legend, 0.0);
         AnchorPane.setLeftAnchor(legend, 0.0);
 
-        algorithmSpace.getChildren().add(legend);
+//        mainController.getGraphPane().getChildren().add(legend);
     }
 
 
@@ -189,7 +189,7 @@ public class PathFindingController implements Subscriber {
      * @return Optional of GraphAlgorithm if an algorithm is selected, otherwise empty Optional.
      */
     public Optional<GraphAlgorithm> initializeSelectedAlgorithm() {
-        if (this.algorithmListBox.getValue() instanceof GraphAlgorithm selectedAlgorithm) {
+        if (this.mainController.getAlgorithmListBox().getValue() instanceof GraphAlgorithm selectedAlgorithm) {
             try {
                 return Optional.of(selectedAlgorithm.getClass()
                                            .getDeclaredConstructor(ListView.class, ListView.class, ListView.class,
@@ -197,8 +197,8 @@ public class PathFindingController implements Subscriber {
                                                                    SimpleObjectProperty.class,
                                                                    AnchorPane.class
                                            )
-                                           .newInstance(candidateNodeList, visitedNodeList, pseudocodeList,
-                                                        startNodeProperty, destinationNodeProperty, algorithmSpace
+                                           .newInstance(candidateNodeList, visitedNodeList, pseudoCodeListGraph,
+                                                        startNodeProperty, destinationNodeProperty, this.mainController.getGraphPane()
                                            ));
             } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
                      InstantiationException e) {
@@ -327,7 +327,7 @@ public class PathFindingController implements Subscriber {
      */
     private void addNodeToUI(GraphNode graphNode) {
         addNodeToAccordion(graphNode);
-        this.algorithmSpace.getChildren().add(graphNode);
+        this.mainController.getGraphPane().getChildren().add(graphNode);
     }
 
     /**
@@ -354,7 +354,7 @@ public class PathFindingController implements Subscriber {
     private void addEdgeToNodes(GraphNode node1, GraphNode node2, Edge edge) {
         node1.addEdge(edge);
         node2.addEdge(edge);
-        this.algorithmSpace.getChildren().add(edge);
+        this.mainController.getGraphPane().getChildren().add(edge);
     }
 
     /**
@@ -380,7 +380,7 @@ public class PathFindingController implements Subscriber {
      */
     private void finalizeNodeMovement() {
         this.startingNode.removeEdge(this.connectingEdge);
-        this.algorithmSpace.getChildren().removeAll(this.draggedNode, this.connectingEdge);
+        this.mainController.getGraphPane().getChildren().removeAll(this.draggedNode, this.connectingEdge);
         this.removeNodeFromAccordion(this.draggedNode);
         GraphNode.decrementCount();
 
@@ -476,9 +476,9 @@ public class PathFindingController implements Subscriber {
     private void deleteGraphNode(GraphNode node) {
         for (Edge edge : node.getAllEdges()) {
             edge.getNeighbour(node).getAllEdges().remove(edge);
-            this.algorithmSpace.getChildren().remove(edge);
+            this.mainController.getGraphPane().getChildren().remove(edge);
         }
-        this.algorithmSpace.getChildren().remove(node);
+        this.mainController.getGraphPane().getChildren().remove(node);
     }
 
     // Resets the interaction state by clearing references to the starting node, dragged node, and connecting edge.
@@ -635,7 +635,7 @@ public class PathFindingController implements Subscriber {
             }
             case "removeEdge" -> {
                 logger.info("Removing edge");
-                this.algorithmSpace.getChildren().remove(node);
+                this.mainController.getGraphPane().getChildren().remove(node);
             }
             default -> logger.info("Not supported");
         }
@@ -709,17 +709,17 @@ public class PathFindingController implements Subscriber {
     }
 
     public void resetGraphState() {
-        for (Node n : algorithmSpace.getChildren()) {
+        for (Node n : this.mainController.getGraphPane().getChildren()) {
             if (n instanceof GraphNode node) {
                 node.setParentNode(null);
             }
         }
 
         Platform.runLater(() -> {
-            for (Node n : algorithmSpace.getChildren()) {
+            for (Node n : this.mainController.getGraphPane().getChildren()) {
                 if (n instanceof GraphNode node) {
-                    node.pseudoClassStateChanged(PathFindingController.neighborNodeStyle, false);
-                    node.pseudoClassStateChanged(PathFindingController.currentNodeStyle, false);
+                    node.pseudoClassStateChanged(GraphTabController.neighborNodeStyle, false);
+                    node.pseudoClassStateChanged(GraphTabController.currentNodeStyle, false);
                     node.setPrimaryClass("vertex");
                 }
 
@@ -729,7 +729,7 @@ public class PathFindingController implements Subscriber {
 
                 candidateNodeList.getItems().clear();
                 visitedNodeList.getItems().clear();
-                pseudocodeList.getItems().clear();
+                pseudoCodeListGraph.getItems().clear();
 
                 startNodeProperty.get().setPrimaryClass("start");
                 destinationNodeProperty.get().setPrimaryClass("destination");
@@ -743,32 +743,17 @@ public class PathFindingController implements Subscriber {
     public void clearAlgorithmSpace() {
         this.destinationNodeProperty.set(null);
         this.startNodeProperty.set(null);
-        this.pseudocodeList.getItems().clear();
+        this.pseudoCodeListGraph.getItems().clear();
         this.candidateNodeList.getItems().clear();
         this.visitedNodeList.getItems().clear();
-        this.algorithmSpace.getChildren().clear();
+        this.mainController.getGraphPane().getChildren().clear();
         this.renderedNodes.getPanes().clear();
         GraphNode.setCount(0);
     }
 
-    public void onExportGraphButtonClick() {
-        Window mainStage = algorithmSpace.getScene().getWindow();
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save graph");
-        fileChooser.setInitialFileName("graph-" + LocalDate.now() + ".txt");
-        File file = fileChooser.showSaveDialog(mainStage);
-        if (file != null) {
-            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
-                bufferedWriter.write(exportGraphToString());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
     // noNodes,start,destination,[node,x,y],[nodeA,nodeB,headAVisible,HeadBVisible,weight]
     private String exportGraphToString() {
-        if (algorithmSpace.getChildren().isEmpty()) {
+        if (this.mainController.getGraphPane().getChildren().isEmpty()) {
             return "";
         } else {
             StringBuilder graph = new StringBuilder();
@@ -783,7 +768,7 @@ public class PathFindingController implements Subscriber {
             List<GraphNode> nodes = new ArrayList<>();
 
 
-            for (Node child : algorithmSpace.getChildren()) {
+            for (Node child : this.mainController.getGraphPane().getChildren()) {
                 if (child instanceof GraphNode node) {
                     nodes.add(node);
                     graph.append(node.getId()).append(",").append(node.getLayoutX()).append(",").append(
@@ -793,7 +778,7 @@ public class PathFindingController implements Subscriber {
 
             graph.insert(0, nodes.size() + ",");
 
-            for (Node child : algorithmSpace.getChildren()) {
+            for (Node child : this.mainController.getGraphPane().getChildren()) {
                 if (child instanceof Edge edge) {
                     graph.append(edge.getNodeA().getId()).append(",")
                             .append(edge.getNodeB().getId()).append(",")
@@ -910,4 +895,46 @@ public class PathFindingController implements Subscriber {
         return node;
     }
 
+    public void selectAlgorithmTab() {
+        graphTab.getSelectionModel().selectFirst();
+    }
+
+    @FXML
+    private void onExportGraphButtonClick() {
+        Window mainStage = this.mainController.getGraphPane().getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save graph");
+        fileChooser.setInitialFileName("graph-" + LocalDate.now() + ".txt");
+        File file = fileChooser.showSaveDialog(mainStage);
+        if (file != null) {
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
+                bufferedWriter.write(exportGraphToString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @FXML
+    private void onClearGraphButtonClick() {
+        this.mainController.runningAlgorithmThreadProperty().set(null);
+        this.mainController.getResetButton().setDisable(true);
+        clearAlgorithmSpace();
+    }
+
+    @FXML
+    private void onClickGenerateTreeGraph(ActionEvent actionEvent) {
+        clearAlgorithmSpace();
+        generateTreeGraph();
+    }
+
+    @FXML
+    private void onClickGenerateCompleteGraph(ActionEvent actionEvent) {
+        clearAlgorithmSpace();
+        generateCompleteGraph(7, 300, 420, 420);
+    }
+
+    public void injectController(MainController mainController) {
+        this.mainController = mainController;
+    }
 }

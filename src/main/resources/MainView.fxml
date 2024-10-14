@@ -68,95 +68,10 @@
     <left>
         <TabPane fx:id="algorithmTab" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
             <Tab text="Path Finding">
-                <TabPane fx:id="graphTab" tabClosingPolicy="UNAVAILABLE">
-                    <Tab text="Algorithm">
-                        <VBox>
-                            <padding>
-                                <Insets topRightBottomLeft="10"/>
-                            </padding>
-                            <spacing>10</spacing>
-                            <VBox>
-                                <Label text="Candidate Nodes" contentDisplay="RIGHT" styleClass="list-view-label">
-                                </Label>
-                                <ListView fx:id="candidateNodeList"/>
-                            </VBox>
-                            <VBox>
-                                <Label text="Visited" contentDisplay="RIGHT" styleClass="list-view-label">
-                                </Label>
-                                <ListView fx:id="visitedNodeList"/>
-                            </VBox>
-                            <VBox>
-                                <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
-                                </Label>
-                                <ListView fx:id="pseudoCodeListGraph"/>
-                            </VBox>
-                        </VBox>
-                    </Tab>
-                    <Tab text="Vertex">
-                        <VBox spacing="10">
-                            <padding>
-                                <Insets topRightBottomLeft="10"/>
-                            </padding>
-                            <HBox spacing="10">
-                                <ToggleButton fx:id="showEdgeWeightToggle" text="Show weight"/>
-                                <ToggleButton fx:id="showEdgeDistanceToggle" text="Show distance"/>
-                            </HBox>
-                            <HBox spacing="10">
-                                <Button fx:id="exportGraphBtn" text="Export Graph"
-                                        onAction="#onExportGraphButtonClick"/>
-                                <Button fx:id="clearGraphBtn" text="Clear Graph" onAction="#onClearGraphButtonClick"/>
-                            </HBox>
-
-                            <HBox spacing="10">
-                                <Button text="Generate Tree Graph"
-                                        onAction="#onClickGenerateTreeGraph"/>
-                                <Button text="Generate Complete Graph" onAction="#onClickGenerateCompleteGraph"/>
-                            </HBox>
-
-                            <ScrollPane hbarPolicy="NEVER" fitToWidth="true" minHeight="300">
-                                <Accordion fx:id="renderedNodes" style="-fx-background-color: transparent;"/>
-                            </ScrollPane>
-                        </VBox>
-                    </Tab>
-                    <Tab text="Help">
-                    </Tab>
-                </TabPane>
+                <fx:include fx:id="graphTab" source="pathfinding_tab.fxml"/>
             </Tab>
             <Tab text="Sorting">
-                <TabPane fx:id="sortTab" tabClosingPolicy="UNAVAILABLE">
-                    <Tab text="Algorithm">
-                        <VBox>
-                            <padding>
-                                <Insets topRightBottomLeft="10"/>
-                            </padding>
-                            <spacing>10</spacing>
-                            <VBox>
-                                <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
-                                </Label>
-                                <ListView fx:id="pseudoCodeListSort"/>
-                            </VBox>
-                        </VBox>
-                    </Tab>
-                    <Tab text="Settings">
-                        <VBox spacing="10">
-                            <padding>
-                                <Insets topRightBottomLeft="10"/>
-                            </padding>
-
-                            <Button text="Generate big unsorted list"
-                                    onAction="#onClickGenerateBigUnsortedList"/>
-
-                            <Button text="Generate small unsorted list"
-                                    onAction="#onClickGenerateSmallUnsortedList"/>
-
-                            <Label text="Number List" contentDisplay="RIGHT" styleClass="list-view-label"/>
-                            <TextField fx:id="sortInput"/>
-
-                        </VBox>
-                    </Tab>
-                    <Tab text="Help">
-                    </Tab>
-                </TabPane>
+                <fx:include fx:id="sortTab" source="sorting_tab.fxml"/>
             </Tab>
         </TabPane>
     </left>

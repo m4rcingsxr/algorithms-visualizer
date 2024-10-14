@@ -1,0 +1,44 @@
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+
+<TabPane fx:id="sortTab" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml" fx:controller="com.marcinseweryn.visualizer.controller.SortTabController">
+    <Tab text="Algorithm">
+        <VBox>
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+            <spacing>10</spacing>
+            <VBox>
+                <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
+                </Label>
+                <ListView fx:id="pseudoCodeListSort"/>
+            </VBox>
+        </VBox>
+    </Tab>
+
+    <Tab text="Settings">
+        <VBox spacing="10">
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Button text="Generate big unsorted list"
+                    onAction="#onClickGenerateBigUnsortedList"/>
+
+            <Button text="Generate small unsorted list"
+                    onAction="#onClickGenerateSmallUnsortedList"/>
+
+            <Label text="Number List" contentDisplay="RIGHT" styleClass="list-view-label"/>
+            <TextField fx:id="sortInput"/>
+        </VBox>
+    </Tab>
+
+    <Tab text="Help">
+    </Tab>
+</TabPane>

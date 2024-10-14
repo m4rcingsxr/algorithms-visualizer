@@ -1,16 +1,16 @@
 package com.marcinseweryn.visualizer.controller;
 
 import com.marcinseweryn.visualizer.model.Algorithm;
-import com.marcinseweryn.visualizer.model.GraphAlgorithm;
 import com.marcinseweryn.visualizer.model.SortingAlgorithm;
 import com.marcinseweryn.visualizer.view.SortingRectangles;
 import javafx.animation.PauseTransition;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
@@ -22,15 +22,19 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.joining;
 
-public class SortingController {
+public class SortTabController {
 
-    private static final Logger logger = LogManager.getLogger(SortingController.class);
+    private static final Logger logger = LogManager.getLogger(SortTabController.class);
 
-    private final VBox algorithmSpace;
-    private final ListView<SimpleStringProperty> pseudoCodeList;
-    private final TextField sortInput;
-    private final ChoiceBox<Algorithm> algorithmListBox;
+    @FXML
+    private ListView<SimpleStringProperty> pseudoCodeListSort;
+    @FXML
+    private TabPane sortTab;
+    @FXML
+    private TextField sortInput;
+
     private List<Integer> unsortedList;
+
     private final Random random = new Random();
 
     private final PauseTransition pauseTransition = new PauseTransition(Duration.millis(500));
@@ -38,13 +42,13 @@ public class SortingController {
     private final SimpleStringProperty sortInputProperty = new SimpleStringProperty();
 
     private SortingRectangles sortingRectangles;
+    private MainController mainController;
 
-    public SortingController(VBox algorithmSpace, TextField sortInput, ChoiceBox<Algorithm> algorithmListBox, ListView<SimpleStringProperty> pseudoCodeList) {
-        this.algorithmSpace = algorithmSpace;
-        this.pseudoCodeList = pseudoCodeList;
-        this.sortInput = sortInput;
-        this.algorithmListBox = algorithmListBox;
+    public SortTabController() {
+    }
 
+    @FXML
+    public void initialize() {
         sortInputProperty.bindBidirectional(sortInput.textProperty());
         sortInputProperty.addListener(((observable, oldValue, newValue) -> {
             pauseTransition.setOnFinished(event -> updateAlgorithmSpace(newValue));
@@ -56,7 +60,7 @@ public class SortingController {
         if (newVal.isEmpty() || newVal.isBlank()) return;
 
         // Clear previous rectangles
-        algorithmSpace.getChildren().clear();
+        this.mainController.getSortingPane().getChildren().clear();
 
         // Parse CSV to list
         String[] split = newVal.split(",");
@@ -74,13 +78,15 @@ public class SortingController {
             throw new IllegalStateException();
         }
 
-        sortingRectangles = new SortingRectangles(unsortedList, max.get(), min.get(), algorithmSpace.getHeight(), algorithmSpace.getWidth());
-        algorithmSpace.getChildren().add(sortingRectangles);
+        sortingRectangles = new SortingRectangles(unsortedList, max.get(), min.get(), this.mainController.getSortingPane().getHeight(),
+                                                  this.mainController.getSortingPane().getWidth()
+        );
+        this.mainController.getSortingPane().getChildren().add(sortingRectangles);
     }
 
 
     public void clearAlgorithmSpace() {
-        algorithmSpace.getChildren().clear();
+        this.mainController.getSortingPane().getChildren().clear();
         this.unsortedList = new ArrayList<>();
     }
 
@@ -94,14 +100,14 @@ public class SortingController {
     }
 
     public Optional<SortingAlgorithm> initializeSelectedAlgorithm() {
-        if (this.algorithmListBox.getValue() instanceof SortingAlgorithm selectedAlgorithm) {
+        if (this.mainController.getAlgorithmListBox().getValue() instanceof SortingAlgorithm selectedAlgorithm) {
             try {
                 return Optional.of(selectedAlgorithm.getClass()
                                            .getDeclaredConstructor(
                                                    ListView.class, SortingRectangles.class
                                            )
                                            .newInstance(
-                                                   pseudoCodeList, sortingRectangles
+                                                   pseudoCodeListSort, sortingRectangles
                                            ));
             } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
                      InstantiationException e) {
@@ -114,5 +120,26 @@ public class SortingController {
 
     public void resetListState() {
 
+    }
+
+    public void selectAlgorithmTab() {
+        sortTab.getSelectionModel().selectFirst();
+    }
+
+
+    @FXML
+    public void onClickGenerateBigUnsortedList(ActionEvent actionEvent) {
+        clearAlgorithmSpace();
+        generateUnsortedList(100);
+    }
+
+    @FXML
+    public void onClickGenerateSmallUnsortedList(ActionEvent actionEvent) {
+        clearAlgorithmSpace();
+        generateUnsortedList(10);
+    }
+
+    public void injectController(MainController mainController) {
+        this.mainController = mainController;
     }
 }
