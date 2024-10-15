@@ -1,4 +1,4 @@
-package com.marcinseweryn.visualizer.model;
+package com.marcinseweryn.visualizer.model.path;
 
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleStringProperty;
@@ -6,7 +6,7 @@ import javafx.scene.control.ListView;
 
 public class GraphNodeStack extends GraphNodeDeque {
 
-    public GraphNodeStack(ListType listType, ListView<SimpleStringProperty> list) {
+    public GraphNodeStack(ViewType listType, ListView<SimpleStringProperty> list) {
         super(listType, list);
     }
 

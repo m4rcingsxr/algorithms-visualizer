@@ -20,7 +20,7 @@ public class AlgorithmThread extends Thread {
      * @param algorithm The algorithm that this thread will control.
      */
     public AlgorithmThread(Runnable runnable, Algorithm algorithm) {
-        super(runnable); // Calls the Thread constructor with the runnable task
+        super(runnable);
         this.algorithm = algorithm;
     }
 
@@ -29,7 +29,7 @@ public class AlgorithmThread extends Thread {
      * This method is intended to be called when the algorithm is paused and needs to be resumed.
      */
     public void resumeAlgorithm() {
-        this.algorithm.resumeAlgorithm(); // Calls the resume function in the associated algorithm
+        this.algorithm.resumeAlgorithm();
     }
 
 }

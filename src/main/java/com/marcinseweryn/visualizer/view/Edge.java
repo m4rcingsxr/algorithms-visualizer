@@ -16,7 +16,7 @@ public class Edge extends PaneArrow {
     private final GraphNode nodeA;
     private final GraphNode nodeB;
 
-    // The weight of the edge (for weighted graphs)
+    // The weight of the edge (for weighted exported_graphs)
     private final DoubleProperty weight = new SimpleDoubleProperty();
 
 

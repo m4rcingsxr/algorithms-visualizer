@@ -2,7 +2,7 @@ package com.marcinseweryn.visualizer.controller;
 
 import com.marcinseweryn.visualizer.Publisher;
 import com.marcinseweryn.visualizer.Subscriber;
-import com.marcinseweryn.visualizer.model.GraphAlgorithm;
+import com.marcinseweryn.visualizer.model.path.GraphAlgorithm;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import com.marcinseweryn.visualizer.view.VertexSetup;
@@ -12,8 +12,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
@@ -21,9 +19,7 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
@@ -93,83 +89,11 @@ public class GraphTabController implements Subscriber {
      */
     public GraphTabController() {
 
-        initializeAlgorithmLegend();
-
         this.eventPublisher = new Publisher();
         initializeEventSubscriptions();
 
         logger.info("PathFindingController initialized.");
     }
-
-    private void initializeAlgorithmLegend() {
-        HBox legend = new HBox(20);
-        legend.setPadding(new Insets(0, 20, 10, 20));
-        legend.setStyle("-fx-background-color: grey;-fx-background-radius: 15; -fx-padding: 10;");
-
-        VBox vbox1 = new VBox(10);
-        vbox1.setPadding(new Insets(10, 10, 10, 10));
-        VBox vbox2 = new VBox(10);
-        vbox1.setPadding(new Insets(10, 10, 10, 10));
-
-        // Create HBox to hold the GraphNode and Label side by side
-        HBox visited = new HBox(10); // 10 is the spacing between GraphNode and Label
-        visited.setAlignment(Pos.CENTER_LEFT);
-
-        GraphNode visitedNode = new GraphNode("visited"); // Your GraphNode
-        Label visitedLabel = new Label("Visited");
-        visitedLabel.setFont(Font.font(14));
-
-        visited.getChildren().addAll(visitedNode, visitedLabel); // Add GraphNode and Label side by side
-
-
-        GraphNode candidateNode = new GraphNode("candidate-nodes"); // Your GraphNode
-        Label candidateLabel = new Label("Candidate");
-        candidateLabel.setFont(Font.font(14));
-
-        HBox candidate = new HBox(10);
-        candidate.getChildren().addAll(candidateNode, candidateLabel);
-        candidate.setAlignment(Pos.CENTER_LEFT);
-
-        GraphNode pathNode = new GraphNode("path"); // Your GraphNode
-        Label pathLabel = new Label("Path");
-        pathLabel.setFont(Font.font(14));
-
-        HBox path = new HBox(10);
-        path.getChildren().addAll(pathNode, pathLabel);
-        path.setAlignment(Pos.CENTER_LEFT);
-
-        GraphNode currentNode = new GraphNode();
-        currentNode.pseudoClassStateChanged(GraphTabController.currentNodeStyle, true);
-        Label currentLabel = new Label("Current node");
-        currentLabel.setFont(Font.font(14));
-
-        HBox current = new HBox(10);
-        current.getChildren().addAll(currentNode, currentLabel);
-        current.setAlignment(Pos.CENTER_LEFT);
-
-        GraphNode neighborNode = new GraphNode();
-        neighborNode.pseudoClassStateChanged(GraphTabController.neighborNodeStyle, true);
-        Label neighborLabel = new Label("Neighbor node");
-        neighborLabel.setFont(Font.font(14));
-
-        currentNode.setStyle("-fx-background-color: null;");
-        neighborNode.setStyle("-fx-background-color: null;");
-
-        HBox neighbor = new HBox(10);
-        neighbor.getChildren().addAll(neighborNode, neighborLabel);
-        neighbor.setAlignment(Pos.CENTER_LEFT);
-
-        vbox1.getChildren().addAll(visited, candidate, path);
-        vbox2.getChildren().addAll(current, neighbor);
-
-        legend.getChildren().addAll(vbox1, vbox2);
-
-        AnchorPane.setBottomAnchor(legend, 0.0);
-        AnchorPane.setLeftAnchor(legend, 0.0);
-
-//        mainController.getGraphPane().getChildren().add(legend);
-    }
-
 
     /**
      * Initializes the event subscriptions for the controller.
@@ -182,32 +106,45 @@ public class GraphTabController implements Subscriber {
 
     /**
      * Initializes the selected algorithm from the algorithm list.
-     * It creates a new instance of the selected GraphAlgorithm with the required properties.
+     * It dynamically creates a new instance of the selected GraphAlgorithm using reflection.
      *
-     * @return Optional of GraphAlgorithm if an algorithm is selected, otherwise empty Optional.
+     * @return Optional of GraphAlgorithm if an algorithm is selected and instantiated successfully, otherwise empty Optional.
      */
     public Optional<GraphAlgorithm> initializeSelectedAlgorithm() {
-        this.clearAlgorithmViews();
-        if (this.mainController.getAlgorithmListBox().getValue() instanceof GraphAlgorithm selectedAlgorithm) {
+        this.clearAlgorithmViews();  // Clear previous algorithm views
+
+        // Get the selected class name from the ChoiceBox
+        String selectedClassName = this.mainController.getAlgorithmChoiceBox().getValue();
+
+        if (selectedClassName != null && !selectedClassName.isEmpty()) {
             try {
-                return Optional.of(selectedAlgorithm.getClass()
-                                           .getDeclaredConstructor(VBox.class, ListView.class,
-                                                                   SimpleObjectProperty.class,
-                                                                   SimpleObjectProperty.class,
-                                                                   AnchorPane.class
-                                           )
-                                           .newInstance(algorithmTab, pseudoCodeListGraph, startNodeProperty,
-                                                        destinationNodeProperty,
-                                                        algorithmSpace
-                                           ));
-            } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
-                     InstantiationException e) {
-                throw new RuntimeException(e);
+                // Load the class dynamically using reflection
+                Class<?> algorithmClass = Class.forName(selectedClassName);
+
+                // Ensure that the class is a subtype of GraphAlgorithm
+                if (GraphAlgorithm.class.isAssignableFrom(algorithmClass)) {
+                    // Create a new instance of the selected GraphAlgorithm using its constructor
+                    GraphAlgorithm algorithmInstance = (GraphAlgorithm) algorithmClass
+                            .getDeclaredConstructor(VBox.class, ListView.class,
+                                                    SimpleObjectProperty.class, SimpleObjectProperty.class,
+                                                    AnchorPane.class
+                            )
+                            .newInstance(algorithmTab, pseudoCodeListGraph, startNodeProperty, destinationNodeProperty, algorithmSpace);
+
+                    return Optional.of(algorithmInstance);  // Return the created algorithm instance
+                } else {
+                    logger.error("Selected class {} is not a subclass of GraphAlgorithm", selectedClassName);
+                }
+            } catch (ClassNotFoundException e) {
+                logger.error("Algorithm class {} not found", selectedClassName, e);
+            } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                logger.error("Failed to instantiate algorithm class {}", selectedClassName, e);
             }
         }
 
-        return Optional.empty();
+        return Optional.empty();  // Return an empty Optional if no valid algorithm is selected
     }
+
 
     // remove all except pseudocode
     private void clearAlgorithmViews() {

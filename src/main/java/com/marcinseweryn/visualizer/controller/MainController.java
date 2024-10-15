@@ -1,8 +1,8 @@
 package com.marcinseweryn.visualizer.controller;
 
 import com.marcinseweryn.visualizer.model.Algorithm;
-import com.marcinseweryn.visualizer.model.GraphAlgorithm;
-import com.marcinseweryn.visualizer.model.SortingAlgorithm;
+import com.marcinseweryn.visualizer.model.path.GraphAlgorithm;
+import com.marcinseweryn.visualizer.model.sort.SortingAlgorithm;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -45,8 +45,10 @@ public class MainController {
     private BorderPane main;
     @FXML
     private TabPane algorithmTab;
+
     @FXML
-    private ChoiceBox<Algorithm> algorithmListBox;
+    private ChoiceBox<String> algorithmChoiceBox;
+
     @FXML
     private VBox algorithmContainer;
 
@@ -83,7 +85,7 @@ public class MainController {
         setupTabSelectionListener();
 
         // Load the initial list of pathfinding algorithms
-        loadAlgorithmList("com/marcinseweryn/visualizer/model/path");
+        loadAlgorithmList("com/marcinseweryn/visualizer/model/path/algorithm");
 
         // Initially display the graph pane by default
         algorithmContainer.getChildren().remove(sortingPane);
@@ -112,12 +114,12 @@ public class MainController {
                     // Show the graph pane when the Path Finding tab is selected
                     if (selectedTab.equals("Path Finding")) {
                         showGraphPane();
-                        loadAlgorithmList("com/marcinseweryn/visualizer/model/path");
+                        loadAlgorithmList("com/marcinseweryn/visualizer/model/path/algorithm");
                     }
                     // Show the sorting pane when the Sorting tab is selected
                     else if (selectedTab.equals("Sorting")) {
                         showSortingPane();
-                        loadAlgorithmList("com/marcinseweryn/visualizer/model/sort");
+                        loadAlgorithmList("com/marcinseweryn/visualizer/model/sort/algorithm");
                     } else {
                         logger.warn("Unknown tab selected: {}", selectedTab);
                     }
@@ -148,44 +150,40 @@ public class MainController {
 
     /**
      * Loads the list of algorithm classes from the specified resource path.
-     * The method dynamically loads available algorithms from the file system and
-     * populates the algorithm list (ChoiceBox).
+     * The method dynamically loads available algorithm class names from the file system
+     * and populates the algorithm list (ChoiceBox) with class names, without instantiating them.
      *
      * @param resourcePath The path to the directory containing the algorithm classes.
      */
     private void loadAlgorithmList(String resourcePath) {
         try {
             // Clear the current algorithm list
-            algorithmListBox.getItems().clear();
+            algorithmChoiceBox.getItems().clear();
 
             // Load classes from the resource path
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             Enumeration<URL> resources = classLoader.getResources(resourcePath);
             File directory = new File(resources.nextElement().getFile().replace("%20", " "));
 
-            ArrayList<Class<?>> algorithmClasses = new ArrayList<>();
             if (directory.listFiles() != null) {
+                // Iterate over the files in the directory and find .class files
                 for (File file : Objects.requireNonNull(directory.listFiles())) {
                     if (file != null && file.getName().endsWith(".class")) {
+                        // Construct the full class name (package name + class name)
                         String className = resourcePath.replace('/', '.') + '.' + file.getName().replace(".class", "");
-                        algorithmClasses.add(Class.forName(className));
+
+                        // Add the class name to the ChoiceBox (instead of instantiating the class)
+                        algorithmChoiceBox.getItems().add(className);
                     }
                 }
 
-                // Instantiate each class and add it to the algorithm list
-                for (Class<?> clazz : algorithmClasses) {
-                    Object algorithmInstance = clazz.getDeclaredConstructor().newInstance();
-                    if (algorithmInstance instanceof Algorithm algorithm) {
-                        algorithmListBox.getItems().add(algorithm);
-                    }
+                // Select the first algorithm by default, if any are available
+                if (!algorithmChoiceBox.getItems().isEmpty()) {
+                    algorithmChoiceBox.getSelectionModel().selectFirst();
                 }
             }
-
-            // Select the first algorithm by default
-            algorithmListBox.getSelectionModel().selectFirst();
-        } catch (IOException | ClassNotFoundException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException | NoSuchMethodException e) {
-            logger.error(e);
+        } catch (IOException e) {
+            logger.error("Error loading algorithm list from path: " + resourcePath, e);
         }
     }
 
@@ -347,100 +345,17 @@ public class MainController {
         this.graphTabController.onAlgorithmSpaceDragDropped(dragEvent);
     }
 
-    public AnchorPane getGraphPane() {
-        return graphPane;
-    }
-
-    public void setGraphPane(AnchorPane graphPane) {
-        this.graphPane = graphPane;
-    }
-
-    public VBox getSortingPane() {
-        return sortingPane;
-    }
-
-    public void setSortingPane(VBox sortingPane) {
-        this.sortingPane = sortingPane;
-    }
-
-    public BorderPane getMain() {
-        return main;
-    }
-
-    public void setMain(BorderPane main) {
-        this.main = main;
-    }
-
-    public TabPane getAlgorithmTab() {
-        return algorithmTab;
-    }
-
-    public void setAlgorithmTab(TabPane algorithmTab) {
-        this.algorithmTab = algorithmTab;
-    }
-
-    public ChoiceBox<Algorithm> getAlgorithmListBox() {
-        return algorithmListBox;
-    }
-
-    public void setAlgorithmListBox(
-            ChoiceBox<Algorithm> algorithmListBox) {
-        this.algorithmListBox = algorithmListBox;
-    }
-
-    public VBox getAlgorithmContainer() {
-        return algorithmContainer;
-    }
-
-    public void setAlgorithmContainer(VBox algorithmContainer) {
-        this.algorithmContainer = algorithmContainer;
-    }
-
-    public Button getStartButton() {
-        return startButton;
-    }
-
-    public void setStartButton(Button startButton) {
-        this.startButton = startButton;
-    }
-
-    public Button getStepButton() {
-        return stepButton;
-    }
-
-    public void setStepButton(Button stepButton) {
-        this.stepButton = stepButton;
+    public ChoiceBox<String> getAlgorithmChoiceBox() {
+        return algorithmChoiceBox;
     }
 
     public Button getResetButton() {
         return resetButton;
     }
 
-    public void setResetButton(Button resetButton) {
-        this.resetButton = resetButton;
-    }
-
-    public AlgorithmThread getRunningAlgorithmThread() {
-        return runningAlgorithmThread.get();
-    }
 
     public SimpleObjectProperty<AlgorithmThread> runningAlgorithmThreadProperty() {
         return runningAlgorithmThread;
     }
 
-    public GraphTabController getGraphTabController() {
-        return graphTabController;
-    }
-
-    public void setGraphTabController(GraphTabController graphTabController) {
-        this.graphTabController = graphTabController;
-    }
-
-    public SortTabController getSortTabController() {
-        return sortTabController;
-    }
-
-    public void setSortTabController(SortTabController sortTabController) {
-        this.sortTabController = sortTabController;
-    }
 }

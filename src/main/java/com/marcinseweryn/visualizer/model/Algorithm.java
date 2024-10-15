@@ -11,117 +11,146 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Abstract class representing a general algorithm with step-by-step and continuous execution modes.
- * Provides functionality to pause and resume execution using a lock mechanism.
+ * Abstract base class for algorithms that support step-by-step and continuous execution modes.
+ * It provides pause and resume functionality using a thread-safe lock mechanism, allowing
+ * algorithms to either run continuously or wait at certain steps for user interaction.
+ *
+ * This class applies the Template Method design pattern. The general structure of the algorithm
+ * execution is defined here, but the concrete steps of the algorithm (`executeAlgorithm` and `setPseudocode`)
+ * are delegated to subclasses.
  */
 public abstract class Algorithm {
 
-    public static final Logger logger = LogManager.getLogger(Algorithm.class);
+    private static final Logger logger = LogManager.getLogger(Algorithm.class);
+
+    // The ListView UI component that displays pseudocode steps for the algorithm
     private final ListView<String> pseudocodeList;
 
-    // Flag to determine if step mode is disabled (continuous execution)
-    protected boolean isContinuousMode = false;
+    // Observable list that holds pseudocode steps, displayed in the pseudocodeList UI
+    protected final ObservableList<String> pseudocode = FXCollections.observableArrayList();
 
-    // Lock and condition variables for managing thread control
+    // Determines if the algorithm runs in continuous execution mode (true) or step-by-step (false)
+    private boolean isContinuousMode = false;
+
+    // Thread control mechanism to pause and resume execution
     private final ReentrantLock executionLock = new ReentrantLock();
     private final Condition canProceed = executionLock.newCondition();
 
-    protected final ObservableList<String> pseudocode = FXCollections.observableArrayList();
+    // Flag indicating whether the algorithm is currently paused
+    private boolean isPaused;
 
-    // Flag to indicate if the algorithm is currently paused
-    private volatile boolean isPaused;
-
+    /**
+     * Constructor to initialize the Algorithm object with a ListView to display pseudocode.
+     * The pseudocodeList is set to update with pseudocode steps in a thread-safe manner.
+     *
+     * @param pseudocodeList The ListView to display algorithm pseudocode.
+     */
     protected Algorithm(ListView<String> pseudocodeList) {
         this.pseudocodeList = pseudocodeList;
-        if(pseudocodeList != null) {
+        if (pseudocodeList != null) {
+            // Ensuring the UI is updated in the JavaFX application thread
             Platform.runLater(() -> pseudocodeList.setItems(pseudocode));
         }
     }
 
     /**
-     * Resumes the algorithm if it is in step mode.
-     * Signals the waiting thread to continue execution.
+     * Starts the algorithm execution.
+     * The execution mode is determined by the provided flag (continuous or step-by-step).
+     *
+     * @param continuousMode If true, the algorithm will run continuously without pauses.
+     */
+    public void start(boolean continuousMode) {
+        this.isContinuousMode = continuousMode;
+        logger.info("Starting algorithm execution in {} mode.", continuousMode ? "continuous" : "step-by-step");
+
+        setPseudocode();  // Initialize the pseudocode for display
+        executeAlgorithm();  // Begin executing the algorithm's logic
+    }
+
+    /**
+     * Resumes the algorithm execution if it is paused in step-by-step mode.
+     * Signals the waiting thread to continue execution by unlocking the pause condition.
      */
     public void resumeAlgorithm() {
         if (!this.isContinuousMode) {
+            logger.debug("Attempting to resume algorithm execution...");
+
             executionLock.lock();
             try {
-                logger.debug("Lock acquired, signaling condition to resume algorithm...");
+                logger.debug("Lock acquired, signaling all waiting threads to resume.");
                 canProceed.signalAll();
                 isPaused = false;
-                logger.debug("Condition signaled");
             } finally {
-                logger.debug("Lock released after signaling");
+                logger.debug("Lock released after signaling.");
                 executionLock.unlock();
             }
 
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                logger.error("Interrupted while sleeping after resume.", e);
                 Thread.currentThread().interrupt();
             }
+        } else {
+            logger.debug("Resume ignored because the algorithm is in continuous mode.");
         }
     }
 
     /**
-     * Pauses the execution at a specific step when in step-by-step mode.
-     * The method waits for a signal before resuming.
+     * Pauses the algorithm at a specific step when in step-by-step mode.
+     * In continuous mode, a brief delay is introduced instead of pausing.
      *
-     * @param stepNumber The current step number where the algorithm pauses.
+     * @param stepNumber The current step number where the algorithm is pausing.
      */
     protected void pauseAtStep(int stepNumber) {
-        Platform.runLater(() -> {
-            pseudocodeList.scrollTo(stepNumber);
-            pseudocodeList.getSelectionModel().select(stepNumber);
-        });
+        // Scroll and select the current step in the UI's pseudocode ListView
+        if (pseudocodeList != null) {
+            Platform.runLater(() -> {
+                pseudocodeList.scrollTo(stepNumber);
+                pseudocodeList.getSelectionModel().select(stepNumber);
+            });
+        }
+
         if (!isContinuousMode) {
             executionLock.lock();
             try {
-                logger.debug("Pausing at step: " + stepNumber);
+                logger.debug("Pausing execution at step: {}", stepNumber);
                 isPaused = true;
 
-                // Wait until a signal is received to resume
+                // Loop to prevent spurious wakeup
                 while (isPaused) {
                     canProceed.await();
                 }
 
-                logger.debug("Resumed from pause at step: " + stepNumber);
+                logger.debug("Resuming execution after step: {}", stepNumber);
             } catch (InterruptedException e) {
-                logger.error("Thread interrupted while pausing at step: " + stepNumber, e);
+                logger.error("Thread interrupted while paused at step: {}", stepNumber, e);
                 Thread.currentThread().interrupt();
             } finally {
-                logger.debug("Lock released after step: " + stepNumber);
+                logger.debug("Lock released after resuming from step: {}", stepNumber);
                 executionLock.unlock();
             }
         } else {
-            // If continuous mode is enabled, introduce a short delay between steps
+            // In continuous mode, add a brief delay between steps to slow down execution
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                logger.error("Thread interrupted during continuous mode delay", e);
+                logger.error("Thread interrupted during delay in continuous mode", e);
                 Thread.currentThread().interrupt();
             }
         }
     }
 
     /**
-     * Starts the algorithm, setting the mode of execution based on the provided flag.
-     *
-     * @param continuousMode If true, the algorithm runs continuously without pausing at steps.
-     */
-    public void start(boolean continuousMode) {
-        this.isContinuousMode = continuousMode;
-        setPseudocode();
-        executeAlgorithm();  // Begin the algorithm's execution
-    }
-
-    /**
-     * Abstract method to be implemented by subclasses to define the algorithm's logic.
-     * The implementation should call {@link #pauseAtStep(int)} at appropriate points
-     * in the algorithm to enable step-by-step execution.
+     * Abstract method for algorithm logic execution.
+     * Subclasses must implement the algorithm's steps and call {@link #pauseAtStep(int)} where necessary.
      */
     public abstract void executeAlgorithm();
 
+    /**
+     * Abstract method to set the pseudocode steps for the algorithm.
+     * Subclasses must provide the list of pseudocode steps for display in the UI.
+     */
     public abstract void setPseudocode();
 
 }

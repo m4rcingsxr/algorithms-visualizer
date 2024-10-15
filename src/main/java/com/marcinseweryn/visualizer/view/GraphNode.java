@@ -33,7 +33,7 @@ public class GraphNode extends Button {
     private final SimpleStringProperty generalInfo = new GraphNodeGeneralInfo();
     private final SimpleStringProperty distanceInfo = new GraphNodeDistanceInfo();
 
-    private double distance;
+    private double distance = Double.POSITIVE_INFINITY;
 
     public GraphNode() {
         getStyleClass().add("vertex");
@@ -175,11 +175,11 @@ public class GraphNode extends Button {
      * Clears all applied styles from the node, resetting it to its base appearance.
      */
     public void clearStyle() {
-        this.getStyleClass().removeAll("start", "destination", "visited", "candidate-nodes", "path");
+        this.getStyleClass().removeAll("start", "destination", "visited", "candidate-nodes", "path", "negative-cycle");
     }
 
     public void setPrimaryClass(String clazz) {
-        this.getStyleClass().removeAll("start", "destination", "visited", "candidate-nodes", "path");
+        this.getStyleClass().removeAll("start", "destination", "visited", "candidate-nodes", "path", "negative-cycle");
         this.getStyleClass().add(clazz);
     }
 
