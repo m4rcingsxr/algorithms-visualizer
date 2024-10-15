@@ -40,7 +40,11 @@ public abstract class GraphNodeVisualizer {
      * @param node The GraphNode whose information is to be added to the visualized list.
      */
     public void addNodeInfoToList(GraphNode node) {
-        Platform.runLater(() -> visualizedNodes.add(node.getInfo()));
+        if(listType.equals(ListType.DISTANCE)) {
+            Platform.runLater(() -> visualizedNodes.add(node.getDistanceInfo()));
+        } else {
+            Platform.runLater(() -> visualizedNodes.add(node.getGeneralInfo()));
+        }
     }
 
     /**
@@ -68,7 +72,7 @@ public abstract class GraphNodeVisualizer {
     public void removeNodeFromListAndClearStyle(GraphNode node) {
         Platform.runLater(() -> {
             node.clearStyle();
-            visualizedNodes.remove(node.getInfo());
+            visualizedNodes.remove(node.getGeneralInfo());
         });
     }
 

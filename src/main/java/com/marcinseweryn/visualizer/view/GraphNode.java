@@ -30,7 +30,8 @@ public class GraphNode extends Button {
     private final SimpleObjectProperty<GraphNode> parent = new SimpleObjectProperty<>(null);
 
     // Holds information about the node (ID, parent)
-    private final SimpleStringProperty info = new GraphNodeInfo();
+    private final SimpleStringProperty generalInfo = new GraphNodeGeneralInfo();
+    private final SimpleStringProperty distanceInfo = new GraphNodeDistanceInfo();
 
     private double distance;
 
@@ -72,7 +73,7 @@ public class GraphNode extends Button {
         logger.debug("GraphNode ID {} positioned at coordinates: [X: {}, Y: {}]", this.getId(), x, y);
 
         // Bind the info property to reflect the node's parent
-        info.bind(Bindings.concat(parent));
+        generalInfo.bind(Bindings.concat(parent));
     }
 
     /**
@@ -166,8 +167,8 @@ public class GraphNode extends Button {
      *
      * @return The info property (SimpleStringProperty).
      */
-    public SimpleStringProperty getInfo() {
-        return info;
+    public SimpleStringProperty getGeneralInfo() {
+        return generalInfo;
     }
 
     /**
@@ -191,17 +192,30 @@ public class GraphNode extends Button {
         this.distance = distance;
     }
 
+    public SimpleStringProperty getDistanceInfo() {
+        return this.distanceInfo;
+    }
+
     /**
      * Inner class that overrides SimpleStringProperty to provide a detailed
      * string representation of the GraphNode and bind it on other properties.
      */
-    private class GraphNodeInfo extends SimpleStringProperty {
+    private class GraphNodeGeneralInfo extends SimpleStringProperty {
 
         @Override
         public String toString() {
             // Return the node's ID and the parent's ID (or null if no parent)
             return "ID: " + getId() + " | Parent: " +
                     (parent.getValue() != null ? parent.getValue().getId() : "null");
+        }
+    }
+
+    private class GraphNodeDistanceInfo extends SimpleStringProperty {
+
+        @Override
+        public String toString() {
+            // Return the node's ID and the parent's ID (or null if no parent)
+            return "ID: " + getId() + " | Distance: " + getDistance();
         }
     }
 

@@ -16,6 +16,7 @@ public class LazyDijkstra extends GraphAlgorithm {
     private final DistanceList distance = new DistanceList();
     private GraphNodeVisualizer visitedNodeList;
     private GraphNodeVisualizer candidateNodeList;
+    private GraphNodeVisualizer distanceNodeList;
 
     public LazyDijkstra() {
         super();
@@ -29,6 +30,7 @@ public class LazyDijkstra extends GraphAlgorithm {
         super(algorithmTab, pseudocodeList, startNode, destinationNode, algorithmSpace);
         candidateNodeList = initializeGraphNodeVisualizer("CANDIDATE", DataStructureType.PRIORITY_QUEUE);
         visitedNodeList = initializeGraphNodeVisualizer("VISITED", DataStructureType.STACK);
+        distanceNodeList = initializeGraphNodeVisualizer("DISTANCE", DataStructureType.LIST);
     }
 
     @Override
@@ -41,8 +43,9 @@ public class LazyDijkstra extends GraphAlgorithm {
         pauseAtStep(2);
         this.startNode.get().setDistance(0.0);
         pauseAtStep(3);
-        candidateNodeList.addNodeAndVisualize(this.startNode.get());
+        this.candidateNodeList.addNodeAndVisualize(this.startNode.get());
         this.distance.set(0, 0.0);
+        this.distanceNodeList.addNode(this.startNode.get());
 
         pauseAtStep(4);
         while (!candidateNodeList.isEmpty()) {
@@ -83,6 +86,9 @@ public class LazyDijkstra extends GraphAlgorithm {
                     this.distance.set(Integer.parseInt(getNeighborNode().getId()), newDistance);
                     getNeighborNode().setParentNode(getCurrentNode());
                     getNeighborNode().setDistance(newDistance);
+                    if(!distanceNodeList.containsNode(getNeighborNode())) {
+                        this.distanceNodeList.addNode(getNeighborNode());
+                    }
                     pauseAtStep(16);
                     candidateNodeList.addNodeAndVisualize(getNeighborNode());
                 }

@@ -1,7 +1,6 @@
 package com.marcinseweryn.visualizer.model.path;
 
-import com.marcinseweryn.visualizer.model.DistanceList;
-import com.marcinseweryn.visualizer.model.GraphAlgorithm;
+import com.marcinseweryn.visualizer.model.*;
 import com.marcinseweryn.visualizer.view.Edge;
 import com.marcinseweryn.visualizer.view.GraphNode;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,6 +12,8 @@ import java.util.List;
 
 public class BellmanFord extends GraphAlgorithm {
 
+    private GraphNodeVisualizer distanceNodeList;
+
     public BellmanFord() {
         super();
     }
@@ -23,6 +24,7 @@ public class BellmanFord extends GraphAlgorithm {
                        SimpleObjectProperty<GraphNode> destinationNode,
                        AnchorPane algorithmSpace) {
         super(algorithmTab, pseudocodeList, startNode, destinationNode, algorithmSpace);
+        this.distanceNodeList = initializeGraphNodeVisualizer("DISTANCE", DataStructureType.LIST);
     }
 
     @Override
@@ -37,6 +39,7 @@ public class BellmanFord extends GraphAlgorithm {
 
         DistanceList distanceList = new DistanceList();
         distanceList.set(start, 0.0);
+        distanceNodeList.addNode(startNode.get());
 
         pauseAtStep(2);
         for (int i = 0; i < N - 1; i++) {
@@ -44,6 +47,10 @@ public class BellmanFord extends GraphAlgorithm {
             for (GraphNode graphNode : graph) {
                 int from = Integer.parseInt(graphNode.getId());
                 setCurrentNode(graphNode);
+                if(!distanceNodeList.containsNode(graphNode)) {
+                    getCurrentNode().setDistance(Double.POSITIVE_INFINITY);
+                    distanceNodeList.addNode(graphNode);
+                }
 
                 pauseAtStep(4);
                 for (GraphNode neighbor : graphNode.getNeighbors()) {
@@ -55,6 +62,7 @@ public class BellmanFord extends GraphAlgorithm {
                     if(distanceList.get(from) + edge.getWeight() < distanceList.get(to)) {
                         pauseAtStep(6);
                         distanceList.set(to, distanceList.get(from) + edge.getWeight());
+                        getNeighborNode().setDistance(distanceList.get(from) + edge.getWeight());
                     }
                     setNeighborNode(null);
                 }
@@ -70,15 +78,14 @@ public class BellmanFord extends GraphAlgorithm {
                     Edge edge = graphNode.getConnection(neighbor);
                     if(distanceList.get(from) + edge.getWeight() < distanceList.get(to)) {
                         distanceList.set(to, Double.NEGATIVE_INFINITY);
-
-                        // visited - nodes that are part of negative cycles
-//                        visitedNodeList.applyVisualStyleOnNode(neighbor);
+                        neighbor.setDistance(Double.NEGATIVE_INFINITY);
                     }
                 }
             }
         }
 
         System.out.println(distanceList);
+
     }
 
     @Override

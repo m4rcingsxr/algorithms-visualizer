@@ -203,6 +203,7 @@ public abstract class GraphAlgorithm extends Algorithm {
             case STACK -> visualizer = new GraphNodeStack(listType, view);
             case QUEUE -> visualizer = new GraphNodeQueue(listType, view);
             case PRIORITY_QUEUE -> visualizer = new GraphNodePriorityQueue(listType, view);
+            case LIST -> visualizer = new GraphNodeList(listType, view);
             default -> throw new RuntimeException("Not supported list visualizer");
         }
 
