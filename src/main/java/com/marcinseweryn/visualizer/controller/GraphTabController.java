@@ -187,6 +187,7 @@ public class GraphTabController implements Subscriber {
      * @return Optional of GraphAlgorithm if an algorithm is selected, otherwise empty Optional.
      */
     public Optional<GraphAlgorithm> initializeSelectedAlgorithm() {
+        this.clearAlgorithmViews();
         if (this.mainController.getAlgorithmListBox().getValue() instanceof GraphAlgorithm selectedAlgorithm) {
             try {
                 return Optional.of(selectedAlgorithm.getClass()
@@ -195,7 +196,8 @@ public class GraphTabController implements Subscriber {
                                                                    SimpleObjectProperty.class,
                                                                    AnchorPane.class
                                            )
-                                           .newInstance(algorithmTab, pseudoCodeListGraph, startNodeProperty, destinationNodeProperty,
+                                           .newInstance(algorithmTab, pseudoCodeListGraph, startNodeProperty,
+                                                        destinationNodeProperty,
                                                         algorithmSpace
                                            ));
             } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException |
@@ -205,6 +207,12 @@ public class GraphTabController implements Subscriber {
         }
 
         return Optional.empty();
+    }
+
+    // remove all except pseudocode
+    private void clearAlgorithmViews() {
+        algorithmTab.getChildren().removeIf(
+                node -> !((Label) ((VBox) node).getChildren().get(0)).getText().equalsIgnoreCase("code"));
     }
 
     /**

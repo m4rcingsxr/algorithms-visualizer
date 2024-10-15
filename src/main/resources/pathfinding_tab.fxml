@@ -16,16 +16,7 @@
                 <Insets topRightBottomLeft="10"/>
             </padding>
             <spacing>10</spacing>
-<!--            <VBox>-->
-<!--                <Label text="Candidate Nodes" contentDisplay="RIGHT" styleClass="list-view-label">-->
-<!--                </Label>-->
-<!--                <ListView fx:id="candidateNodeList"/>-->
-<!--            </VBox>-->
-<!--            <VBox>-->
-<!--                <Label text="Visited" contentDisplay="RIGHT" styleClass="list-view-label">-->
-<!--                </Label>-->
-<!--                <ListView fx:id="visitedNodeList"/>-->
-<!--            </VBox>-->
+
             <VBox>
                 <Label text="Code" contentDisplay="RIGHT" styleClass="list-view-label">
                 </Label>

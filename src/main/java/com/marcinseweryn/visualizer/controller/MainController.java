@@ -89,10 +89,6 @@ public class MainController {
         algorithmContainer.getChildren().remove(sortingPane);
         logger.debug("Graph pane selected by default.");
 
-//        candidateNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
-//        visitedNodeList.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.3));
-//        pseudoCodeListGraph.prefHeightProperty().bind(algorithmContainer.heightProperty().multiply(0.4));
-
         // Bind the left pane to 30% of the BorderPane width
         algorithmTab.prefWidthProperty().bind(main.widthProperty().multiply(0.2));
 
