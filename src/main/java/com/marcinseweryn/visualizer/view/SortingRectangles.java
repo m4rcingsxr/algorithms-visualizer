@@ -69,7 +69,7 @@ public class SortingRectangles extends HBox {
 
     public void resetStyles(int index) {
         removeStyles(index);
-        getStyleClass().add("sorting-rectangle");
+        getChildren().get(index).getStyleClass().add("sorting-rectangle");
     }
 
 }

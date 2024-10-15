@@ -59,7 +59,7 @@ public abstract class SortingAlgorithm extends Algorithm {
      */
     protected void setComparisonStyle(int index) {
         logger.debug("Setting comparison style for rectangle at index {}", index);
-        setRectangleStyle(index, "comparison-rectangle");
+        setRectangleStyle(index, "comparing-rectangle");
     }
 
     /**

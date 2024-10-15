@@ -64,7 +64,10 @@ public class SortTabController {
         // Parse CSV to list
         String[] split = newVal.split(",");
         unsortedList = Arrays.stream(split).map(Integer::parseInt).toList();
+        updateAlgorithmSpace();
+    }
 
+    private void updateAlgorithmSpace() {
         if (unsortedList.isEmpty()) {
             return;
         }
@@ -135,7 +138,8 @@ public class SortTabController {
 
 
     public void resetListState() {
-
+        algorithmSpace.getChildren().clear();
+        updateAlgorithmSpace();
     }
 
     public void selectAlgorithmTab() {
