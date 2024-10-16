@@ -50,10 +50,7 @@ public class GraphTabController implements Subscriber {
     private TabPane graphTab;
     @FXML
     private Accordion renderedNodes;
-    @FXML
-    private Button exportGraphBtn;
-    @FXML
-    private Button clearGraphBtn;
+
     @FXML
     private ToggleButton showEdgeWeightToggle;
     @FXML

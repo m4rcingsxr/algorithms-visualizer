@@ -63,7 +63,8 @@ public abstract class Algorithm {
         this.isContinuousMode = continuousMode;
         logger.info("Starting algorithm execution in {} mode.", continuousMode ? "continuous" : "step-by-step");
 
-        setPseudocode();  // Initialize the pseudocode for display
+        // Initialize the pseudocode for display
+        Platform.runLater(this::setPseudocode);
         executeAlgorithm();  // Begin executing the algorithm's logic
     }
 

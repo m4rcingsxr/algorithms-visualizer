@@ -237,3 +237,11 @@
 .sorted-rectangle {
     -fx-background-color: green;
 }
+
+.left {
+    -fx-background-color: #ef4444;
+}
+
+.right {
+    -fx-background-color: #b91c1c;
+}

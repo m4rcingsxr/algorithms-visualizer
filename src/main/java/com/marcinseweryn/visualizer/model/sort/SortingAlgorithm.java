@@ -31,8 +31,8 @@ public abstract class SortingAlgorithm extends Algorithm {
     /**
      * Constructor for initializing a SortingAlgorithm instance with the pseudocode list and sorting rectangles.
      *
-     * @param pseudocodeList      The ListView displaying pseudocode steps for the algorithm.
-     * @param sortingRectangles   The visual representation of the rectangles being sorted.
+     * @param pseudocodeList    The ListView displaying pseudocode steps for the algorithm.
+     * @param sortingRectangles The visual representation of the rectangles being sorted.
      */
     protected SortingAlgorithm(ListView<String> pseudocodeList, SortingRectangles sortingRectangles) {
         super(pseudocodeList);
@@ -59,7 +59,21 @@ public abstract class SortingAlgorithm extends Algorithm {
      */
     protected void setComparisonStyle(int index) {
         logger.debug("Setting comparison style for rectangle at index {}", index);
-        setRectangleStyle(index, "comparing-rectangle");
+        Platform.runLater(() -> {
+            setRectangleStyle(index, "comparing-rectangle");
+        });
+    }
+
+    protected void setComparisonStyle(int left, int mid, int right) {
+        Platform.runLater(() -> {
+            for (int i = left; i <= mid; i++) {
+                setRectangleStyle(i, "left");
+            }
+
+            for (int i = mid + 1; i <= right; i++) {
+                setRectangleStyle(i, "right");
+            }
+        });
     }
 
     /**
@@ -79,7 +93,7 @@ public abstract class SortingAlgorithm extends Algorithm {
      */
     protected void setSorted(int index) {
         logger.debug("Marking rectangle at index {} as sorted", index);
-        setRectangleStyle(index, "sorted-rectangle");
+        Platform.runLater(() -> setRectangleStyle(index, "sorted-rectangle"));
     }
 
     /**
@@ -89,10 +103,9 @@ public abstract class SortingAlgorithm extends Algorithm {
      * @param style The CSS style class to apply.
      */
     private void setRectangleStyle(int index, String style) {
-        Platform.runLater(() -> {
-            sortingRectangles.removeStyles(index);
-            sortingRectangles.getChildren().get(index).getStyleClass().add(style);
-        });
+        sortingRectangles.removeStyles(index);
+        sortingRectangles.getChildren().get(index).getStyleClass().add(style);
+
         logger.debug("Applied style {} to rectangle at index {}", style, index);
     }
 
@@ -118,6 +131,13 @@ public abstract class SortingAlgorithm extends Algorithm {
         this.sortedList.set(j, temp);
 
         logger.debug("Swap completed between indices {} and {}", i, j);
+    }
+
+    protected void setWithAnimation(int k, int value) {
+        Platform.runLater(() -> {
+            sortedList.set(k, value);
+            sortingRectangles.setRectangle(k, value);
+        });
     }
 
 }

@@ -63,13 +63,31 @@ public class SortingRectangles extends HBox {
         getChildren().get(index).getStyleClass().removeAll(
                 "sorting-rectangle",
                 "sorted-rectangle",
-                "comparing-rectangle"
+                "comparing-rectangle",
+                "left",
+                "right"
         );
     }
 
     public void resetStyles(int index) {
         removeStyles(index);
         getChildren().get(index).getStyleClass().add("sorting-rectangle");
+    }
+
+    public void setRectangle(int k, int value) {
+        double scaledHeight = getScaledHeight(value);
+
+        double calculatedWidth = containerWidth / unsortedList.size();
+        double rectangleWidth = Math.min(calculatedWidth, 20);
+
+        VBox rectangle = new VBox();
+        rectangle.setPrefWidth(rectangleWidth);
+        rectangle.setMaxHeight(scaledHeight);
+        rectangle.setPrefHeight(scaledHeight);
+        rectangle.getStyleClass().addAll("rectangle", "sorting-rectangle");
+
+        // Replace the old rectangle at index k with the new one
+        getChildren().set(k, rectangle);
     }
 
 }
