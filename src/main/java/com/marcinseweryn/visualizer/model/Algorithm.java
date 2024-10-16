@@ -134,7 +134,7 @@ public abstract class Algorithm {
         } else {
             // In continuous mode, add a brief delay between steps to slow down execution
             try {
-                Thread.sleep(50);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 logger.error("Thread interrupted during delay in continuous mode", e);
                 Thread.currentThread().interrupt();

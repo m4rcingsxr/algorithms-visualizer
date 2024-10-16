@@ -150,7 +150,7 @@ public class SortTabController {
     @FXML
     public void onClickGenerateBigUnsortedList(ActionEvent actionEvent) {
         clearAlgorithmSpace();
-        generateUnsortedList(100);
+        generateUnsortedList(50);
     }
 
     @FXML

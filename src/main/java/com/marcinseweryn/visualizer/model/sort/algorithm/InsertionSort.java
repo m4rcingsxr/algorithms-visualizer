@@ -33,46 +33,48 @@ public class InsertionSort extends SortingAlgorithm {
     @Override
     public void executeAlgorithm() {
         logger.info("Executing InsertionSort algorithm.");
-        pauseAtStep(0);
+        pauseAtStep(0); // Initial step, visual preparation
 
-        pauseAtStep(1);
+        pauseAtStep(1); // Outer loop iterating through the unsorted portion of the array
         for (int i = 1; i < sortedList.size(); i++) {
-            setComparisonStyle(i);
             pauseAtStep(2);
+            setComparisonStyle(i);  // Highlight the current element being compared
 
-            int key = sortedList.get(i);
+            int key = sortedList.get(i);  // Store the key value to be inserted
             logger.debug("Outer loop iteration i = {}, key = {}", i, key);
             pauseAtStep(3);
 
             int j = i - 1;
 
-
+            // Shifting elements greater than key to the right
             pauseAtStep(4);
             while (j >= 0 && sortedList.get(j) > key) {
                 logger.debug("Shifting element at index {} to index {}", j, j + 1);
-                setComparisonStyle(j);
+                setComparisonStyle(j);  // Highlight the element being shifted
 
                 pauseAtStep(5);
-                setWithAnimation(j + 1, sortedList.get(j));
-                resetRectangleStyle(j);
+                setWithAnimation(j + 1, sortedList.get(j));  // Visualize the shift
+                resetRectangleStyle(j);  // Reset the style for the current comparison
 
                 pauseAtStep(6);
                 j--;
             }
 
+            // Insert the key at its correct position
             pauseAtStep(7);
-            setWithAnimation(j + 1, key);
+            setWithAnimation(j + 1, key);  // Place the key in its correct position
             logger.debug("Inserting key = {} at index {}", key, j + 1);
-            resetRectangleStyle(i);
-
+            resetRectangleStyle(i);  // Reset the style of the inserted key for the next iteration
         }
 
+        // After sorting is complete, mark all elements as sorted
         for (int k = 0; k < sortedList.size(); k++) {
             setSorted(k);
         }
 
         logger.debug("All elements sorted.");
     }
+
 
     /**
      * Sets the pseudocode for the Insertion Sort algorithm.
