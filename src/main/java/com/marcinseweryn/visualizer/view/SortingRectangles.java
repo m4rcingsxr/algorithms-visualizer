@@ -65,7 +65,8 @@ public class SortingRectangles extends HBox {
                 "sorted-rectangle",
                 "comparing-rectangle",
                 "left",
-                "right"
+                "right",
+                "pivot"
         );
     }
 

@@ -102,7 +102,7 @@ public abstract class SortingAlgorithm extends Algorithm {
      * @param index The index of the rectangle to style.
      * @param style The CSS style class to apply.
      */
-    private void setRectangleStyle(int index, String style) {
+    public void setRectangleStyle(int index, String style) {
         sortingRectangles.removeStyles(index);
         sortingRectangles.getChildren().get(index).getStyleClass().add(style);
 

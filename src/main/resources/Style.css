@@ -245,3 +245,7 @@
 .right {
     -fx-background-color: #b91c1c;
 }
+
+.pivot {
+    -fx-background-color: yellow;
+}
